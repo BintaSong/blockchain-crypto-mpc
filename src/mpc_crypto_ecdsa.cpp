@@ -266,7 +266,7 @@ MPCCRYPTO_API int MPCCrypto_initGenerateEcdsaKeyEx(int peer, unsigned curve_type
 
 MPCCRYPTO_API int MPCCrypto_initGenerateEcdsaKey(int peer, MPCCryptoContext** context)
 {
-  return MPCCrypto_initGenerateEcdsaKeyEx(peer, NID_secp256k1, context);
+  return MPCCrypto_initGenerateEcdsaKeyEx(peer, NID_secp256k1, context); // curve is secp256k1
 }
 
 MPCCRYPTO_API int MPCCrypto_initEcdsaSign(int peer, MPCCryptoShare* share_ptr, const uint8_t* in, int in_size, int refresh, MPCCryptoContext** context)

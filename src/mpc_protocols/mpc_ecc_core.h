@@ -44,7 +44,44 @@ struct zk_paillier_zero_t
   bool v(const bn_t& N, const bn_t& c, mem_t session_id, uint8_t aux) const;
 };
 
+// added by XF Song, proving plaintext = m
 
+//---------------- begin -----------------
+struct zk_paillier_m_t 
+{
+  bn_t e, z, _r, _c; //_c = Enc(m, _r)
+
+  void convert(ub::converter_t& converter)
+  {
+    converter.convert(e);
+    converter.convert(z);
+    converter.convert(_r);
+    converter.convert(_c);
+  }
+
+  void p(const bn_t& N, const bn_t& c, const bn_t& m, mem_t session_id, uint8_t aux, const bn_t& r);
+  bool v(const bn_t& N, const bn_t& c, const bn_t& m, mem_t session_id, uint8_t aux) const;
+};
+
+struct zk_paillier_mult_t
+{
+  bn_t e, c_d, c_db, c_1, c_2, f, z_1, z_2;
+
+  void convert(ub::converter_t& converter)
+  {
+    converter.convert(e);
+    converter.convert(z_1);
+    converter.convert(z_2);
+    converter.convert(c_1);
+    converter.convert(c_2);
+  }
+
+  void p(const bn_t& N, const bn_t& c_a, const bn_t& c_b, const bn_t& c_c, mem_t session_id, uint8_t aux, 
+                        const bn_t& a, const bn_t& b, const bn_t& c, const bn_t& r_a, const bn_t& r_b, const bn_t& r_c);
+  bool v(const bn_t& N, const bn_t& c_a, const bn_t& c_b, const bn_t& c_c, mem_t session_id, uint8_t aux) const;
+};
+
+//----------------- end ------------------
 
 struct zk_paillier_range_t 
 {

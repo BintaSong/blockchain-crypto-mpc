@@ -143,6 +143,134 @@ bool zk_paillier_zero_t::v(const bn_t& N, const bn_t& c, mem_t session_id, uint8
   return e==e_tag;
 }
 
+
+//----------------------------------- zk_paillier_m_t --------------------------- 
+// added by XF Song, proving plaintext equal to `m`
+
+void zk_paillier_m_t::p(const bn_t& N, const bn_t& c, const bn_t& m, mem_t session_id, uint8_t aux, const bn_t& r)
+{
+  bn_t N2 = N*N;
+  bn_t rho = bn_t::rand(N);
+  bn_t a = rho.pow_mod(N, N2);
+
+  _r = bn_t::rand(N);
+  MODULO(N2) _c = (m * N + 1) * _r.pow(N);// _c = Enc(m, _r)
+
+  e = bn_t(sha256_t::hash(N, c, _r, _c, a, session_id, aux));
+  MODULO(N2) z = rho * (r/_r).pow(e);
+}
+
+bool zk_paillier_m_t::v(const bn_t& N, const bn_t& c, const bn_t& m, mem_t session_id, uint8_t aux) const
+{
+  bn_t N2 = N*N;
+  bn_t a;
+  MODULO(N2) a = z.pow(N) / c.pow(e);
+
+  if (bn_t::gcd(a, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(c, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(_c, N) != 1) // check _c
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(z, N) != 1) 
+  {
+    return false;
+  }
+
+  bn_t e_tag = bn_t(sha256_t::hash(N, c, _r, _c, a, session_id, aux));
+  return e==e_tag;
+}
+
+//----------------------------------- zk_paillier_mult_t ---------------------------
+// added by XF Song, proving multiplication relation
+
+void zk_paillier_mult_t::p(const bn_t& N, const bn_t& c_a, const bn_t& c_b, const bn_t& c_c, mem_t session_id, uint8_t aux, 
+                                          const bn_t& a, const bn_t& b, const bn_t& c, const bn_t& r_a, const bn_t& r_b, const bn_t& r_c)
+{
+  bn_t N2 = N*N;
+  bn_t d = bn_t::rand(N);
+  bn_t r_d = bn_t::rand(N); 
+  bn_t r_db = bn_t::rand(N);
+  
+  bn_t c_d, c_db;
+  MODULO(N2) c_d = (d * N + 1) * r_d.pow(N); // Enc(d, r_d)
+  MODULO(N2) c_db = (d * b * N + 1) * r_db.pow(N); // Enc(db, r_db)
+
+  e = bn_t(sha256_t::hash(N, c_a, c_b, c_c, c_d, c_db, session_id, aux));
+
+  MODULO(N2) c_1 = c_a.pow(e) * c_d;
+  MODULO(N) f = e * a + d;
+  MODULO(N2) c_2 = c_b.pow(f) * (c_db * c_c.pow(e)).inv();
+
+  MODULO(N) z_1 = r_a.pow(e) * r_d; 
+  MODULO(N) z_2 = r_b.pow(f) * (r_db * r_c.pow(e)).inv();
+}
+
+bool zk_paillier_mult_t::v(const bn_t& N, const bn_t& c_a, const bn_t& c_b, const bn_t& c_c, mem_t session_id, uint8_t aux) const
+{
+  bn_t N2 = N*N;
+
+  if (bn_t::gcd(c_d, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(c_db, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(c_1, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(c_2, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(z_1, N) != 1)
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(z_2, N) != 1) 
+  {
+    return false;
+  }
+
+  if (bn_t::gcd(f, N) != 1) 
+  {
+    return false;
+  }
+
+  bool valid = false; 
+  MODULO(N2) valid = c_1 == (f * N + 1) * z_1.pow(N); // c_1 == Enc(f, z_1)
+  if (!valid)
+  {
+    return false;
+  }
+
+  MODULO(N2) valid = c_2 == z_2.pow(N); // c_2 == Enc(0, z_2)
+  if (!valid)
+  {
+    return false;
+  }
+
+  bn_t e_tag = bn_t(sha256_t::hash(N, c_a, c_b, c_c, c_d, c_db, session_id, aux));
+  return e==e_tag;
+}
+
 //------------- zk_paillier_range_t ---------------------------------------
 
 struct paillier_enc_info_t
