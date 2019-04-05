@@ -591,6 +591,96 @@ bool zk_pdl_t::v(ecurve_t curve, const ecc_point_t& Q, const bn_t& c_key, const 
   return true;
 }
 
+//-------------------------------------- zk_pdl_mult_t ------------------------------ 
+// Added by XF Song
+
+void zk_pdl_mult_t::p(ecurve_t curve, const ecc_point_t X, const bn_t c_1, const bn_t c_2, const crypto::paillier_t& paillier, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux, 
+         const bn_t x, const bn_t y, const bn_t r)
+{
+  const bn_t& q = curve.order();
+  const ecc_generator_point_t& G = curve.generator();
+
+  bn_t N = paillier.get_N();
+  
+  bn_t alpha = bn_t::rand(q.pow(3));
+  bn_t rho = bn_t::rand(q * _N);
+  bn_t _rho = bn_t::rand(q.pow(3) * _N);
+  bn_t sigma = bn_t::rand(q * _N);
+  bn_t beta = bn_t::rand(N);
+  bn_t gamma = bn_t::rand(N);
+  bn_t tau = bn_t::rand(q * _N);
+
+  U = G * alpha;
+  MODULO(N) z = h_1.pow(x) * h_2.pow(rho);
+  MODULO(_N) _z = h_1.pow(alpha) * h_2.pow(_rho);
+  MODULO(_N) t = h_1.pow(y) * h_2.pow(sigma);
+
+  bn_t tmp = paillier.encrypt(gamma, beta);
+  bn_t tmp2 = paillier.mul_scalar(c_1, alpha);
+  k = paillier.add_ciphers(tmp, tmp2);
+
+  MODULO(_N) w = h_1.pow(gamma) * h_2.pow(tau);
+  
+  bn_t e = bn_t(sha256_t::hash(X, c_1, c_2, h_1, h_2, U, z, _z, t, k, w, session_id, aux));
+
+  MODULO(N) s = r.pow(e) * beta;
+  s_1 = e * x + alpha;
+  s_2 = e * rho + _rho;
+  t_1 = e * y + gamma;
+  t_2 = e * sigma + tau;
+}
+
+
+bool zk_pdl_mult_t::v(ecurve_t curve, const ecc_point_t X, const bn_t N, const bn_t c_1, const bn_t c_2, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux) const
+{
+  const bn_t& q = curve.order();
+  const ecc_generator_point_t& G = curve.generator();
+
+  paillier_t paillier; paillier.create_pub(N);
+
+  bn_t e = bn_t(sha256_t::hash(X, c_1, c_2, h_1, h_2, U, z, _z, t, k, w, session_id, aux));
+
+  if (! (s <= q.pow(3))) 
+  {
+    return false;
+  }
+
+  ecc_point_t P = X * e + U;
+  if (P != G * e) 
+  {
+    return false;
+  }
+
+  bn_t tmp, tmp2;
+  MODULO(_N) tmp = h_1.pow(s_1) * h_2.pow(s_2);
+  MODULO(_N) tmp2 = z.pow(e) * _z;
+  if (tmp != tmp2)
+  {
+    return false;
+  }
+
+  MODULO(_N) tmp = h_1.pow(t_1) * h_2.pow(t_2);
+  MODULO(_N) tmp2 = t.pow(e) * w;
+  if (tmp != tmp2)
+  {
+    return false;
+  }
+
+  tmp = paillier.mul_scalar(c_1, s_1);
+  tmp2 = paillier.encrypt(t_1, s);
+  bn_t c_tmp = paillier.add_ciphers(tmp, tmp2);
+
+  bn_t c_tmp2;
+  MODULO(N) c_tmp2 = c_2.pow(e) * k;
+  if (c_tmp != c_tmp2)
+  {
+    return false;
+  }
+  
+  return true;
+}
+
+
 
 // ------------------------------ zk_dl ------------------------
 
