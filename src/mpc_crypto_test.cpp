@@ -24,6 +24,7 @@
 #include "mpc_crypto.h"
 #include "mpc_ot.h"
 #include "mpc_ecc_core.h"
+#include "mpc_leath.h"
 
 extern "C" MPCCRYPTO_API int MPCCrypto_test();
 
@@ -559,6 +560,189 @@ static int test_bip()
   return rv;
 }
 
+// added by XF Song
+static int test_paillier()
+{
+    crypto::paillier_t p_1024, p_2048, p_3072, p_4096, p_5120, p_6144;
+
+    p_1024.generate(1024, true);
+    p_2048.generate(2048, true);
+    p_3072.generate(3072, true);
+    p_4096.generate(4096, true);
+    p_5120.generate(5120, true);
+    p_6144.generate(6144, true);
+
+    // p_1024 
+    crypto::bn_t N = p_1024.get_N();
+    u_int count = 10;
+
+    crypto::bn_t m[count], c[count];    
+    for (int i = 0; i < count; i++)
+    {
+         m[i] =  crypto::bn_t::rand(N);
+    }
+    std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         c[i] = p_1024.encrypt(m[i]);
+    }
+    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+    double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_1024 encryption: %f ms \n", duration / count);
+
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         m[i] = p_1024.decrypt(c[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_1024 decryption: %f ms \n", duration / count);
+
+// p_2048
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         c[i] = p_2048.encrypt(m[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_2048 encryption: %f ms \n", duration / count);
+
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         m[i] = p_2048.decrypt(c[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_2048 encryption: %f ms \n", duration / count);
+
+// p_3072
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         c[i] = p_3072.encrypt(m[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_3072 encryption: %f ms \n", duration / count);
+
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         m[i] = p_3072.decrypt(c[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_3072 decryption: %f ms \n", duration / count);
+  
+// p_4096
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         c[i] = p_4096.encrypt(m[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_4096 encryption: %f ms \n", duration / (count));
+
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         m[i] = p_4096.decrypt(c[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_4096 decryption: %f ms \n", duration / (count));
+
+  
+// p_5120
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         c[i] = p_5120.encrypt(m[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_5120 encryption: %f ms \n", duration / (count));
+
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         m[i] = p_5120.decrypt(c[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_5120 decryption: %f ms \n", duration / (count));
+
+// p_6144
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         c[i] = p_6144.encrypt(m[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_6144 encryption: %f ms \n", duration / (count));
+
+    begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < count; i++)
+    {
+         m[i] = p_6144.decrypt(c[i]);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+    return 0;
+}
+
+// added by XF Song
+static int test_leath_create_paillier()
+{
+  error_t rv;
+
+  // client's input
+  crypto::paillier_t p_2048, _p;
+  p_2048.generate(2048, true);
+  _p.generate(2048, true);
+
+  // auxulary value for RS
+  bn_t _N, h1, h2;
+  _N = _p.get_N();
+  h1 = bn_t::rand(_N);
+  h2 = bn_t::rand(_N);
+
+  // curve information
+  ecc_point_t G;
+  bn_t order;
+  ecurve_t curve = ecurve_t::find( NID_secp256k1 );
+  if (!curve) return rv = ub::error(E_BADARG);
+  G = curve.generator();
+  order = curve.order();
+
+  // server1's input
+  ecc_point_t pk1;
+  bn_t sk1 = bn_t::rand(order);
+  pk1 = G * sk1;
+
+  // server2's input
+  ecc_point_t pk2;
+  bn_t sk2 = bn_t::rand(order);
+  pk2 = G * sk2;
+
+  mpc::leath_create_paillier_t setup;
+  mpc::leath_create_paillier_t::message1_t msg1;
+  mpc::leath_create_paillier_t::message2_t msg2;
+
+  if ( rv = setup.peer1_step1(mem_t::from_string("session1"), p_2048, msg1)) return ub::error(E_BADARG);
+  if ( rv = setup.peer2_step1(mem_t::from_string("session1"), pk1, sk1, h1, h2, _N, msg1, msg2)) return ub::error(E_BADARG);
+  
+  
+}
+
 namespace mpc {
 extern int zk_paillier_range_time;
 }
@@ -577,7 +761,7 @@ MPCCRYPTO_API int MPCCrypto_test()
   }
 
   */
-  test_key_t ecdsa_key;
+/*   test_key_t ecdsa_key;
   if (rv = test_ecdsa_gen(ecdsa_key)) return rv;
 
   uint64_t t = ub::read_timer_ms();
@@ -585,7 +769,9 @@ MPCCRYPTO_API int MPCCrypto_test()
   {
     if (rv = test_ecdsa_sign(ecdsa_key)) return rv;
   }
-  t = ub::read_timer_ms() - t;
+  t = ub::read_timer_ms() - t; */
+
+  test_paillier();
 
   /*
   if (rv = test_ecdsa_backup(ecdsa_key)) return rv;
@@ -605,7 +791,7 @@ MPCCRYPTO_API int MPCCrypto_test()
     if (rv = test_refresh(secret_key2)) return rv;
   }
   */
-  printf("\nAll tests successfully finished. 10 Signatures took %d ms\n", int(t));
+  //printf("\nAll tests successfully finished. 10 Signatures took %d ms\n", int(t));
   return rv;
 }
 

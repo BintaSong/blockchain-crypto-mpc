@@ -114,7 +114,7 @@ struct ecdsa_generate_t
     converter.convert(create_paillier);
   }
 
-  struct message1_t 
+  struct message1_t //for F_com-zk, added by XF Song
   {
     buf256_t comm_hash;
     void convert(ub::converter_t& converter) 
@@ -123,7 +123,7 @@ struct ecdsa_generate_t
     }
   };
 
-  struct message2_t 
+  struct message2_t // for Q_2 = x_2 * G, added by XF Song
   {
     ecc_point_t Q2;
     zk_dl_t zk_dl;
@@ -135,7 +135,7 @@ struct ecdsa_generate_t
     }
   };
 
-  struct message3_t 
+  struct message3_t // decommit com-zk, where `H(comm_rand||Q_1||zk_dl) = comm_hash`, `create_paillier_msg1` used for `c_key`, added by XF Song
   {
     buf128_t comm_rand;
     ecc_point_t Q1;

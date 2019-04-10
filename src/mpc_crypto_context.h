@@ -263,6 +263,6 @@ template <class T> inline error_t mpc_crypto_message_t::get(const mpc_crypto_con
   if (context.get_uid() != context_uid) return rv = ub::error(E_BADARG);
   if (this->message_type != message_type) return rv = ub::error(E_BADARG);
 
-  if (!ub::convert(data, buffer)) return rv = ub::error(E_FORMAT);
+  if (!ub::convert(data, buffer)) return rv = ub::error(E_FORMAT); // 把buffer中的数据转换，保存在data（其实是消息）中
   return rv;
 }

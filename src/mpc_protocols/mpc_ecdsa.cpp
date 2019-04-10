@@ -77,7 +77,7 @@ error_t ecdsa_share_t::refresh_peer2(const bn_t& delta)
 
 //------------------------ ecdsa_create_paillier_t---------------------------------
 
-error_t ecdsa_create_paillier_t::peer1_step1(ecdsa_share_t& share, mem_t session_id, message1_t& out)
+error_t ecdsa_create_paillier_t::peer1_step1(ecdsa_share_t& share, mem_t session_id, message1_t& out) // see `ecdsa_generate_t::peer1_step2()` for its usage, added by XF Song
 {
   ecurve_t curve = share.get_curve();
   int paillier_size = get_safe_paillier_bits(curve);

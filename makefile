@@ -102,6 +102,7 @@ src/%.o: src/%.cpp src/utils/precompiled.h.gch
 libmpc_crypto.so: $(LIB_OBJ)
 	$(CXX) -o $@ $^ $(LIB_LDFLAGS)
 
+
 #----------------------- TEST --------------------------	
 	
 TEST_SRC = \
@@ -143,7 +144,7 @@ BENCH_CPPFLAGS = \
 BENCH_INCLUDES = \
 	$(COMMON_INCLUDES) \
 	-I src
-	
+
 BENCH_LDFLAGS = \
 	$(COMMON_LDFLAGS) \
 	-L . \
@@ -156,6 +157,8 @@ bench/%.o: bench/%.cpp
 mpc_crypto_bench: $(BENCH_OBJ) libmpc_crypto.so
 	$(CXX) -o $@ $^ $(BENCH_LDFLAGS)
 
+# crypto_paillier_bench: $(BENCH_OBJ) libmpc_crypto.so
+# 	$(CXX) -o $@ $^ $(BENCH_LDFLAGS)
 #---------------------------------------------------------
 	
 .PHONY: clean
@@ -163,4 +166,4 @@ mpc_crypto_bench: $(BENCH_OBJ) libmpc_crypto.so
 clean:
 	rm -f $(LIB_OBJ) $(TEST_OBJ) mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
 	
-.DEFAULT_GOAL := mpc_crypto_bench
+.DEFAULT_GOAL := mpc_crypto_test

@@ -124,7 +124,7 @@ public:
 
   void convert_len(uint32_t& len);
   
-  template<class T> void convert(T& value) { value.convert(*this); }
+  template<class T> void convert(T& value) { value.convert(*this); } // convert `value` using values' convert function, added by XF Song 
 
   uint64_t convert_code_type(uint64_t code, uint64_t code2=0, uint64_t code3=0, uint64_t code4=0, uint64_t code5=0, uint64_t code6=0, uint64_t code7=0, uint64_t code8=0);
 
@@ -228,7 +228,7 @@ protected:
 };
 
 
-template <class T> buf_t convert(const T& src)
+template <class T> buf_t convert(const T& src) // global function, added by XF Song
 {
   int size = converter_t::convert(src, nullptr);
   buf_t result(size);

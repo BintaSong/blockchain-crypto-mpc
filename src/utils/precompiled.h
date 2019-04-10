@@ -33,6 +33,9 @@
 #include <poll.h>
 #include <link.h>
 
+#include <time.h>
+#include <chrono>
+
 #if defined(_LP64) && defined(__x86_64__) // !defined(__ANDROID__)
 extern "C"
 {
