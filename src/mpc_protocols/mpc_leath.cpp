@@ -130,14 +130,15 @@ error_t leath_create_paillier_t::peer1_step2(leath_client_share_t& client_share,
   
   if (!in.zk_pdl_mult.v(in.pk_i.get_curve(), in.pk_i, _N, c_1, in._c_i, h_1, h_2, _N, session_id, 1)) return rv = error(E_CRYPTO);
   
-  bn_t x_i;
-  x_i = client_share.paillier.decrypt(in._c_i);
+  bn_t x_i = client_share.paillier.decrypt(in._c_i);
 
   if (server_id <= 0) return rv = error(E_BADARG);
 
-  
+  int bits =  in.pk_i.get_curve().get_bits();
 
-  // TODO: 把存起来
+  //TODO: mayber return the share is better
+  MODULO(client_share.create_paillier.get_N()) client_share.keys_share += x_i * bn_t(2).pow_mod( bits * (server_id - 1)));
+  
   return 0;
 }
 
