@@ -709,11 +709,21 @@ static int test_leath_create_paillier()
   p_2048.generate(2048, true);
   _p.generate(2048, true);
 
-  // auxulary value for RS
+  // auxulary value
   bn_t _N, h1, h2;
   _N = _p.get_N();
   h1 = bn_t::rand(_N);
   h2 = bn_t::rand(_N);
+
+  mpc::leath_client_share_t c_share;
+  mpc::leath_server_share_t s_share;
+  s_share.h_1 = c_share.h_1 = h1;
+  s_share.h_2 = c_share.h_2 = h2;
+  s_share._N = c_share._N = _N;
+  s_share.server_id = 1; // TODO: just for test now
+  c_share.paillier = p_2048;
+
+//printf("%s\n\n", c_share.paillier.get_N().to_string().c_str());
 
   // curve information
   ecc_point_t G;
@@ -737,10 +747,38 @@ static int test_leath_create_paillier()
   mpc::leath_create_paillier_t::message1_t msg1;
   mpc::leath_create_paillier_t::message2_t msg2;
 
-  if ( rv = setup.peer1_step1(mem_t::from_string("session1"), p_2048, msg1)) return ub::error(E_BADARG);
-  if ( rv = setup.peer2_step1(mem_t::from_string("session1"), pk1, sk1, h1, h2, _N, msg1, msg2)) return ub::error(E_BADARG);
+//printf("before steps. \n\n");
+  // => msg1
+  if ( rv = setup.peer1_step1(c_share, mem_t::from_string("session1"), msg1)) return ub::error(E_BADARG);
+
   
-  
+
+  mpc::leath_create_paillier_t::message1_t fuck;
+  buf_t msg1_buf = ub::convert(msg1);
+
+  ub::convert(fuck, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
+
+
+
+//printf("before peer2_step1. \n\n");
+  // msg1 => msg2
+  if ( rv = setup.peer2_step1(s_share, mem_t::from_string("session1"), s_share.server_id, pk1, sk1, fuck, msg2)) return ub::error(E_BADARG);
+
+// printf("before peer1_step2. \n\n");
+  // msg2 <=
+  if ( rv = setup.peer1_step2(c_share, mem_t::from_string("session1"), s_share.server_id, msg2)) return ub::error(E_BADARG);
+  return 0;
+}
+
+static int test_ecurve()
+{
+  error_t rv = 0;
+  ecurve_t curve = ecurve_t::find( NID_secp256k1 );
+  if (!curve) return rv = ub::error(E_BADARG);
+  ecc_generator_point_t G = curve.generator();
+  bn_t order = curve.order();
+  int bits = curve.bits();
+  printf("bits: %d bits \n", bits);
 }
 
 namespace mpc {
@@ -771,7 +809,12 @@ MPCCRYPTO_API int MPCCrypto_test()
   }
   t = ub::read_timer_ms() - t; */
 
-  test_paillier();
+
+
+ // test_paillier();
+  rv = test_leath_create_paillier();
+  assert(rv == 0);
+  printf("all good.\n\n");
 
   /*
   if (rv = test_ecdsa_backup(ecdsa_key)) return rv;

@@ -70,8 +70,11 @@ struct zk_paillier_mult_t
   void convert(ub::converter_t& converter)
   {
     converter.convert(e);
+    converter.convert(c_d);
+    converter.convert(c_db);
     converter.convert(z_1);
     converter.convert(z_2);
+    converter.convert(f);
     converter.convert(c_1);
     converter.convert(c_2);
   }

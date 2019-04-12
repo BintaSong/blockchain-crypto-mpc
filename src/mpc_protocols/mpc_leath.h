@@ -34,14 +34,14 @@ bn_t eGCD(const bn_t N, const bn_t a, const bn_t b, bn_t &x, bn_t &y);
 
 struct leath_client_share_t 
 {
-  bn_t h1, h2, _N;
-  bn_t keys_share, mac_key;
+  bn_t h_1, h_2, _N;
+  bn_t c_1, c_2, keys_share, mac_key;
   crypto::paillier_t paillier;  
 
   void convert(ub::converter_t& converter)
   { 
-    converter.convert(h1);
-    converter.convert(h2);
+    converter.convert(h_1);
+    converter.convert(h_2);
     converter.convert(_N);
     converter.convert(keys_share);
     converter.convert(mac_key);
@@ -111,9 +111,9 @@ struct leath_create_paillier_t
   { 
   }
   
-  error_t peer1_step1(mem_t session_id, message1_t& out);
-  error_t peer2_step1(leath_server_share_t& server_share, mem_t session_id, int server_id,  ecc_point_t pk, bn_t sk, bn_t h_1, bn_t h_2, bn_t _N, const message1_t& in, message2_t& out);
-  error_t peer1_step2(leath_client_share_t& client_share, mem_t session_id, int server_id,  bn_t h_1, bn_t h_2, bn_t _N, const message2_t& in);
+  error_t peer1_step1(leath_client_share_t& client_share, mem_t session_id, message1_t& out);
+  error_t peer2_step1(leath_server_share_t& server_share, mem_t session_id, int server_id,  ecc_point_t pk, bn_t sk, const message1_t& in, message2_t& out);
+  error_t peer1_step2(leath_client_share_t& client_share, mem_t session_id, int server_id,  const message2_t& in);
 };
 
 } //namespace mpc

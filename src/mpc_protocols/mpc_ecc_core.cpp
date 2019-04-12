@@ -149,7 +149,7 @@ bool zk_paillier_zero_t::v(const bn_t& N, const bn_t& c, mem_t session_id, uint8
 
 void zk_paillier_m_t::p(const bn_t& N, const bn_t& c, const bn_t& m, mem_t session_id, uint8_t aux, const bn_t& r)
 {
-  bn_t N2 = N*N;
+  bn_t N2 = N * N;
   bn_t rho = bn_t::rand(N);
   bn_t a = rho.pow_mod(N, N2);
 
@@ -157,14 +157,14 @@ void zk_paillier_m_t::p(const bn_t& N, const bn_t& c, const bn_t& m, mem_t sessi
   MODULO(N2) _c = (m * N + 1) * _r.pow(N);// _c = Enc(m, _r)
 
   e = bn_t(sha256_t::hash(N, c, _r, _c, a, session_id, aux));
-  MODULO(N2) z = rho * (r/_r).pow(e);
+  MODULO(N) z = rho * (r/_r).pow(e);
 }
 
 bool zk_paillier_m_t::v(const bn_t& N, const bn_t& c, const bn_t& m, mem_t session_id, uint8_t aux) const
 {
   bn_t N2 = N*N;
   bn_t a;
-  MODULO(N2) a = z.pow(N) / c.pow(e);
+  MODULO(N2) a = z.pow(N) / (c / _c).pow(e);
 
   if (bn_t::gcd(a, N) != 1) 
   {
@@ -196,14 +196,17 @@ bool zk_paillier_m_t::v(const bn_t& N, const bn_t& c, const bn_t& m, mem_t sessi
 void zk_paillier_mult_t::p(const bn_t& N, const bn_t& c_a, const bn_t& c_b, const bn_t& c_c, mem_t session_id, uint8_t aux, 
                                           const bn_t& a, const bn_t& b, const bn_t& c, const bn_t& r_a, const bn_t& r_b, const bn_t& r_c)
 {
-  bn_t N2 = N*N;
+  bn_t N2 = N * N;
   bn_t d = bn_t::rand(N);
   bn_t r_d = bn_t::rand(N); 
   bn_t r_db = bn_t::rand(N);
   
-  bn_t c_d, c_db;
-  MODULO(N2) c_d = (d * N + 1) * r_d.pow(N); // Enc(d, r_d)
-  MODULO(N2) c_db = (d * b * N + 1) * r_db.pow(N); // Enc(db, r_db)
+  crypto::paillier_t paillier;
+  paillier.create_pub(N);
+  c_d = paillier.encrypt(d, r_d); //(d * N + 1) * r_d.pow(N); // Enc(d, r_d)
+  c_db = paillier.encrypt(d*b, r_db); //(d * b * N + 1) * r_db.pow(N); // Enc(db, r_db)
+
+  // printf("gcd(c_d, N): %s\n\n", bn_t::gcd(c_d, N).to_string().c_str());
 
   e = bn_t(sha256_t::hash(N, c_a, c_b, c_c, c_d, c_db, session_id, aux));
 
@@ -218,17 +221,6 @@ void zk_paillier_mult_t::p(const bn_t& N, const bn_t& c_a, const bn_t& c_b, cons
 bool zk_paillier_mult_t::v(const bn_t& N, const bn_t& c_a, const bn_t& c_b, const bn_t& c_c, mem_t session_id, uint8_t aux) const
 {
   bn_t N2 = N*N;
-
-  if (bn_t::gcd(c_d, N) != 1) 
-  {
-    return false;
-  }
-
-  if (bn_t::gcd(c_db, N) != 1) 
-  {
-    return false;
-  }
-
   if (bn_t::gcd(c_1, N) != 1) 
   {
     return false;
@@ -253,6 +245,20 @@ bool zk_paillier_mult_t::v(const bn_t& N, const bn_t& c_a, const bn_t& c_b, cons
   {
     return false;
   }
+
+  if (bn_t::gcd(c_db, N) != 1) 
+  {
+    printf("gcd(c_db, N)\n\n");
+    return false;
+  }
+
+
+  if (bn_t::gcd(c_d, N) != 1) 
+  {
+    printf("gcd(c_d, N)\n\n");
+    return false;
+  }
+
 
   bool valid = false; 
   MODULO(N2) valid = c_1 == (f * N + 1) * z_1.pow(N); // c_1 == Enc(f, z_1)
@@ -611,7 +617,7 @@ void zk_pdl_mult_t::p(ecurve_t curve, const ecc_point_t X, const bn_t c_1, const
   bn_t tau = bn_t::rand(q * _N);
 
   U = G * alpha;
-  MODULO(N) z = h_1.pow(x) * h_2.pow(rho);
+  MODULO(_N) z = h_1.pow(x) * h_2.pow(rho);
   MODULO(_N) _z = h_1.pow(alpha) * h_2.pow(_rho);
   MODULO(_N) t = h_1.pow(y) * h_2.pow(sigma);
 
@@ -621,32 +627,36 @@ void zk_pdl_mult_t::p(ecurve_t curve, const ecc_point_t X, const bn_t c_1, const
 
   MODULO(_N) w = h_1.pow(gamma) * h_2.pow(tau);
   
-  bn_t e = bn_t(sha256_t::hash(X, c_1, c_2, h_1, h_2, U, z, _z, t, k, w, session_id, aux));
+  bn_t e = bn_t(sha256_t::hash(X, c_1, c_2, h_1, h_2, U, z, _z, t, k, w, session_id, aux)) % q;
 
   MODULO(N) s = r.pow(e) * beta;
   s_1 = e * x + alpha;
   s_2 = e * rho + _rho;
   t_1 = e * y + gamma;
   t_2 = e * sigma + tau;
+
+//printf("in zk_pdl_mult_t::v: \n\n %s, \n\n %s \n\n", N.to_string().c_str(), f2.to_string().c_str());
+
 }
 
 
 bool zk_pdl_mult_t::v(ecurve_t curve, const ecc_point_t X, const bn_t N, const bn_t c_1, const bn_t c_2, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux) const
 {
+  bn_t N2 = N * N;
   const bn_t& q = curve.order();
   const ecc_generator_point_t& G = curve.generator();
 
   paillier_t paillier; paillier.create_pub(N);
 
-  bn_t e = bn_t(sha256_t::hash(X, c_1, c_2, h_1, h_2, U, z, _z, t, k, w, session_id, aux));
-
-  if (! (s <= q.pow(3))) 
+  bn_t e = bn_t(sha256_t::hash(X, c_1, c_2, h_1, h_2, U, z, _z, t, k, w, session_id, aux)) % q;
+  
+  if (! (s_1 <= q.pow(3))) 
   {
     return false;
   }
 
   ecc_point_t P = X * e + U;
-  if (P != G * e) 
+  if (P != G * s_1) 
   {
     return false;
   }
@@ -658,25 +668,27 @@ bool zk_pdl_mult_t::v(ecurve_t curve, const ecc_point_t X, const bn_t N, const b
   {
     return false;
   }
-
   MODULO(_N) tmp = h_1.pow(t_1) * h_2.pow(t_2);
   MODULO(_N) tmp2 = t.pow(e) * w;
   if (tmp != tmp2)
   {
     return false;
   }
+// printf("in zk_pdl_mult_t::v, step 4 \n\n");
 
   tmp = paillier.mul_scalar(c_1, s_1);
   tmp2 = paillier.encrypt(t_1, s);
-  bn_t c_tmp = paillier.add_ciphers(tmp, tmp2);
+  bn_t c_tmp = paillier.add_ciphers(tmp, tmp2); 
 
   bn_t c_tmp2;
-  MODULO(N) c_tmp2 = c_2.pow(e) * k;
+  MODULO(N2) c_tmp2 = c_2.pow(e) * k;
+
+// printf("in zk_pdl_mult_t::v: \n\n %s, \n\n %s \n\n", N.to_string().c_str(), c_tmp2.to_string().c_str());
   if (c_tmp != c_tmp2)
   {
     return false;
   }
-  
+// printf("done. \n\n");
   return true;
 }
 

@@ -1,0 +1,51 @@
+
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package mpc;
+
+service Leath {
+
+// Setup
+rpc setup (SetupMessage) returns (SetupMessage) {}
+
+// Share
+rpc share (ShareRequestMessage) returns (google.protobuf.Empty) {}
+rpc batch_share (stream ShareRequestMessage) returns (google.protobuf.Empty) {}
+
+// Update
+rpc reconstruct (ReconstructRequestMessage) returns (ReconstructReply) {}
+rpc bulk_reconstruct (stream ReconstructRequestMessage) returns (stream ReconstructReply) {}
+
+}
+
+message SetupMessage
+{
+    uint64 msg_id = 1;
+    bytes msg = 2;
+}
+
+message ShareRequestMessage
+{
+    uint64 value_id = 1;
+    bytes value_share = 2;
+    bytes  mac_share = 3;
+}
+
+message SearchReply
+{
+    bytes result = 1;
+}
+
+message ReconstructRequestMessage
+{
+    uint64 value_id = 1;
+}
+
+message ReconstructReply
+{
+    uint64 value_id = 1;
+    bytes value_share = 2;
+    bytes  mac_share = 3;
+}
