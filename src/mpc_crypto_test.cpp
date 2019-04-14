@@ -753,16 +753,16 @@ static int test_leath_create_paillier()
 
   
 
-  mpc::leath_create_paillier_t::message1_t fuck;
-  buf_t msg1_buf = ub::convert(msg1);
+  // mpc::leath_create_paillier_t::message1_t fuck;
+  // buf_t msg1_buf = ub::convert(msg1);
 
-  ub::convert(fuck, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
+  // ub::convert(fuck, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
 
 
 
 //printf("before peer2_step1. \n\n");
   // msg1 => msg2
-  if ( rv = setup.peer2_step1(s_share, mem_t::from_string("session1"), s_share.server_id, pk1, sk1, fuck, msg2)) return ub::error(E_BADARG);
+  if ( rv = setup.peer2_step1(s_share, mem_t::from_string("session1"), s_share.server_id, pk1, sk1, msg1, msg2)) return ub::error(E_BADARG);
 
 // printf("before peer1_step2. \n\n");
   // msg2 <=
