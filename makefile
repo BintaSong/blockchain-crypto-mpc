@@ -198,13 +198,13 @@ test/%.o: test/%.cpp
 # added by XF Song
 .PRECIOUS: %.grpc.pb.cpp
 %.grpc.pb.cpp: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=./src/protos --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
 .PRECIOUS: %.pb.cpp
 %.pb.cpp: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=./src/protos $<
 
-mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so  leath.pb.cpp leath.grpc.pb.cpp
+mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so leath.pb.cpp leath.grpc.pb.cpp
 	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
 
 
