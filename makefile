@@ -27,12 +27,11 @@ PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
-PROTOS_PATH = src/protos/
+PROTOS_PATH = leath/protos/
 
 vpath %.proto $(PROTOS_PATH)
 
 all: system-check
-
 
 PROTOC_CMD = which $(PROTOC)
 PROTOC_CHECK_CMD = $(PROTOC) --version | grep -q libprotoc.3
@@ -181,7 +180,10 @@ TEST_CPPFLAGS = \
 TEST_INCLUDES = \
 	$(COMMON_INCLUDES) \
 	-I src \
-	-I src/protos
+	-I src/protos \
+	-I src/mpc_protocols \
+	-I src/crypto_utils \
+	-I src/utils
 	
 TEST_LDFLAGS = \
 	$(COMMON_LDFLAGS) \
@@ -194,19 +196,8 @@ test/%.o: test/%.cpp
 	$(CXX) $(TEST_CPPFLAGS) $(TEST_INCLUDES) -o $@ -c $<
 
 
-
-# added by XF Song
-.PRECIOUS: %.grpc.pb.cpp
-%.grpc.pb.cpp: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=./src/protos --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-
-.PRECIOUS: %.pb.cpp
-%.pb.cpp: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=./src/protos $<
-
-mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so leath.pb.cpp leath.grpc.pb.cpp
+mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so# leath.pb.cpp  leath.grpc.pb.cpp
 	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
-
 
 #----------------------- BENCH --------------------------	
 	
@@ -235,13 +226,66 @@ bench/%.o: bench/%.cpp
 mpc_crypto_bench: $(BENCH_OBJ) libmpc_crypto.so
 	$(CXX) -o $@ $^ $(BENCH_LDFLAGS)
 
-# crypto_paillier_bench: $(BENCH_OBJ) libmpc_crypto.so
-# 	$(CXX) -o $@ $^ $(BENCH_LDFLAGS)
-#---------------------------------------------------------
+
+
+#----------------------- LEATH --------------------------	
 	
+LEATH_SRC = \
+	$(wildcard leath/*.cpp)\
+	$(wildcard leath/protos/*.cc)
+
+LEATH_OBJ = \
+	$(LEATH_SRC:.cpp=.o)
+	
+LEATH_CPPFLAGS = \
+	$(COMMON_CPPFLAGS)
+  
+LEATH_INCLUDES = \
+	$(COMMON_INCLUDES) \
+	-I src \
+	-I leath/protos
+
+LEATH_LDFLAGS = \
+	$(COMMON_LDFLAGS) \
+	-L . \
+	-lmpc_crypto\
+	-lprotobuf \
+	-lz\
+	-lgrpc \
+	-lgrpc++\
+	-lpthread\
+	-std=c++0x
+
+
+leath/protos/%.o: leath/protos/%.cc
+	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
+
+leath/%.o: leath/%.cpp
+	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
+
+
+leath_client: $(LEATH_OBJ) libmpc_crypto.so  # leath.pb.o  leath.grpc.pb.o
+	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
+
+leath_server: $(LEATH_OBJ) libmpc_crypto.so
+	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
+
+.PRECIOUS: %.grpc.pb.cc
+%.grpc.pb.cc: %.proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=./leath/protos --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+
+.PRECIOUS: %.pb.cc
+%.pb.cc: %.proto
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=./leath/protos $<
+
+#---------------------------------------------------------
+
+
+
+
 .PHONY: clean
 
 clean:
-	rm -f $(LIB_OBJ) $(TEST_OBJ) mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
+	rm -f $(LIB_OBJ) $(TEST_OBJ) $(LEATH_OBJ) mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
 	
-.DEFAULT_GOAL := mpc_crypto_test
+.DEFAULT_GOAL := leath_client #leath_server #mpc_crypto_test

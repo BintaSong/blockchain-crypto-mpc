@@ -3,9 +3,9 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
-package mpc;
+package mpc.leath;
 
-service Leath {
+service LeathRPC {
 
 // Setup
 rpc setup (SetupMessage) returns (SetupMessage) {}
