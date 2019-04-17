@@ -24,7 +24,10 @@
 #include "mpc_crypto.h"
 #include "mpc_ot.h"
 #include "mpc_ecc_core.h"
+
 #include "mpc_leath.h"
+#include "leath_client.h"
+#include "leath_server.h"
 
 extern "C" MPCCRYPTO_API int MPCCrypto_test();
 
@@ -781,6 +784,44 @@ static int test_ecurve()
   printf("bits: %d bits \n", bits);
 }
 
+static int test_leath_client_server()
+{
+    error_t rv = 0;
+    std::string server_path = "test", client_path = "test";
+
+    mpc::LeathServer server(server_path, 1);
+    mpc::LeathClient client(client_path, 1024);
+
+    mpc::leath_setup_message1_t msg1;
+    mpc::leath_setup_message2_t msg2;
+
+    rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), msg1);
+ // printf("after leath_setup_peer1_step1. \n\n");
+
+    assert(rv == 0);
+
+    ecc_point_t G;
+    bn_t order;
+    ecurve_t curve = ecurve_t::find(NID_secp256k1);
+    if (!curve)
+        return ub::error(E_BADARG);
+    G = curve.generator();
+    order = curve.order();
+    ecc_point_t pk1;
+    bn_t sk1 = bn_t::rand(order);
+    pk1 = G * sk1;
+
+//---------------------------------
+    rv = server.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, pk1, sk1, msg1, msg2);
+//printf("after leath_setup_peer2_step1. \n\n");
+    assert(rv == 0);
+
+    rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 0, msg2);
+//printf("after leath_setup_peer1_step2. \n\n");
+    assert(rv == 0);
+    return 0;
+}
+
 namespace mpc {
 extern int zk_paillier_range_time;
 }
@@ -812,7 +853,7 @@ MPCCRYPTO_API int MPCCrypto_test()
 
 
  // test_paillier();
-  rv = test_leath_create_paillier();
+  rv = test_leath_client_server();
   assert(rv == 0);
   printf("all good.\n\n");
 

@@ -106,7 +106,9 @@ COMMON_LDFLAGS = \
 LIB_CPPSRC = $(wildcard src/*.cpp) \
 	$(wildcard src/utils/*.cpp) \
 	$(wildcard src/crypto_utils/*.cpp) \
-	$(wildcard src/mpc_protocols/*.cpp)
+	$(wildcard src/mpc_protocols/*.cpp) \
+	$(wildcard src/leath/*.cpp) \
+	$(wildcard src/leath/protos/*.cpp)
 		 
 LIB_ASMSRC = \
 	$(wildcard src/mpc_protocols/*.s)
@@ -118,7 +120,9 @@ LIB_OBJ = \
 LIB_HEADERS = $(wildcard src/*.h) \
 	$(wildcard src/utils/*.h) \
 	$(wildcard src/crypto_utils/*.h) \
-	$(wildcard src/mpc_protocols/*.h)
+	$(wildcard src/mpc_protocols/*.h) \
+	$(wildcard src/leath/*.h) \
+	$(wildcard src/leath/protos/*.h)
 	
 LIB_INCLUDES = \
 	$(COMMON_INCLUDES) \
@@ -126,7 +130,9 @@ LIB_INCLUDES = \
 	-I ${JAVA_HOME}/include/linux \
 	-I src/utils \
 	-I src/crypto_utils \
-	-I src/mpc_protocols
+	-I src/mpc_protocols \
+	-I src/leath \
+	-I src/leath/protos
 	
 
 LIB_CPPFLAGS = \
@@ -142,7 +148,11 @@ LIB_LDFLAGS = \
 	-shared \
 	-rdynamic \
 	-lcrypto \
-	-lpthread
+	-lpthread \
+	-lprotobuf \
+	-lz \
+	-lgrpc \
+	-lgrpc++
 
 .s.o: 
 	$(CXX) -o $@ -c $<
@@ -158,6 +168,13 @@ src/crypto_utils/%.o: src/crypto_utils/%.cpp src/utils/precompiled.h.gch
 
 src/mpc_protocols/%.o: src/mpc_protocols/%.cpp src/utils/precompiled.h.gch
 	$(CXX) $(LIB_CPPFLAGS) $(LIB_INCLUDES) -o $@ -c $<
+
+src/leath/%.o: src/leath/%.cpp src/utils/precompiled.h.gch
+	$(CXX) $(LIB_CPPFLAGS) $(LIB_INCLUDES) -o $@ -c $<
+
+src/leath/protos/%.o: src/leath/protos/%.cpp src/utils/precompiled.h.gch
+	$(CXX) $(LIB_CPPFLAGS) $(LIB_INCLUDES) -o $@ -c $<
+
 
 src/%.o: src/%.cpp src/utils/precompiled.h.gch
 	$(CXX) $(LIB_CPPFLAGS) $(LIB_INCLUDES) -o $@ -c $<
@@ -230,54 +247,61 @@ mpc_crypto_bench: $(BENCH_OBJ) libmpc_crypto.so
 
 #----------------------- LEATH --------------------------	
 	
-LEATH_SRC = \
-	$(wildcard leath/*.cpp)\
-	$(wildcard leath/protos/*.cc)
+# LEATH_SRC = \
+# 	$(wildcard leath/*.cpp)\
+# 	$(wildcard leath/protos/*.cpp)
 
-LEATH_OBJ = \
-	$(LEATH_SRC:.cpp=.o)
-	
-LEATH_CPPFLAGS = \
-	$(COMMON_CPPFLAGS)
+# LEATH_OBJ = \
+# 	$(LEATH_SRC:.cpp=.o)
+
+# LEATH_CPPFLAGS = \
+# 	$(COMMON_CPPFLAGS)
   
-LEATH_INCLUDES = \
-	$(COMMON_INCLUDES) \
-	-I src \
-	-I leath/protos
+# LEATH_INCLUDES = \
+# 	$(COMMON_INCLUDES) \
+# 	-I src \
+# 	-I src/mpc_protocols\
+# 	-I src/utils \
+# 	-I src/crypto_utils \
+# 	-I leath/protos \
+# 	-I leath
 
-LEATH_LDFLAGS = \
-	$(COMMON_LDFLAGS) \
-	-L . \
-	-lmpc_crypto\
-	-lprotobuf \
-	-lz\
-	-lgrpc \
-	-lgrpc++\
-	-lpthread\
-	-std=c++0x
-
-
-leath/protos/%.o: leath/protos/%.cc
-	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
-
-leath/%.o: leath/%.cpp
-	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
+# LEATH_LDFLAGS = \
+# 	$(COMMON_LDFLAGS) \
+# 	-L . \
+# 	-lmpc_crypto\
+# 	-lprotobuf \
+# 	-lz\
+# 	-lgrpc \
+# 	-lgrpc++\
+# 	-lpthread\
+# 	-std=c++0x
 
 
-leath_client: $(LEATH_OBJ) libmpc_crypto.so  # leath.pb.o  leath.grpc.pb.o
-	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
+# .PRECIOUS: %.grpc.pb.cpp
+# %.grpc.pb.cpp: %.proto
+# 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=./leath/protos --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
-leath_server: $(LEATH_OBJ) libmpc_crypto.so
-	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
+# .PRECIOUS: %.pb.cpp
+# %.pb.cpp: %.proto
+# 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=./leath/protos $<
 
-.PRECIOUS: %.grpc.pb.cc
-%.grpc.pb.cc: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=./leath/protos --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
-.PRECIOUS: %.pb.cc
-%.pb.cc: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=./leath/protos $<
+# leath/protos/%.o: %.pb.cpp %.grpc.pb.cpp
+# 	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
 
+# leath/%.o: leath/%.cpp 
+# 	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
+
+# test_leath_client_server: $(LEATH_OBJ) #libmpc_crypto.so
+# 	$(CXX) -o $@ $^ $(LEATH_INCLUDES) $(LEATH_LDFLAGS) 
+
+
+# leath_client: $(LEATH_OBJ) libmpc_crypto.so # leath.grpc.pb.o leath.pb.o  
+# 	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
+
+# leath_server: $(LEATH_OBJ) libmpc_crypto.so
+# 	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
 #---------------------------------------------------------
 
 
@@ -286,6 +310,6 @@ leath_server: $(LEATH_OBJ) libmpc_crypto.so
 .PHONY: clean
 
 clean:
-	rm -f $(LIB_OBJ) $(TEST_OBJ) $(LEATH_OBJ) mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
+	rm -f $(LIB_OBJ) $(TEST_OBJ) $(LEATH_OBJ)  mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
 	
-.DEFAULT_GOAL := leath_client #leath_server #mpc_crypto_test
+.DEFAULT_GOAL := mpc_crypto_test #leath_server #mpc_crypto_test
