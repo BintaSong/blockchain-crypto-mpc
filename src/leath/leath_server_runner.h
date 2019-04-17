@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mpc_leath.h"
-
+#include "leath_server.h"
 
 #include "leath.pb.h"
 #include "leath.grpc.pb.h"
@@ -10,26 +10,40 @@
 #include <memory>
 #include <mutex>
 
+#include <grpc/grpc.h>
 #include <grpc++/server.h>
+#include <grpc++/server_builder.h>
 #include <grpc++/server_context.h>
+#include <grpc++/security/server_credentials.h>
+
+
+using namespace mpc::leath;
 
 namespace mpc {
 
     class LeathServerImpl final : public leath::LeathRPC::Service {
     public:
-        explicit LeathServerImpl(const std::string& path, const int server_id);
+        explicit LeathServerImpl(const std::string& path, uint8_t id);
         
         grpc::Status setup(grpc::ServerContext* context,
-                           const leath::SetupMessage* request,
-                           leath::SetupMessage* response) override;
+                           const SetupMessage* request,
+                           SetupMessage* response) override;
                 
         
     private:
-        leath_server_share_t server_share;
-        
+        std::unique_ptr<LeathServer> server_;
+
+        bool already_setup;
+        ecc_point_t pk; bn_t sk;
+
+        uint8_t server_id, current_step;
+
         std::mutex mtx_;
     };
     
-    void run_leath_server(const std::string &address, const std::string& server_db_path, grpc::Server **server_ptr);
+
+    // template <typename T> SetupMessage struct_to_message(T &struct_msg, int step);
+
+    void run_leath_server(const std::string &address, uint8_t server_id, const std::string& server_db_path, grpc::Server **server_ptr);
 
 } // namespace mpc

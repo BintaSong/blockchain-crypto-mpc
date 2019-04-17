@@ -23,7 +23,6 @@ error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_messa
 // printf("in leath_setup_peer1_step1: \n\n %s\n\n", out.N.to_string().c_str());
 
 
-
     // auxulary value
     out._N = client_share._N =_paillier.get_N();
     out.h_1 = client_share.h_1 = bn_t::rand(out._N);

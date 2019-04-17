@@ -5,7 +5,7 @@ using namespace ub;
 namespace mpc
 {
 
-    LeathServer::LeathServer(std::string path, int32_t id) : server_path(path), server_id(id) {}
+    LeathServer::LeathServer(std::string path, uint8_t id) : server_path(path), server_id(id) {}
 
     error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, ecc_point_t pk, bn_t sk, const leath_setup_message1_t &in, leath_setup_message2_t &out)
     {
@@ -64,5 +64,9 @@ namespace mpc
         MODULO(in.N) server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
 
         return 0;
+    }
+
+    int32_t LeathServer::get_id(){
+        return server_id;
     }
 } // namespace mpc

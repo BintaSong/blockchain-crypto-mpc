@@ -157,8 +157,8 @@ struct leath_setup_message2_t
   }
 };
 
-error_t peer1_step1(leath_client_share_t &client_share, mem_t session_id, leath_setup_message1_t &out);
-error_t peer2_step1(leath_server_share_t &server_share, mem_t session_id, int server_id, ecc_point_t pk, bn_t sk, const leath_setup_message1_t &in, leath_setup_message2_t &out);
-error_t peer1_step2(leath_client_share_t &client_share, mem_t session_id, int server_id, const leath_setup_message2_t &in);
+// error_t peer1_step1(leath_client_share_t &client_share, mem_t session_id, leath_setup_message1_t &out);
+// error_t peer2_step1(leath_server_share_t &server_share, mem_t session_id, int server_id, ecc_point_t pk, bn_t sk, const leath_setup_message1_t &in, leath_setup_message2_t &out);
+// error_t peer1_step2(leath_client_share_t &client_share, mem_t session_id, int server_id, const leath_setup_message2_t &in);
 
 } //namespace mpc

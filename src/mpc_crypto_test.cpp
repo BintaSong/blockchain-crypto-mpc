@@ -756,10 +756,9 @@ static int test_leath_create_paillier()
 
   
 
-  // mpc::leath_create_paillier_t::message1_t fuck;
-  // buf_t msg1_buf = ub::convert(msg1);
-
-  // ub::convert(fuck, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
+//  mpc::leath_create_paillier_t::message1_t fuck;
+//  buf_t msg1_buf = ub::convert(msg1);
+//  ub::convert(fuck, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
 
 
 
