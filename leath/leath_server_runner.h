@@ -22,9 +22,7 @@ namespace mpc {
         grpc::Status setup(grpc::ServerContext* context,
                            const leath::SetupMessage* request,
                            leath::SetupMessage* response) override;
-
-
-        
+                
         
     private:
         leath_server_share_t server_share;
