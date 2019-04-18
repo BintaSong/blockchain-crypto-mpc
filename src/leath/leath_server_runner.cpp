@@ -4,8 +4,8 @@ using namespace mpc::leath;
 
 namespace mpc {
     LeathServerImpl::LeathServerImpl(const std::string& path, uint8_t id): already_setup(false), server_id(id), current_step(1){
-        //TODO: set pk, sk !
-
+        //
+        server_.reset(new LeathServer(path, id));
     }
 
     grpc::Status LeathServerImpl::setup(grpc::ServerContext* context, const SetupMessage* request, SetupMessage* response) {
@@ -24,7 +24,7 @@ namespace mpc {
 
             // perform server-sid compuation
             leath_setup_message2_t out;
-            rv = server_->leath_setup_peer2_step1(mem_t::from_string("setup_session"), server_->get_id(), pk, sk, in, out);
+            rv = server_->leath_setup_peer2_step1(mem_t::from_string("setup_session"), server_->get_id(), in, out);
             if (rv != 0) return grpc::Status::CANCELLED;
 
             // response client 

@@ -1,11 +1,12 @@
-#include "leath_server_runner.h"
+// #include "leath_server_runner.h"
 
+// #include "precompiled.h"
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <csignal>
+// #include <unistd.h>
 
-#include <stdio.h>
-#include <csignal>
-#include <unistd.h>
-
-// extern grpc::Server *server_ptr__;
+// grpc::Server *server_ptr__ = NULL;
 
 // void exit_handler(int signal)
 // {

@@ -28,6 +28,15 @@
 #include "mpc_leath.h"
 #include "leath_client.h"
 #include "leath_server.h"
+#include "leath.grpc.pb.h"
+#include "leath.pb.h"
+#include "leath_client_runner.h"
+#include "leath_server_runner.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <csignal>
+#include <unistd.h>
 
 extern "C" MPCCRYPTO_API int MPCCrypto_test();
 
@@ -799,19 +808,19 @@ static int test_leath_client_server()
 
     assert(rv == 0);
 
-    ecc_point_t G;
-    bn_t order;
-    ecurve_t curve = ecurve_t::find(NID_secp256k1);
-    if (!curve)
-        return ub::error(E_BADARG);
-    G = curve.generator();
-    order = curve.order();
-    ecc_point_t pk1;
-    bn_t sk1 = bn_t::rand(order);
-    pk1 = G * sk1;
+    // ecc_point_t G;
+    // bn_t order;
+    // ecurve_t curve = ecurve_t::find(NID_secp256k1);
+    // if (!curve)
+    //     return ub::error(E_BADARG);
+    // G = curve.generator();
+    // order = curve.order();
+    // ecc_point_t pk1;
+    // bn_t sk1 = bn_t::rand(order);
+    // pk1 = G * sk1;
 
 //---------------------------------
-    rv = server.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, pk1, sk1, msg1, msg2);
+    rv = server.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, msg1, msg2);
 //printf("after leath_setup_peer2_step1. \n\n");
     assert(rv == 0);
 
@@ -820,6 +829,51 @@ static int test_leath_client_server()
     assert(rv == 0);
     return 0;
 }
+
+grpc::Server *server_ptr__ = NULL;
+
+void exit_handler(int signal)
+{
+    std::cout << "INFO: " << "\nExiting ... " << std::endl;
+    
+    if (server_ptr__) {
+        server_ptr__->Shutdown();
+    }
+};
+
+
+static int test_leath_server_rpc() {
+    std::signal(SIGTERM, exit_handler);
+    std::signal(SIGINT, exit_handler);
+    std::signal(SIGQUIT, exit_handler);
+
+
+    mpc::run_leath_server("0.0.0.0:7788", 0, "", &server_ptr__);
+    
+
+    std::cout << "INFO:" << "Done." << std::endl;
+
+   return 0;
+}
+
+static int test_leath_client_rpc() {
+
+
+    std::unique_ptr<mpc::LeathClientRunner> client_runner;
+
+    std::cout << "INFO:" << "client begin." << std::endl;
+    std::vector<std::string> addresses;
+    addresses.push_back("localhost:7788");
+    std::cout << "INFO:" << "before reset." << std::endl;
+    client_runner.reset( new  mpc::LeathClientRunner(addresses, ""));
+    std::cout << "INFO:" << "before setup." << std::endl;
+    client_runner->setup();
+
+    std::cout << "INFO:" << "Done." << std::endl;
+
+   return 0;
+}
+
 
 namespace mpc {
 extern int zk_paillier_range_time;
@@ -852,7 +906,7 @@ MPCCRYPTO_API int MPCCrypto_test()
 
 
  // test_paillier();
-  rv = test_leath_client_server();
+  rv = test_leath_client_rpc();
   assert(rv == 0);
   printf("all good.\n\n");
 

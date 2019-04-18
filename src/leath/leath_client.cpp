@@ -11,7 +11,8 @@ LeathClient::LeathClient(std::string path, int bits) : client_path(path), pailli
 
 error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out)
 {
-
+    // printf("in leath_setup_peer1_step1: begin ");
+    
     crypto::paillier_t paillier, _paillier;
     paillier.generate(paillier_keysize, true);
     _paillier.generate(paillier_keysize, true);
@@ -20,7 +21,7 @@ error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_messa
     client_share.paillier = paillier;
     out.N =  paillier.get_N();
 
-// printf("in leath_setup_peer1_step1: \n\n %s\n\n", out.N.to_string().c_str());
+ // printf("in leath_setup_peer1_step1: \n\n %s\n\n", out.N.to_string().c_str());
 
 
     // auxulary value

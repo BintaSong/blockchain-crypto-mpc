@@ -7,7 +7,7 @@ namespace mpc
 
     LeathServer::LeathServer(std::string path, uint8_t id) : server_path(path), server_id(id) {}
 
-    error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, ecc_point_t pk, bn_t sk, const leath_setup_message1_t &in, leath_setup_message2_t &out)
+    error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, const leath_setup_message1_t &in, leath_setup_message2_t &out)
     {
         error_t rv = 0;
 
@@ -37,8 +37,17 @@ namespace mpc
         // printf("in peer2_step1, after zk_paillier_mult.v \n");
 
         // if all good, prepare return message
-        ecurve_t curve = pk.get_curve();
-        const bn_t &order = curve.order();
+        // TODO:
+        ecc_point_t pk, G; 
+        bn_t sk, order;
+        ecurve_t curve = ecurve_t::find(NID_secp256k1);
+        if (!curve) return ub::error(E_BADARG);
+
+        G = curve.generator();
+        order = curve.order();
+        sk = bn_t::rand(order);
+        pk = G * sk;
+
 
         bn_t r, r_r;
         r = bn_t::rand(in.N);
