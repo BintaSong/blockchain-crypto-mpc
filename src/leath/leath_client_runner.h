@@ -5,6 +5,8 @@
 
 #include "leath_client.h"
 
+#include "logger.h"
+
 #include <memory>
 #include <thread>
 #include <grpc++/channel.h>

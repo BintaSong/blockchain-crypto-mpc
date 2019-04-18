@@ -213,8 +213,8 @@ test/%.o: test/%.cpp
 	$(CXX) $(TEST_CPPFLAGS) $(TEST_INCLUDES) -o $@ -c $<
 
 
-# mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cpp  leath.grpc.pb.cpp
-# 	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
+mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cpp  leath.grpc.pb.cpp
+	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
 
 leath_rpc_server: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cpp  leath.grpc.pb.cpp
 	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
@@ -251,71 +251,9 @@ mpc_crypto_bench: $(BENCH_OBJ) libmpc_crypto.so
 
 
 
-#----------------------- LEATH --------------------------	
-	
-# LEATH_SRC = \
-# 	$(wildcard leath/*.cpp)\
-# 	$(wildcard leath/protos/*.cpp)
-
-# LEATH_OBJ = \
-# 	$(LEATH_SRC:.cpp=.o)
-
-# LEATH_CPPFLAGS = \
-# 	$(COMMON_CPPFLAGS)
-  
-# LEATH_INCLUDES = \
-# 	$(COMMON_INCLUDES) \
-# 	-I src \
-# 	-I src/mpc_protocols\
-# 	-I src/utils \
-# 	-I src/crypto_utils \
-# 	-I leath/protos \
-# 	-I leath
-
-# LEATH_LDFLAGS = \
-# 	$(COMMON_LDFLAGS) \
-# 	-L . \
-# 	-lmpc_crypto\
-# 	-lprotobuf \
-# 	-lz\
-# 	-lgrpc \
-# 	-lgrpc++\
-# 	-lpthread\
-# 	-std=c++0x
-
-
-# .PRECIOUS: %.grpc.pb.cpp
-# %.grpc.pb.cpp: %.proto
-# 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=./leath/protos --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-
-# .PRECIOUS: %.pb.cpp
-# %.pb.cpp: %.proto
-# 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=./leath/protos $<
-
-
-# leath/protos/%.o: %.pb.cpp %.grpc.pb.cpp
-# 	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
-
-# leath/%.o: leath/%.cpp 
-# 	$(CXX) $(LEATH_CPPFLAGS) $(LEATH_INCLUDES) -o $@ -c $<
-
-# test_leath_client_server: $(LEATH_OBJ) #libmpc_crypto.so
-# 	$(CXX) -o $@ $^ $(LEATH_INCLUDES) $(LEATH_LDFLAGS) 
-
-
-# leath_client: $(LEATH_OBJ) libmpc_crypto.so # leath.grpc.pb.o leath.pb.o  
-# 	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
-
-# leath_server: $(LEATH_OBJ) libmpc_crypto.so
-# 	$(CXX) -o $@ $^ $(LEATH_LDFLAGS)
-#---------------------------------------------------------
-
-
-
-
 .PHONY: clean
 
 clean:
 	rm -f $(LIB_OBJ) $(TEST_OBJ) $(LEATH_OBJ)  mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
 	
-.DEFAULT_GOAL := leath_rpc_client #leath_server #mpc_crypto_test
+.DEFAULT_GOAL := leath_rpc_server #leath_server #mpc_crypto_test

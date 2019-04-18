@@ -25,6 +25,9 @@
 #include "crypto.h"
 #include "mpc_ecc_core.h"
 
+#include "logger.h"
+
+
 namespace mpc
 {
 
