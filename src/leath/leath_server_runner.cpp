@@ -42,6 +42,18 @@ namespace mpc {
         return grpc::Status::OK;
     }
 
+    grpc::Status LeathServerImpl::share(grpc::ServerContext* context, const ShareRequestMessage* request, google::protobuf::Empty* response){
+        
+                
+        return grpc::Status::OK;
+    }
+
+    grpc::Status LeathServerImpl::reconstruct(grpc::ServerContext* context,  const ReconstructRequestMessage* request, ReconstructReply* response) {
+        
+        
+        return grpc::Status::OK;
+    }  
+
     void run_leath_server(const std::string &address, uint8_t server_id,  const std::string& server_db_path, grpc::Server **server_ptr) {
         std::string server_address(address);
         LeathServerImpl service(server_db_path, server_id);

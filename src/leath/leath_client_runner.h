@@ -21,6 +21,10 @@ namespace mpc {
 
         void setup();
 
+        error_t setup(int val_id, bn_t val);
+
+        bn_t reconstruct(int val_id);
+
     private:
         std::vector< std::unique_ptr<leath::LeathRPC::Stub>> stub_vector;
         std::unique_ptr<LeathClient> client_;

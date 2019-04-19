@@ -37,7 +37,7 @@ bn_t eGCD(const bn_t N, const bn_t a, const bn_t b, bn_t &x, bn_t &y);
 
 struct leath_client_share_t
 {
-  bn_t h_1, h_2, _N;
+  bn_t h_1, h_2, _N, N;
   bn_t c_1, c_2, keys_share, mac_key;
   crypto::paillier_t paillier;
 
@@ -46,6 +46,7 @@ struct leath_client_share_t
     converter.convert(h_1);
     converter.convert(h_2);
     converter.convert(_N);
+    converter.convert(N);
     converter.convert(c_1);
     converter.convert(c_2);
     converter.convert(keys_share);
@@ -159,6 +160,43 @@ struct leath_setup_message2_t
     converter.convert(zk_pdl_mult);
   }
 };
+
+
+struct leath_setup_message3_t
+{
+  bn_t mac_key_share;
+
+  void convert(ub::converter_t &converter)
+  {
+    converter.convert(mac_key_share);
+  }
+};
+
+struct leath_maced_share_t
+{
+  //uint64_t val_id;
+  bn_t share, mac_share;
+
+  void convert(ub::converter_t &converter)
+  {
+    //converter.convert(val_id);
+    converter.convert(share);
+    converter.convert(mac_share);
+  }
+};
+
+struct leath_maced_share_with_VID_t
+{
+  uint64_t val_id;
+  leath_maced_share_t maced_share;
+
+  void convert(ub::converter_t &converter)
+  {
+    converter.convert(val_id);
+    converter.convert(maced_share);
+  }
+};
+
 
 // error_t peer1_step1(leath_client_share_t &client_share, mem_t session_id, leath_setup_message1_t &out);
 // error_t peer2_step1(leath_server_share_t &server_share, mem_t session_id, int server_id, ecc_point_t pk, bn_t sk, const leath_setup_message1_t &in, leath_setup_message2_t &out);

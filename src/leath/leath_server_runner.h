@@ -29,7 +29,14 @@ namespace mpc {
         grpc::Status setup(grpc::ServerContext* context,
                            const SetupMessage* request,
                            SetupMessage* response) override;
-                
+
+        grpc::Status share(grpc::ServerContext* context,
+                           const ShareRequestMessage* request,
+                           google::protobuf::Empty* response) override;
+
+        grpc::Status reconstruct(grpc::ServerContext* context,
+                           const ReconstructRequestMessage* request,
+                           ReconstructReply* response) override;       
         
     private:
         std::unique_ptr<LeathServer> server_;
