@@ -20,15 +20,15 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// #include "precompiled.h"
+#include "precompiled.h"
 
-// extern "C" int MPCCrypto_test();
+extern "C" int MPCCrypto_test();
 
-// int main(int argc, char* argv[])
-// {
-//   int rv = 0;
+int main(int argc, char* argv[])
+{
+  int rv = 0;
 
-//   if (rv = MPCCrypto_test()) return rv;
-// 	return rv;
-// }
+  if (rv = MPCCrypto_test()) return rv;
+	return rv;
+}
 

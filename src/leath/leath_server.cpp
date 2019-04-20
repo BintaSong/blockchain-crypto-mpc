@@ -5,7 +5,7 @@ using namespace ub;
 namespace mpc
 {
 
-LeathServer::LeathServer(std::string path, uint8_t id) : server_path(path), server_id(id) {}
+LeathServer::LeathServer(std::string path, uint8_t id) : server_path(path), server_id(id){}
 
 error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, const leath_setup_message1_t &in, leath_setup_message2_t &out)
 {
@@ -61,6 +61,8 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     server_share.h_1 = in.h_1;
     server_share.h_2 = in.h_2;
     server_share._N = in._N;
+    server_share.pk = pk;
+    server_share.sk = sk;
 
     out._c_i = paillier.add_ciphers(paillier.mul_scalar(in.c_1, sk), paillier.encrypt(r, r_r));
 
@@ -70,8 +72,7 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     int bits = curve.bits();
     if (server_id < 0)
         return rv = error(E_BADARG);
-    MODULO(in.N)
-    server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
+    MODULO(in.N) server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
 
     return 0;
 }
@@ -97,24 +98,24 @@ error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const leath_maced
     out.val_id = in.val_id;
     out.maced_share = add_constant(in.maced_share, server_share.keys_share);
 
-    // TODO: store(vid, share, mac_share) somewhere !
+    share_map[out.val_id] = out.maced_share;
     return 0;
 }
 
-error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out)
-{
-    out.share = server_share.c_2.pow_mod(in.share, server_share.N) ;
-    out.mac_share = in.mac_share; 
+// error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out)
+// {
+//     out.share = server_share.c_2.pow_mod(in.share, server_share.N) ;
+//     out.mac_share = in.mac_share; 
 
-    return 0;
-}
+//     return 0;
+// }
 error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint64_t vid, leath_maced_share_t &out)
 {
     leath_maced_share_t tmp;
     get_maced_share(vid, tmp);
 
     out.share = server_share.c_2.pow_mod(tmp.share, server_share.N) ;
-    out.mac_share = tmp.mac_share; 
+    out.mac_share = tmp.mac_share;
 
     return 0;
 }
@@ -164,8 +165,15 @@ int32_t LeathServer::get_id()
 }
 
 error_t LeathServer::get_maced_share(const uint64_t vid, leath_maced_share_t &s) {
-    //TODO: how to get the maced share by vid !
+    //TODO: how to get the maced share by vid!
 
+    std::map<uint64_t, leath_maced_share_t>::iterator it;
+    it = share_map.find(vid);
+    if (it == share_map.end()){
+        logger::log(logger::ERROR) << "Not find the matching share" << std::endl;
+    }
+    s = it->second;
     return 0;
 }
+
 } // namespace mpc

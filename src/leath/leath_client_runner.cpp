@@ -16,7 +16,7 @@ namespace mpc {
 
         number_of_servers = addresses.size();
         
-        client_.reset( new LeathClient("TODO: test", 1024) );
+        client_.reset( new LeathClient("TODO: test", number_of_servers, 1024) );
     }
 
     void LeathClientRunner::setup() {

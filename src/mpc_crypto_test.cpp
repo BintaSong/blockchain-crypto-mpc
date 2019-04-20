@@ -917,13 +917,13 @@ static int test_ecurve()
   printf("bits: %d bits \n", bits);
 }
 
-static int test_leath_client_server()
+static int test_leath_share_reconstruct()
 {
   error_t rv = 0;
   std::string server_path = "test", client_path = "test";
 
   mpc::LeathServer server(server_path, 1);
-  mpc::LeathClient client(client_path, 1024);
+  mpc::LeathClient client(client_path, 1, 1024);
 
   mpc::leath_setup_message1_t msg1;
   mpc::leath_setup_message2_t msg2;
@@ -954,6 +954,75 @@ static int test_leath_client_server()
   assert(rv == 0);
   return 0;
 }
+
+static int test_leath_client_server()
+{
+  error_t rv = 0;
+  std::string server_path = "test", client_path = "test";
+
+  mpc::LeathServer server0(server_path + "_0", 0), server1(server_path + "_1", 1);
+  mpc::LeathClient client(client_path, 2, 1024);
+
+  mpc::leath_setup_message1_t client_setup_msg1;
+  mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2;
+   mpc::leath_setup_message3_t server0_setup_msg3, server1_setup_msg3;
+
+  rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), client_setup_msg1);
+  assert(rv == 0);
+
+
+  //---------------------------------
+  rv = server0.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, client_setup_msg1, server0_setup_msg2);
+  //printf("after leath_setup_peer2_step1. \n\n");
+  assert(rv == 0);
+
+  rv = server1.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 1, client_setup_msg1, server1_setup_msg2);
+  //printf("after leath_setup_peer2_step1. \n\n");
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg2);
+  //printf("after leath_setup_peer1_step2. \n\n");
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg2);
+  //printf("after leath_setup_peer1_step2. \n\n");
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg3);
+  //printf("after leath_setup_peer1_step2. \n\n");
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
+  //printf("after leath_setup_peer1_step2. \n\n");
+  assert(rv == 0);
+
+  rv = server0.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg3);
+  //printf("after leath_setup_peer1_step2. \n\n");
+  assert(rv == 0);
+
+  rv = server1.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
+  //printf("after leath_setup_peer1_step2. \n\n");
+  assert(rv == 0);
+
+  bn_t tmp;
+  MODULO(client.client_share.N) tmp = client.client_share.mac_key - server0.server_share.mac_key_share - server1.server_share.mac_key_share ;
+  assert(tmp == 0);
+
+  MODULO(client.client_share.N) tmp = client.client_share.keys_share + server0.server_share.keys_share + server1.server_share.keys_share ;
+
+  int bits = server0.server_share.pk.get_curve().bits();
+
+  tmp = tmp -(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk) * client.client_share.paillier.decrypt(client.client_share.c_1);
+  assert(tmp % client.client_share.N == 0);
+
+
+  
+
+
+  return 0;
+
+}
+
 
 grpc::Server *server_ptr__ = NULL;
 
@@ -997,6 +1066,7 @@ static int test_leath_client_rpc()
 
   return 0;
 }
+
 
 namespace mpc
 {
@@ -1130,7 +1200,7 @@ MPCCRYPTO_API int MPCCrypto_test()
   t = ub::read_timer_ms() - t; */
 
   // test_paillier();
-  rv = test_leath_client_rpc();
+  rv = test_leath_client_server();
   assert(rv == 0);
   logger::log(logger::INFO) << "ALL GOOD !" << std::endl;
   /*

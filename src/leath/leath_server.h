@@ -23,7 +23,7 @@ public:
     error_t leath_share_peer2_step1(mem_t session_id, const leath_maced_share_with_VID_t &in, leath_maced_share_with_VID_t &out);
 
     //-------------------for reconstruct------------
-    error_t leath_reconstruct_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out);
+    // error_t leath_reconstruct_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out);
     error_t leath_reconstruct_peer2_step1(mem_t session_id, const uint64_t vid, leath_maced_share_t &out);
 
 
@@ -36,13 +36,16 @@ public:
     int32_t get_id();
 
 
-private:
+public:
 
     uint8_t server_id;
     std::string server_path;
 
     leath_server_share_t server_share;
     std::mutex server_share_mutx_;
+
+    // TODO: just for test !
+    std::map<uint64_t, leath_maced_share_t> share_map;
 
     // TODO: how ot get?
     error_t get_maced_share(const uint64_t vid, leath_maced_share_t &s);

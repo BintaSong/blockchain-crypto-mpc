@@ -38,7 +38,7 @@ bn_t eGCD(const bn_t N, const bn_t a, const bn_t b, bn_t &x, bn_t &y);
 struct leath_client_share_t
 {
   bn_t h_1, h_2, _N, N;
-  bn_t c_1, c_2, keys_share, mac_key;
+  bn_t x_1, x_2, c_1, c_2, keys_share, mac_key;
   crypto::paillier_t paillier;
 
   void convert(ub::converter_t &converter)
@@ -47,6 +47,8 @@ struct leath_client_share_t
     converter.convert(h_2);
     converter.convert(_N);
     converter.convert(N);
+    converter.convert(x_1);
+    converter.convert(x_2);
     converter.convert(c_1);
     converter.convert(c_2);
     converter.convert(keys_share);
@@ -60,7 +62,8 @@ struct leath_server_share_t
   int server_id;
   bn_t h_1, h_2, _N;
   bn_t c_1, c_2, N;
-  bn_t keys_share, mac_key_share;
+  ecc_point_t pk;
+  bn_t sk, keys_share, mac_key_share;
 
   void convert(ub::converter_t &converter)
   {
@@ -71,6 +74,8 @@ struct leath_server_share_t
     converter.convert(c_2);
     converter.convert(_N);
     converter.convert(N);
+    converter.convert(pk);
+    converter.convert(sk);
     converter.convert(keys_share);
     converter.convert(mac_key_share);
   }
