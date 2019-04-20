@@ -102,19 +102,19 @@ error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const leath_maced
     return 0;
 }
 
-// error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out)
-// {
-//     out.share = server_share.c_2.pow_mod(in.share, server_share.N) ;
-//     out.mac_share = in.mac_share; 
-
-//     return 0;
-// }
 error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint64_t vid, leath_maced_share_t &out)
 {
+    error_t rv = 0;
     leath_maced_share_t tmp;
-    get_maced_share(vid, tmp);
 
-    out.share = server_share.c_2.pow_mod(tmp.share, server_share.N) ;
+    rv = get_maced_share(vid, tmp);
+    if (rv != 0) {
+        logger::log(logger::ERROR) << "leath_reconstruct_peer2_step1(): Get Share Failed!" <<std::endl;
+        return rv;
+    }
+
+    bn_t N2 = server_share.N * server_share.N;
+    out.share = server_share.c_2.pow_mod(tmp.share, N2);
     out.mac_share = tmp.mac_share;
 
     return 0;
@@ -136,16 +136,14 @@ leath_maced_share_t LeathServer::add_constant(const leath_maced_share_t s, const
 
     if (server_share.server_id == 0)
     {
-        MODULO(server_share.N)
-        ret.share = s.share + e;
+        MODULO(server_share.N) ret.share = s.share + e;
     }
     else
     {
         ret.share = s.share;
     }
 
-    MODULO(server_share.N)
-    ret.mac_share = s.mac_share + server_share.mac_key_share * e;
+    MODULO(server_share.N) ret.mac_share = s.mac_share + server_share.mac_key_share * e;
 
     return ret;
 }
@@ -170,7 +168,8 @@ error_t LeathServer::get_maced_share(const uint64_t vid, leath_maced_share_t &s)
     std::map<uint64_t, leath_maced_share_t>::iterator it;
     it = share_map.find(vid);
     if (it == share_map.end()){
-        logger::log(logger::ERROR) << "Not find the matching share" << std::endl;
+        logger::log(logger::ERROR) << "get_maced_share(): Not find the matching share" << std::endl;
+        return error(E_NOT_FOUND);
     }
     s = it->second;
     return 0;

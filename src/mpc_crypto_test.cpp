@@ -965,7 +965,7 @@ static int test_leath_client_server()
 
   mpc::leath_setup_message1_t client_setup_msg1;
   mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2;
-   mpc::leath_setup_message3_t server0_setup_msg3, server1_setup_msg3;
+  mpc::leath_setup_message3_t server0_setup_msg3, server1_setup_msg3;
 
   rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), client_setup_msg1);
   assert(rv == 0);
@@ -1004,26 +1004,62 @@ static int test_leath_client_server()
   //printf("after leath_setup_peer1_step2. \n\n");
   assert(rv == 0);
 
+//-----------------check mac generation------------------
   bn_t tmp;
+  int bits = server0.server_share.pk.get_curve().bits();
+
+
   MODULO(client.client_share.N) tmp = client.client_share.mac_key - server0.server_share.mac_key_share - server1.server_share.mac_key_share ;
   assert(tmp == 0);
 
   MODULO(client.client_share.N) tmp = client.client_share.keys_share + server0.server_share.keys_share + server1.server_share.keys_share ;
-
-  int bits = server0.server_share.pk.get_curve().bits();
-
+  assert(tmp % client.client_share.paillier.get_p() == 0);
+  // TODO: **ATTENTION** Sometimes bug happens !!
+  assert(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk == tmp %  client.client_share.paillier.get_q());
+  
   tmp = tmp -(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk) * client.client_share.paillier.decrypt(client.client_share.c_1);
   assert(tmp % client.client_share.N == 0);
-
-
   
 
+//----------------check share and reconstruction---------
+
+  std::vector<leath_maced_share_with_VID_t> shares;
+  leath_maced_share_with_VID_t server0_share;
+  leath_maced_share_with_VID_t server1_share;
+
+  // vid = 1, raw_data = 678;
+  rv = client.leath_share_peer1_step1(ub::mem_t::from_string("share_session"), 1, bn_t(789), shares );
+  // logger::log(logger::INFO)<< bn_t(789).to_string() <<std::endl;
+  assert(rv == 0);
+
+  server0.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[0], server0_share);
+  server1.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[1], server1_share);
+  logger::log(logger::INFO)<< ((server0_share.maced_share.share + server1_share.maced_share.share) % client.client_share.paillier.get_p()).to_string() <<std::endl;
+
+
+//----------------data reconstruction--------------------
+
+  leath_maced_share_t share_s0, share_s1;
+  std::vector<leath_maced_share_t> share_vector;
+  bn_t data = 0;
+
+  server0.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, share_s0);
+  server1.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, share_s1);
+  share_vector.push_back(share_s0); 
+  share_vector.push_back(share_s1); 
+
+  rv = client.leath_reconstruct_peer1_step1(ub::mem_t::from_string("reconstruction_session"), 1, share_vector, data);
+  //assert(rv == 0);// error!
+  
+  // assert(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk == data % client.client_share.paillier.get_q());
+
+  logger::log(logger::INFO)<< data.to_string() <<std::endl;
+  // assert(data == bn_t(789));
 
   return 0;
-
 }
 
-
+//-----------------leath rpc client and server--------------------------
 grpc::Server *server_ptr__ = NULL;
 
 void exit_handler(int signal)

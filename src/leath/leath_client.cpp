@@ -206,14 +206,14 @@ bn_t LeathClient::reconstruct_data( const std::vector<bn_t>& data_shares)
     return raw_data;
 }
 
-bool LeathClient::check_data(const bn_t data, const bn_t mac)
+error_t LeathClient::check_data(const bn_t data, const bn_t mac)
 {
     bn_t tmp;
     MODULO(client_share.N) tmp = data * client_share.mac_key;
     if ( tmp != mac) {
-        return false;
+        return error(E_AUTH);
     }
-    return true;
+    return 0;
 }
 
 error_t LeathClient::split_data_mac(const bn_t raw_data, std::vector<leath_maced_share_t>& data_mac_shares){
@@ -226,7 +226,7 @@ error_t LeathClient::split_data_mac(const bn_t raw_data, std::vector<leath_maced
 
     bn_t data = get_partial_data(raw_data);
     bn_t mac;
-    MODULO(client_share.N) mac = data * client_share.mac_key;
+    MODULO(client_share.N) mac = raw_data * client_share.x_2 * client_share.mac_key;
 
     for (int i = 0; i < number_of_server - 1; i++)
     {
@@ -249,13 +249,17 @@ error_t LeathClient::split_data_mac(const bn_t raw_data, std::vector<leath_maced
 
 error_t LeathClient::split_data_mac_with_VID(const uint64_t vid, const bn_t raw_data, std::vector<leath_maced_share_with_VID_t>& data_mac_shares){
     error_t rv = 0;
+
     if (number_of_server < 2)
     {
         logger::log(logger::ERROR) << "Number of server must >= 2!" << std::endl;
         return rv = error(E_BADARG);
     }
+
     bn_t mac, data = get_partial_data(raw_data);
-    MODULO(client_share.N) mac = data * client_share.mac_key;
+    MODULO(client_share.N) mac = raw_data * client_share.x_2 * client_share.mac_key; // raw_data * crt(1, 0) * mac_key
+
+    // check_data();
 
     for (int i = 0; i < number_of_server - 1; i++)
     {
@@ -279,7 +283,7 @@ error_t LeathClient::reconstruct_data_mac(const std::vector<leath_maced_share_t>
 
     if (number_of_server != data_mac_shares.size())
     {
-        logger::log(logger::ERROR) << "Number of server not match with share number" << std::endl;
+        logger::log(logger::ERROR) << "reconstruct_data_mac(): Number of server not match with share number" << std::endl;
         return rv = error(E_BADARG);
     }
     bn_t data_tmp = 0, mac_tmp = 0;
@@ -291,11 +295,12 @@ error_t LeathClient::reconstruct_data_mac(const std::vector<leath_maced_share_t>
 
     rv = check_data(data_tmp, mac_tmp);
     if (rv != 0) {
-        logger::log(logger::ERROR) << "reconstruct_data_mac(): mac check failed!" << std::endl;
+        logger::log(logger::ERROR) << "reconstruct_data_mac(): MAC Check Failed!" << std::endl;
         return rv;
     }
 
     // set the correct dara
+    //logger::log(logger::INFO) <<  client_share.paillier.get_q().get_bits_count() << std::endl;
     data = data_tmp % client_share.paillier.get_p();
     return 0;
 }

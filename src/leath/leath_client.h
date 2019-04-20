@@ -40,7 +40,7 @@ public:
     error_t reconstruct_data_mac(const std::vector<leath_maced_share_t>& data_mac_shares, bn_t& raw_data);
     error_t reconstruct_data_mac_with_VID(const std::vector<leath_maced_share_with_VID_t>& data_mac_shares, bn_t& data);
 
-    bool check_data(const bn_t data, const bn_t mac); 
+    error_t check_data(const bn_t data, const bn_t mac); 
 
 public:
     bool is_setup; // TODO: depends on if path has remaining information
