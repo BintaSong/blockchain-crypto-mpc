@@ -5,7 +5,65 @@ using namespace ub;
 namespace mpc
 {
 
-LeathServer::LeathServer(std::string path, uint8_t id) : server_path(path), server_id(id){}
+LeathServer::LeathServer(const std::string path, const uint8_t id) : server_dir(path), server_id(id){
+    
+}
+
+LeathServer::LeathServer(const std::string path, const uint8_t id, const leath_server_share_t stored_share) : server_dir(path), server_id(id), server_share(stored_share){
+    
+}
+
+std::unique_ptr<LeathServer> LeathServer::construct_from_directory (const std::string dir_path, const uint8_t  server_id, const int bits){
+    if (!is_directory(dir_path))
+    {
+        throw std::runtime_error(dir_path + ": not a directory");
+    }
+
+    std::string server_share_path = dir_path + "/server_share_" + std::to_string(server_id);
+    std::string server_input_path = dir_path + "/input_" + std::to_string(server_id);
+    std::string server_triple_path = dir_path + "/triple_" + std::to_string(server_id);
+
+    if (!is_file(server_share_path))
+    {
+        throw std::runtime_error("Missing server share file");
+    }
+
+    if (!is_file(server_input_path))
+    {
+        throw std::runtime_error("Missing server input file");
+    }
+
+    if (!is_file(server_triple_path))
+    {
+        throw std::runtime_error("Missing server triple file");
+    }
+
+    // restore client_share from file
+    std::ifstream server_share_in(server_share_path.c_str(), std::ios::binary);
+    std::stringstream server_share_stream;
+    server_share_stream << server_share_in.rdbuf();
+
+    leath_server_share_t stored_server_share;
+    ub::convert(stored_server_share, mem_t::from_string(server_share_stream.str())); // set client_share !
+
+    return std::unique_ptr<LeathServer>(new LeathServer(dir_path, server_id, stored_server_share));
+}
+
+std::unique_ptr<LeathServer> LeathServer::init_in_directory (const std::string dir_path, const uint8_t  server_id, const int bits) {
+        if (!is_directory(dir_path)) {
+        throw std::runtime_error(dir_path + ": not a directory");
+    }
+
+    return std::unique_ptr<LeathServer>(new LeathServer(dir_path, server_id));
+}
+
+error_t LeathServer::set_server_share(const leath_server_share_t s_share) {
+    error_t rv = 0;
+    
+    server_share = s_share;
+
+    return 0;
+}
 
 error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, const leath_setup_message1_t &in, leath_setup_message2_t &out)
 {
@@ -16,26 +74,20 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     if (in.N.get_bits_count() < paillier_size)
         return rv = error(E_CRYPTO);
 
-    // printf("in peer2_step1, before ZK_PAILLIER_V_non_interactive.v:  %s \n\n", in.N.to_string().c_str());
-
     if (!mpc::ZK_PAILLIER_V_non_interactive(in.N, in.pi_RN, session_id))
         return rv = error(E_CRYPTO);
-    // printf("in peer2_step1, after ZK_PAILLIER_V_non_interactive.v \n");
 
     crypto::paillier_t paillier;
     paillier.create_pub(in.N);
 
     if (!in.zk_paillier_zero.v(in.N, in.c_3, session_id, 1))
         return rv = error(E_CRYPTO);
-    // printf("in peer2_step1, after zk_paillier_zero.v \n");
 
     if (!in.zk_paillier_m.v(in.N, paillier.add_ciphers(in.c_1, in.c_2), bn_t(1), session_id, 1))
         return rv = error(E_CRYPTO);
-    // printf("in peer2_step1, after zk_paillier_m.v \n");
 
     if (!in.zk_paillier_mult.v(in.N, in.c_1, in.c_2, in.c_3, session_id, 1))
         return rv = error(E_CRYPTO);
-    // printf("in peer2_step1, after zk_paillier_mult.v \n");
 
     // if all good, prepare return message
     // TODO:
@@ -80,6 +132,7 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
 error_t LeathServer::leath_setup_peer2_step2(mem_t session_id, int server_id, const leath_setup_message3_t &in)
 {
     server_share.mac_key_share = in.mac_key_share;
+    write_share();
     return 0;
 }
 
@@ -169,6 +222,28 @@ int32_t LeathServer::get_id()
     return server_id;
 }
 
+error_t LeathServer::write_share() 
+{
+    error_t rv = 0;
+    if (!is_directory(server_dir))
+    {
+        throw std::runtime_error(server_dir + ": not a directory");
+    }
+
+    std::string server_share_path = server_dir + "/" + "server_" + std::to_string(server_id);
+
+    std::ofstream server_share_out(server_share_path.c_str());
+    if (!server_share_out.is_open())
+    {
+        throw std::runtime_error(server_share_path + ": unable to write the client share");
+    }
+
+    server_share_out << ub::convert(server_share).to_string();
+    server_share_out.close();
+
+    return 0;
+}
+
 error_t LeathServer::get_maced_share(const uint64_t vid, leath_maced_share_t &s) {
     //TODO: how to get the maced share by vid!
 
@@ -179,7 +254,9 @@ error_t LeathServer::get_maced_share(const uint64_t vid, leath_maced_share_t &s)
         return error(E_NOT_FOUND);
     }
     s = it->second;
+
     return 0;
 }
+
 
 } // namespace mpc

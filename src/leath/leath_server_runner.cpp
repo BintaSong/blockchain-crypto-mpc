@@ -5,7 +5,19 @@ using namespace mpc::leath;
 namespace mpc {
     LeathServerImpl::LeathServerImpl(const std::string& path, uint8_t id): already_setup(false), server_id(id), current_step(1){
         //
-        server_.reset(new LeathServer(path, id));
+        // server_.reset(new LeathServer(path, id));
+
+        if (is_directory(path)) {
+            server_ = LeathServer::construct_from_directory(path, server_id, 1024); //FIXME:   
+        }else if (exists(path)){
+            throw std::runtime_error(path + ": not a directory");
+        }else{      
+            // FIXME: the first time run only create directory, nothing else!
+            if (!create_directory(path, (mode_t)0700)) {
+                throw std::runtime_error(path + ": unable to create directory");
+            }
+            server_ = LeathServer::init_in_directory(path, server_id, 1024);
+        }
     }
 
     grpc::Status LeathServerImpl::setup(grpc::ServerContext* context, const SetupMessage* request, SetupMessage* response) {
@@ -43,13 +55,13 @@ namespace mpc {
     }
 
     grpc::Status LeathServerImpl::share(grpc::ServerContext* context, const ShareRequestMessage* request, google::protobuf::Empty* response){
-        
+        // TODO: 
                 
         return grpc::Status::OK;
     }
 
     grpc::Status LeathServerImpl::reconstruct(grpc::ServerContext* context,  const ReconstructRequestMessage* request, ReconstructReply* response) {
-        
+        // TODO: 
         
         return grpc::Status::OK;
     }  

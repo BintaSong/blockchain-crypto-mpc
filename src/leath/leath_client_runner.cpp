@@ -7,7 +7,7 @@
 #include <grpc++/security/credentials.h>
 
 namespace mpc {
-    LeathClientRunner::LeathClientRunner(const std::vector<std::string>& addresses, const std::string client_path): current_step(1), already_setup(false), abort(false) 
+    LeathClientRunner::LeathClientRunner(const std::vector<std::string>& addresses, const std::string client_path): client_dir(client_path), current_step(1), already_setup(false), abort(false) 
     {
         for(auto& address : addresses) {
             std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
@@ -16,7 +16,19 @@ namespace mpc {
 
         number_of_servers = addresses.size();
         
-        client_.reset( new LeathClient("TODO: test", number_of_servers, 1024) );
+        // client_.reset( new LeathClient(client_path, number_of_servers, 1024) );
+
+        if (is_directory(client_path)) {
+            client_ = LeathClient::construct_from_directory(client_path, number_of_servers, 1024);   
+        }else if (exists(client_path)){
+            throw std::runtime_error(client_path + ": not a directory");
+        }else{      
+            // FIXME: the first time run only create directory, nothing else!
+            if (!create_directory(client_path, (mode_t)0700)) {
+                throw std::runtime_error(client_path + ": unable to create directory");
+            }
+            client_ = LeathClient::init_in_directory(client_path, number_of_servers, 1024);
+        }
     }
 
     void LeathClientRunner::setup() {
@@ -68,6 +80,12 @@ namespace mpc {
         for (auto& t : threads) {
             t.join();
         }
-    }
+
+        // in the end, store client share !
+        already_setup = true;
+        client_->write_share();
+    } //setup
+
+
 
 }

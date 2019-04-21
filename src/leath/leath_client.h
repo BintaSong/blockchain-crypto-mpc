@@ -1,6 +1,7 @@
-
 #pragma once
 #include "mpc_leath.h"
+
+#include "utils.h"
 
 #include <mutex>
 
@@ -10,7 +11,10 @@ namespace mpc
 class LeathClient
 {
 public:
-    LeathClient(std::string path, int server_number, int bits);
+    LeathClient(const std::string path, const int server_number, const int bits);
+
+    static std::unique_ptr<LeathClient> construct_from_directory (const std::string dir_path, const int number_of_servers, const int bits);
+    static std::unique_ptr<LeathClient> init_in_directory(const std::string dir_path, const int number_of_servers, const int bits);
 
     //----------client setup step functions---------------
     error_t leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out);
@@ -40,14 +44,15 @@ public:
     error_t reconstruct_data_mac(const std::vector<leath_maced_share_t>& data_mac_shares, bn_t& raw_data);
     error_t reconstruct_data_mac_with_VID(const std::vector<leath_maced_share_with_VID_t>& data_mac_shares, bn_t& raw_data);
 
-    error_t check_data(const bn_t data, const bn_t mac); 
+    error_t check_data(const bn_t data, const bn_t mac);
+
+//----------some file interface-----------
+    error_t write_share();
 
 public:
-    bool is_setup; // TODO: depends on if path has remaining information
-
+    //bool is_setup; // TODO: depends on if path has remaining information
+    std::string client_dir;
     int number_of_server, paillier_keysize;
-
-    std::string client_path;
 
     static leath_client_share_t client_share;
     static std::mutex client_share_mutx_;

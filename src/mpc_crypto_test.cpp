@@ -43,8 +43,8 @@
 using namespace mpc;
 
 extern "C" MPCCRYPTO_API int MPCCrypto_test();
-extern "C" MPCCRYPTO_API int leath_client(int argc, char* argv[]);
-extern "C" MPCCRYPTO_API int leath_server(int argc, char* argv[]);
+extern "C" MPCCRYPTO_API int leath_client(int argc, char *argv[]);
+extern "C" MPCCRYPTO_API int leath_server(int argc, char *argv[]);
 
 static int share_to_buf(MPCCryptoShare *share, std::vector<uint8_t> &buf)
 {
@@ -946,11 +946,9 @@ static int test_leath_share_reconstruct()
 
   //---------------------------------
   rv = server.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, msg1, msg2);
-  //printf("after leath_setup_peer2_step1. \n\n");
   assert(rv == 0);
 
   rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 0, msg2);
-  //printf("after leath_setup_peer1_step2. \n\n");
   assert(rv == 0);
   return 0;
 }
@@ -969,7 +967,6 @@ static int test_leath_client_server()
 
   rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), client_setup_msg1);
   assert(rv == 0);
-
 
   //---------------------------------
   rv = server0.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, client_setup_msg1, server0_setup_msg2);
@@ -996,48 +993,49 @@ static int test_leath_client_server()
   rv = server1.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
   assert(rv == 0);
 
-//-----------------check mac generation------------------
+  //-----------------check mac generation------------------
   bn_t tmp, N;
   bn_t p = client.client_share.paillier.get_p();
   bn_t q = client.client_share.paillier.get_q();
   N = p * q;
   int bits = server0.server_share.pk.get_curve().bits();
 
-
-  MODULO(client.client_share.N) tmp = client.client_share.mac_key - server0.server_share.mac_key_share - server1.server_share.mac_key_share ;
+  MODULO(client.client_share.N)
+  tmp = client.client_share.mac_key - server0.server_share.mac_key_share - server1.server_share.mac_key_share;
   assert(tmp == 0);
 
-  MODULO(client.client_share.N) tmp = client.client_share.keys_share + server0.server_share.keys_share + server1.server_share.keys_share ;
+  MODULO(client.client_share.N)
+  tmp = client.client_share.keys_share + server0.server_share.keys_share + server1.server_share.keys_share;
   assert(tmp % p == 0);
   // FIXME: Sometimes bug happens for 1024-bits paillier, because q may less than sk2||sk1 in some case !
   assert(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk == tmp % q);
-  
-  tmp = tmp -(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk) * client.client_share.paillier.decrypt(client.client_share.c_1);
-  assert(tmp % N == 0);
-  
 
-//----------------check share and reconstruction---------
+  tmp = tmp - (server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk) * client.client_share.paillier.decrypt(client.client_share.c_1);
+  assert(tmp % N == 0);
+
+  //----------------check share and reconstruction---------
 
   std::vector<leath_maced_share_with_VID_t> shares;
   leath_maced_share_with_VID_t server0_share;
   leath_maced_share_with_VID_t server1_share;
 
   // vid = 1, raw_data = 678;
-  rv = client.leath_share_peer1_step1(ub::mem_t::from_string("share_session"), 1, bn_t(789), shares );
+  rv = client.leath_share_peer1_step1(ub::mem_t::from_string("share_session"), 1, bn_t(789), shares);
   // logger::log(logger::INFO)<< bn_t(789).to_string() <<std::endl;
   assert(rv == 0);
   bn_t raw_data_ = 0;
-  MODULO(p) raw_data_ = shares[0].maced_share.share + shares[1].maced_share.share - client.client_share.keys_share;
-  assert( raw_data_ == bn_t(789) );
-
+  MODULO(p)
+  raw_data_ = shares[0].maced_share.share + shares[1].maced_share.share - client.client_share.keys_share;
+  assert(raw_data_ == bn_t(789));
 
   server0.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[0], server0_share);
   server1.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[1], server1_share);
 
-  MODULO(p) raw_data_ = server0_share.maced_share.share + server1_share.maced_share.share;
-  assert(raw_data_ == bn_t(789) );
+  MODULO(p)
+  raw_data_ = server0_share.maced_share.share + server1_share.maced_share.share;
+  assert(raw_data_ == bn_t(789));
 
-//----------------data reconstruction--------------------
+  //----------------data reconstruction--------------------
 
   leath_maced_share_t cipher_share_s0, cipher_share_s1;
   std::vector<leath_maced_share_t> cipher_share_vector;
@@ -1045,30 +1043,59 @@ static int test_leath_client_server()
 
   server0.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s0);
   server1.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s1);
-  cipher_share_vector.push_back(cipher_share_s0); 
-  cipher_share_vector.push_back(cipher_share_s1); 
+  cipher_share_vector.push_back(cipher_share_s0);
+  cipher_share_vector.push_back(cipher_share_s1);
 
   raw_data_ = 0;
   raw_data_ = client.client_share.paillier.decrypt(cipher_share_vector[0].share * cipher_share_vector[1].share);
- 
-  MODULO(p) raw_data_ = raw_data_ - 0;
-  logger::log(logger::INFO)<< "reconstruct raw_data: " << raw_data_.to_string() <<std::endl;
+
+  MODULO(p)
+  raw_data_ = raw_data_ - 0;
+  logger::log(logger::INFO) << "reconstruct raw_data: " << raw_data_.to_string() << std::endl;
   assert(raw_data_ == bn_t(789));
 
-
-// above is all good ...
+  // above is all good ...
 
   rv = client.leath_reconstruct_peer1_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_vector, data);
 
+  assert(rv == 0); // error!
+
+  logger::log(logger::INFO) << "reconstruct data: " << data.to_string() << std::endl;
+  assert(data == bn_t(789));
+
+  std::ifstream is("/home/jason/Desktop/blockchain-crypto-mpc/src/test.txt", std::ios::binary);
+  std::stringstream ifs_stream;
+  ifs_stream << is.rdbuf();
+  logger::log(logger::INFO) << ifs_stream.str() << std::endl;
+
+//   is.seekg(0, is.end);
+//   int length = is.tellg();
+//   is.seekg(0, is.beg);
+// logger::log(logger::INFO) << length << std::endl;
+//   // allocate memory:
+//   char *buffer = new char[length];
+
+//   mem_t m_buf((const_byte_ptr)buffer, length);
+
+//   // read data as a block:
+//   is.read(buffer, length);
+
+//   is.close();
+
+//   std::stringstream stream;
+//   stream << is.rdbuf();
+
+// logger::log(logger::INFO) << stream.str() << std::endl;
 
 
-  //assert(rv == 0);// error!
-  
-  // assert(server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk == data % client.client_share.paillier.get_q());
+// logger::log(logger::INFO) << buf_t(mem_t((const_byte_ptr)buffer, length)).to_string() << std::endl;
+//   // print content:
+//   std::cout.write(buffer, length);
 
-  logger::log(logger::INFO)<< "reconstruct data: " << data.to_string() <<std::endl;
-  // assert(data == bn_t(789));
+  std::string client_share_path = "/home/jason/Desktop/blockchain-crypto-mpc/src/test.txt";
 
+  std::ofstream client_share_out(client_share_path.c_str());
+  client_share_out << "hi";
   return 0;
 }
 
@@ -1116,7 +1143,6 @@ static int test_leath_client_rpc()
   return 0;
 }
 
-
 namespace mpc
 {
 extern int zk_paillier_range_time;
@@ -1132,7 +1158,6 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   addresses.push_back("localhost:7001");
   addresses.push_back("localhost:7002");
   addresses.push_back("localhost:7003");
-
 
   client_runner.reset(new mpc::LeathClientRunner(addresses, ""));
 
@@ -1182,7 +1207,7 @@ MPCCRYPTO_API int leath_server(int argc, char *argv[])
 
   std::string server_address;
   uint8_t server_id;
-  logger::log(logger::INFO)<< "Before server setup..." <<std::endl;
+  logger::log(logger::INFO) << "Before server setup..." << std::endl;
   while ((c = getopt(argc, argv, "i:s:r:a:")) != -1)
     switch (c)
     {
@@ -1212,7 +1237,7 @@ MPCCRYPTO_API int leath_server(int argc, char *argv[])
     //                  optopt);
     //     return 1;
     default:
-      logger::log(logger::INFO)<< "Before server setup..." <<std::endl;
+      logger::log(logger::INFO) << "Before server setup..." << std::endl;
       exit(-1);
     }
 

@@ -28,6 +28,7 @@ namespace mpc {
     private:
         std::vector< std::unique_ptr<leath::LeathRPC::Stub>> stub_vector;
         std::unique_ptr<LeathClient> client_;
+        std::string client_dir;
 
         int32_t current_step;
         int32_t number_of_servers;
