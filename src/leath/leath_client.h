@@ -32,13 +32,13 @@ public:
 
     bn_t get_partial_data(const bn_t raw_data);
 
-    error_t split_data(const bn_t raw_data, std::vector<bn_t>& data_shares);
+    // error_t split_data(const bn_t raw_data, std::vector<bn_t>& data_shares);
     error_t split_data_mac(const bn_t raw_data, std::vector<leath_maced_share_t>& data_mac_shares);
     error_t split_data_mac_with_VID(const uint64_t vid, const bn_t raw_data, std::vector<leath_maced_share_with_VID_t>& data_mac_shares);
 
-    bn_t reconstruct_data(const std::vector<bn_t>& data_shares);  
+    // bn_t reconstruct_data(const std::vector<bn_t>& data_shares);  
     error_t reconstruct_data_mac(const std::vector<leath_maced_share_t>& data_mac_shares, bn_t& raw_data);
-    error_t reconstruct_data_mac_with_VID(const std::vector<leath_maced_share_with_VID_t>& data_mac_shares, bn_t& data);
+    error_t reconstruct_data_mac_with_VID(const std::vector<leath_maced_share_with_VID_t>& data_mac_shares, bn_t& raw_data);
 
     error_t check_data(const bn_t data, const bn_t mac); 
 

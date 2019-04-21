@@ -52,7 +52,8 @@ error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_messa
     // bn_t s, m;
     // MODULO(out.N) s = m1 + m2;
     // MODULO(out.N) m = m1 * m2;
-    // assert( s == bn_t(1));
+    assert( m1 %  paillier.get_q()  == bn_t(1));
+    assert( m1 %  paillier.get_p()  == bn_t(0));
 
     client_share.c_1 = out.c_1 = paillier.encrypt(m1, r_1);
     client_share.c_2 = out.c_2 = paillier.encrypt(m2, r_2);
@@ -120,13 +121,13 @@ error_t LeathClient::leath_share_peer1_step1(mem_t session_id, uint64_t vid, con
     return split_data_mac_with_VID(vid, raw_data, out);
 }
 
-error_t LeathClient::leath_reconstruct_peer1_step1(mem_t session_id, const uint64_t vid, const std::vector<leath_maced_share_t>& in, bn_t &data) {
+error_t LeathClient::leath_reconstruct_peer1_step1(mem_t session_id, const uint64_t vid, const std::vector<leath_maced_share_t>& cipher_in, bn_t &data) {
 
-    return reconstruct_data_mac(in, data);
+    return reconstruct_data_mac(cipher_in, data);
 }
-error_t LeathClient::leath_reconstruct_peer1_step1(mem_t session_id, const std::vector<leath_maced_share_with_VID_t>& in, bn_t &data) {
+error_t LeathClient::leath_reconstruct_peer1_step1(mem_t session_id, const std::vector<leath_maced_share_with_VID_t>& cipher_in, bn_t &data) {
 
-    return reconstruct_data_mac_with_VID(in, data);
+    return reconstruct_data_mac_with_VID(cipher_in, data);
 }
 
 bn_t LeathClient::get_mac_key()
@@ -157,60 +158,65 @@ bn_t LeathClient::get_mac_key()
 //     return 0;
 // }
 
-bn_t LeathClient::get_partial_data(const bn_t raw_data)
+bn_t LeathClient::get_partial_data(const bn_t raw_data) // partial_data = raw_data * crt(1, 0) + keys_share
 { 
-    // partial_data = raw_data * crt(1, 0) + keys_share
-    bn_t partial_data;
+    
+    bn_t partial_data = 0;
     MODULO(client_share.N) partial_data = raw_data * client_share.x_2 + client_share.keys_share;
-
+    // assert( client_share.x_2 % client_share.paillier.get_p() == 1);
+    // bn_t tmp;
+    // MODULO(client_share.N) tmp = (partial_data - client_share.keys_share);
+    // assert( tmp % client_share.paillier.get_p() == raw_data);
     return partial_data;
 }
 
-error_t LeathClient::split_data(const bn_t raw_data, std::vector<bn_t>& _enhanced_data_shares)
+// error_t LeathClient::split_data(const bn_t raw_data, std::vector<bn_t>& _enhanced_data_shares)
+// {
+//     error_t rv = 0;
+//     if (number_of_server < 2)
+//     {
+//         logger::log(logger::ERROR) << "Number of server must >= 2!" << std::endl;
+//         return rv = error(E_BADARG);
+//     }
+//     // firstly make it to Zn
+//     bn_t tmp = get_partial_data(raw_data);
+
+//     for (int i = 0; i < number_of_server - 1; i++)
+//     {
+//         bn_t share_i = bn_t::rand(client_share.N);
+//         _enhanced_data_shares.push_back(share_i);
+//         MODULO(client_share.N)  tmp = tmp - share_i;
+//     }
+//     _enhanced_data_shares.push_back(tmp);
+
+//     return 0;
+// }
+
+// bn_t LeathClient::reconstruct_data( const std::vector<bn_t>& data_shares) 
+// { 
+//     //_data = crt(raw_data, 0)
+//     if (data_shares.size() != number_of_server)
+//     {
+//         logger::log(logger::ERROR) << "Number of server must not match with share number" << std::endl;
+//         exit(-1);
+//     }
+//     bn_t raw_data = 0, data = 0;
+//     for(auto& s : data_shares) {
+//         MODULO(client_share.N) data += s;
+//     }
+//     // get raw data in Zp slot
+//     raw_data = data % client_share.paillier.get_p(); // TODO: do not use % again !!!!
+
+//     return raw_data;
+// }
+
+error_t LeathClient::check_data(const bn_t e_, const bn_t mac)
 {
-    error_t rv = 0;
-    if (number_of_server < 2)
-    {
-        logger::log(logger::ERROR) << "Number of server must >= 2!" << std::endl;
-        return rv = error(E_BADARG);
-    }
-    // firstly make it to Zn
-    bn_t tmp = get_partial_data(raw_data);
-
-    for (int i = 0; i < number_of_server - 1; i++)
-    {
-        bn_t share_i = bn_t::rand(client_share.N);
-        _enhanced_data_shares.push_back(share_i);
-        MODULO(client_share.N)  tmp = tmp - share_i;
-    }
-    _enhanced_data_shares.push_back(tmp);
-
-    return 0;
-}
-
-bn_t LeathClient::reconstruct_data( const std::vector<bn_t>& data_shares) 
-{ 
-    //_data = crt(raw_data, 0)
-    if (data_shares.size() != number_of_server)
-    {
-        logger::log(logger::ERROR) << "Number of server must not match with share number" << std::endl;
-        exit(-1);
-    }
-    bn_t raw_data = 0, data = 0;
-    for(auto& s : data_shares) {
-        MODULO(client_share.N) data += s;
-    }
-    // get raw data in Zp slot
-    raw_data = data % client_share.paillier.get_p(); 
-
-    return raw_data;
-}
-
-error_t LeathClient::check_data(const bn_t data, const bn_t mac)
-{
-    bn_t tmp;
-    MODULO(client_share.N) tmp = data * client_share.mac_key;
+    bn_t tmp = 0;
+    MODULO(client_share.N) tmp = e_ * client_share.mac_key;
+    // assert((tmp - mac) % client_share.N == 0);
     if ( tmp != mac) {
+        logger::log(logger::ERROR) << "check_data(): MAC Check Failed!" <<std::endl;
         return error(E_AUTH);
     }
     return 0;
@@ -257,9 +263,18 @@ error_t LeathClient::split_data_mac_with_VID(const uint64_t vid, const bn_t raw_
     }
 
     bn_t mac, data = get_partial_data(raw_data);
+    bn_t tmp1 = 0, tmp2 = 0;
+
+    // MODULO(client_share.N) tmp1 = (data - client_share.keys_share);
+    // assert(tmp == ((data - client_share.keys_share) % client_share.N));
+    // logger::log(logger::INFO) << tmp1.to_string() << "\n\n" << ((data - client_share.keys_share) % client_share.N).to_string() << std::endl;
+    // assert(tmp1 % client_share.paillier.get_p() == raw_data);
+    
+    // bn_t tmp = data;
     MODULO(client_share.N) mac = raw_data * client_share.x_2 * client_share.mac_key; // raw_data * crt(1, 0) * mac_key
 
-    // check_data();
+    // rv = check_data(data - client_share.keys_share, mac);
+    // assert(rv == 0);
 
     for (int i = 0; i < number_of_server - 1; i++)
     {
@@ -278,56 +293,74 @@ error_t LeathClient::split_data_mac_with_VID(const uint64_t vid, const bn_t raw_
     return 0;
 }
 
-error_t LeathClient::reconstruct_data_mac(const std::vector<leath_maced_share_t>& data_mac_shares, bn_t& data){
+error_t LeathClient::reconstruct_data_mac(const std::vector<leath_maced_share_t>& cipher_maced_shares, bn_t& raw_data){
     error_t rv = 0;
 
-    if (number_of_server != data_mac_shares.size())
+    bn_t N, N2;
+    N = client_share.N;
+    N2 = N * N;
+
+    if (number_of_server != cipher_maced_shares.size())
     {
         logger::log(logger::ERROR) << "reconstruct_data_mac(): Number of server not match with share number" << std::endl;
         return rv = error(E_BADARG);
     }
-    bn_t data_tmp = 0, mac_tmp = 0;
+    bn_t e_ = 1, mac_tmp = 0;
     for (int i = 0; i < number_of_server; i++)
     {
-        MODULO(client_share.N) data_tmp += data_mac_shares[i].share;
-        MODULO(client_share.N) mac_tmp += data_mac_shares[i].mac_share;
+        MODULO(N2) e_ *= cipher_maced_shares[i].share; // attentions: should be *, not + !!!
+        MODULO(N) mac_tmp += cipher_maced_shares[i].mac_share;
     }
 
-    rv = check_data(data_tmp, mac_tmp);
+    bn_t e_data = client_share.paillier.decrypt(e_);
+    
+    // logger::log(logger::INFO) << "***raw_data *** = " << raw_data.to_string() << std::endl;
+
+    rv = check_data(e_data, mac_tmp);
     if (rv != 0) {
         logger::log(logger::ERROR) << "reconstruct_data_mac(): MAC Check Failed!" << std::endl;
         return rv;
     }
 
-    // set the correct dara
-    //logger::log(logger::INFO) <<  client_share.paillier.get_q().get_bits_count() << std::endl;
-    data = data_tmp % client_share.paillier.get_p();
+    bn_t p = client_share.paillier.get_p();
+    // FIXME: **DO NOT** use MODULO(client_share.paillier.get_p())
+    MODULO(p) raw_data = e_data - 0; 
     return 0;
 }
 
-error_t LeathClient::reconstruct_data_mac_with_VID(const std::vector<leath_maced_share_with_VID_t>& data_mac_shares, bn_t& data){
+// TODO: wrong !!!
+error_t LeathClient::reconstruct_data_mac_with_VID(const std::vector<leath_maced_share_with_VID_t>& cipher_maced_shares, bn_t& raw_data){
     error_t rv = 0;
 
-    if (number_of_server != data_mac_shares.size())
+    bn_t N, N2;
+    N = client_share.N;
+    N2 = N * N;
+
+    if (number_of_server != cipher_maced_shares.size())
     {
         logger::log(logger::ERROR) << "Number of server not match with share number" << std::endl;
         return rv = error(E_BADARG);
     }
-    bn_t data_tmp = 0, mac_tmp = 0;
+    bn_t e_ = 1, mac_tmp = 0;
     for (int i = 0; i < number_of_server; i++)
     {
-        MODULO(client_share.N) data_tmp += data_mac_shares[i].maced_share.share;
-        MODULO(client_share.N) mac_tmp += data_mac_shares[i].maced_share.mac_share;
+        MODULO(client_share.N) e_ *= cipher_maced_shares[i].maced_share.share;
+        MODULO(client_share.N) mac_tmp += cipher_maced_shares[i].maced_share.mac_share;
     }
 
-    rv = check_data(data_tmp, mac_tmp);
+    // set the correct dara
+    bn_t e_data = client_share.paillier.decrypt(e_);
+
+     rv = check_data(e_data, mac_tmp);
     if (rv != 0) {
         logger::log(logger::ERROR) << "reconstruct_data_mac(): mac check failed!" << std::endl;
         return rv;
     }
 
-    // set the correct dara
-    data = data_tmp % client_share.paillier.get_p();
+    bn_t p = client_share.paillier.get_p();
+    // FIXME: **DO NOT** use MODULO(client_share.paillier.get_p())
+    MODULO(p) raw_data = e_data - 0;   
+
     return 0;
 }
 

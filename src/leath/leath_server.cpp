@@ -96,7 +96,8 @@ error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const leath_maced
 {
     // firstly add in with local keys_share
     out.val_id = in.val_id;
-    out.maced_share = add_constant(in.maced_share, server_share.keys_share);
+    out.maced_share.share = in.maced_share.share + server_share.keys_share;
+    out.maced_share.mac_share = in.maced_share.mac_share;
 
     share_map[out.val_id] = out.maced_share;
     return 0;
@@ -114,8 +115,14 @@ error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint6
     }
 
     bn_t N2 = server_share.N * server_share.N;
-    out.share = server_share.c_2.pow_mod(tmp.share, N2);
+    MODULO(N2) out.share = server_share.c_2.pow(tmp.share);
     out.mac_share = tmp.mac_share;
+
+    // crypto::paillier_t p; 
+    // p.create_pub(server_share.N);
+    // bn_t test = p.mul_scalar(server_share.c_2, tmp.share);
+
+    // assert(out.share == test);
 
     return 0;
 }
