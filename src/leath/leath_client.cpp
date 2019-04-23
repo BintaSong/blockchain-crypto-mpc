@@ -27,16 +27,19 @@ std::unique_ptr<LeathClient> LeathClient::construct_from_directory(const std::st
         throw std::runtime_error("Missing client share file");
     }
 
-    if (!is_file(client_input_path))
-    {
-        throw std::runtime_error("Missing client input file");
-    }
+//FIXME: 
+    // if (!is_file(client_input_path))
+    // {
+    //     throw std::runtime_error("Missing client input file");
+    // }
 
     // restore client_share from file
     std::ifstream client_share_in(client_share_path.c_str(), std::ios::binary);
     std::stringstream client_share_stream;
     client_share_stream << client_share_in.rdbuf();
     ub::convert(LeathClient::client_share, mem_t::from_string(client_share_stream.str())); // set client_share !
+
+    
 
     return std::unique_ptr<LeathClient>(new LeathClient(dir_path, number_of_servers, bits));
 }
@@ -46,7 +49,7 @@ std::unique_ptr<LeathClient> LeathClient::init_in_directory(const std::string di
     if (!is_directory(dir_path)) {
         throw std::runtime_error(dir_path + ": not a directory");
     }
-
+    
     return std::unique_ptr<LeathClient>(new LeathClient(dir_path, number_of_servers, bits));
 }
 
@@ -65,8 +68,11 @@ error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_messa
     out.h_2 = client_share.h_2 = bn_t::rand(out._N);
 
     assert(out.N == paillier.get_N());
-
+std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
     out.pi_RN = ZK_PAILLIER_P_non_interactive(out.N, paillier.get_phi_N(), session_id);
+std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
     bn_t lambda, mu;
     bn_t r = eGCD(out.N, paillier.get_p(), paillier.get_q(), mu, lambda);
@@ -96,11 +102,19 @@ error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_messa
 
     out.c_3 = paillier.encrypt(0, r_3);
 
+begin = std::chrono::high_resolution_clock::now();
+
     out.zk_paillier_m.p(out.N, paillier.add_ciphers(out.c_1, out.c_2), bn_t(1), session_id, 1, r_1 * r_2);
     out.zk_paillier_zero.p(out.N, out.c_3, session_id, 1, r_3);
     out.zk_paillier_mult.p(out.N, out.c_1, out.c_2, out.c_3, session_id, 1, m1, m2, bn_t(0), r_1, r_2, r_3);
 
+end = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RG proof:" << duration <<std::endl;
+
     client_share.mac_key = 0; // TODO: set mac key to zero!
+    
+    logger::log(logger::INFO) << "Init from dir, N =  " << client_share.N.to_string() << std::endl; 
 
     return 0;
 }

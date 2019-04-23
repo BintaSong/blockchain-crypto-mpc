@@ -4,6 +4,7 @@ using namespace ub;
 
 namespace mpc
 {
+    
 
 LeathServer::LeathServer(const std::string path, const uint8_t id) : server_dir(path), server_id(id){
     
@@ -28,15 +29,15 @@ std::unique_ptr<LeathServer> LeathServer::construct_from_directory (const std::s
         throw std::runtime_error("Missing server share file");
     }
 
-    if (!is_file(server_input_path))
-    {
-        throw std::runtime_error("Missing server input file");
-    }
+    // if (!is_file(server_input_path))
+    // {
+    //     throw std::runtime_error("Missing server input file");
+    // }
 
-    if (!is_file(server_triple_path))
-    {
-        throw std::runtime_error("Missing server triple file");
-    }
+    // if (!is_file(server_triple_path))
+    // {
+    //     throw std::runtime_error("Missing server triple file");
+    // }
 
     // restore client_share from file
     std::ifstream server_share_in(server_share_path.c_str(), std::ios::binary);
@@ -74,11 +75,24 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     if (in.N.get_bits_count() < paillier_size)
         return rv = error(E_CRYPTO);
 
+
+std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
+
     if (!mpc::ZK_PAILLIER_V_non_interactive(in.N, in.pi_RN, session_id))
         return rv = error(E_CRYPTO);
 
+std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RN verification:"  << duration << " ms"  <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+
     crypto::paillier_t paillier;
     paillier.create_pub(in.N);
+
+
+begin = std::chrono::high_resolution_clock::now();
 
     if (!in.zk_paillier_zero.v(in.N, in.c_3, session_id, 1))
         return rv = error(E_CRYPTO);
@@ -88,6 +102,12 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
 
     if (!in.zk_paillier_mult.v(in.N, in.c_1, in.c_2, in.c_3, session_id, 1))
         return rv = error(E_CRYPTO);
+
+end = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RG proof:"  << duration << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
 
     // if all good, prepare return message
     // TODO:
@@ -118,8 +138,16 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
 
     out._c_i = paillier.add_ciphers(paillier.mul_scalar(in.c_1, sk), paillier.encrypt(r, r_r));
 
+
+begin = std::chrono::high_resolution_clock::now();
+
     out.pk_i = pk;
     out.zk_pdl_mult.p(curve, pk, in.c_1, out._c_i, paillier, server_share.h_1, server_share.h_2, server_share._N, session_id, 1, sk, r, r_r);
+
+end = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RS proof:"  << duration << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
 
     int bits = curve.bits();
     if (server_id < 0)
@@ -132,16 +160,16 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
 error_t LeathServer::leath_setup_peer2_step2(mem_t session_id, int server_id, const leath_setup_message3_t &in)
 {
     server_share.mac_key_share = in.mac_key_share;
-    write_share();
     return 0;
 }
 
-error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out)
+error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const uint64_t vid, const leath_maced_share_t &in, leath_maced_share_t &out)
 {
     // firstly add in with local keys_share
-    out = add_constant(in, server_share.keys_share);
+    out.share = in.share + server_share.keys_share;
+    out.mac_share = in.mac_share;
 
-    // TODO: store somewhere
+    store_maced_share(vid, out);
     return 0;
 }
 
@@ -152,7 +180,7 @@ error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const leath_maced
     out.maced_share.share = in.maced_share.share + server_share.keys_share;
     out.maced_share.mac_share = in.maced_share.mac_share;
 
-    share_map[out.val_id] = out.maced_share;
+    store_maced_share(out.val_id, out.maced_share);
     return 0;
 }
 
@@ -230,7 +258,7 @@ error_t LeathServer::write_share()
         throw std::runtime_error(server_dir + ": not a directory");
     }
 
-    std::string server_share_path = server_dir + "/" + "server_" + std::to_string(server_id);
+    std::string server_share_path = server_dir + "/" + "server_share_" + std::to_string(server_id);
 
     std::ofstream server_share_out(server_share_path.c_str());
     if (!server_share_out.is_open())
@@ -240,6 +268,15 @@ error_t LeathServer::write_share()
 
     server_share_out << ub::convert(server_share).to_string();
     server_share_out.close();
+
+    return 0;
+}
+
+error_t LeathServer::store_maced_share( const uint64_t vid, const leath_maced_share_t& s ) {
+
+    share_map[vid] = s;
+
+    //FIXME: store (share, mac_share) to file
 
     return 0;
 }

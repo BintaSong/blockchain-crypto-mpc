@@ -20,7 +20,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "precompiled.h"
+/* #include "precompiled.h"
 
 extern "C" int MPCCrypto_test();
 
@@ -31,4 +31,4 @@ int main(int argc, char* argv[])
   if (rv = MPCCrypto_test()) return rv;
 	return rv;
 }
-
+ */

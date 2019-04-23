@@ -27,7 +27,7 @@ public:
 
     //-------------------for share------------------
     // TODO: store the share locally !
-    error_t leath_share_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out);
+    error_t leath_share_peer2_step1(mem_t session_id,  const uint64_t vid, const leath_maced_share_t &in, leath_maced_share_t &out);
     error_t leath_share_peer2_step1(mem_t session_id, const leath_maced_share_with_VID_t &in, leath_maced_share_with_VID_t &out);
 
     //-------------------for reconstruct------------
@@ -57,6 +57,7 @@ public:
 
     // TODO: how ot get?
     error_t get_maced_share(const uint64_t vid, leath_maced_share_t &s);
+    error_t store_maced_share( const uint64_t vid, const leath_maced_share_t& s);
 
 };
 

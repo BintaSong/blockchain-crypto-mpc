@@ -17,13 +17,14 @@
 namespace mpc {
     class LeathClientRunner {
     public:    
-        LeathClientRunner(const std::vector<std::string>& addresses, const std::string client_path);
+        LeathClientRunner(const std::vector<std::string>& addresses, const std::string client_path, const int bits);
 
         void setup();
+        void simple_setup();
 
-        error_t setup(int val_id, bn_t val);
+        error_t share(const uint64_t val_id, const bn_t& val);
 
-        bn_t reconstruct(int val_id);
+        error_t reconstruct(const uint64_t val_id, bn_t& raw_data);
 
     private:
         std::vector< std::unique_ptr<leath::LeathRPC::Stub>> stub_vector;

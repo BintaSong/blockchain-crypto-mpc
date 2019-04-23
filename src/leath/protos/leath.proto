@@ -33,11 +33,6 @@ message ShareRequestMessage
     bytes  mac_share = 3;
 }
 
-message SearchReply
-{
-    bytes result = 1;
-}
-
 message ReconstructRequestMessage
 {
     uint64 value_id = 1;

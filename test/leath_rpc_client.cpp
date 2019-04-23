@@ -1,5 +1,5 @@
 
-/* #include "precompiled.h"
+#include "precompiled.h"
 
 extern "C" int leath_client( int argc, char* argv[] );
 
@@ -12,4 +12,3 @@ int main(int argc, char* argv[])
 	return rv;
 }
 
- */

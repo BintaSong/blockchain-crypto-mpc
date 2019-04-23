@@ -712,7 +712,7 @@ static int test_paillier()
 
   // p_1024
   crypto::bn_t N = p_1024.get_N();
-  u_int count = 10;
+  u_int count = 20;
 
   crypto::bn_t m[count], c[count];
   for (int i = 0; i < count; i++)
@@ -774,7 +774,7 @@ static int test_paillier()
   end = std::chrono::high_resolution_clock::now();
   duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   printf("p_3072 decryption: %f ms \n", duration / count);
-
+/*
   // p_4096
   begin = std::chrono::high_resolution_clock::now();
   for (int i = 0; i < count; i++)
@@ -831,7 +831,7 @@ static int test_paillier()
   end = std::chrono::high_resolution_clock::now();
   duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   printf("p_6144 decryption: %f ms \n", duration / (count));
-
+*/
   return 0;
 }
 
@@ -955,11 +955,14 @@ static int test_leath_share_reconstruct()
 
 static int test_leath_client_server()
 {
+
+std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
   error_t rv = 0;
-  std::string server_path = "test", client_path = "test";
+  std::string server_path = "test-server", client_path = "test-client";
 
   mpc::LeathServer server0(server_path + "_0", 0), server1(server_path + "_1", 1);
-  mpc::LeathClient client(client_path, 2, 1026);
+  mpc::LeathClient client(client_path, 2, 3072);
 
   mpc::leath_setup_message1_t client_setup_msg1;
   mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2;
@@ -1013,6 +1016,12 @@ static int test_leath_client_server()
   tmp = tmp - (server1.server_share.sk * bn_t(2).pow(bits) + server0.server_share.sk) * client.client_share.paillier.decrypt(client.client_share.c_1);
   assert(tmp % N == 0);
 
+std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+begin = std::chrono::high_resolution_clock::now();
   //----------------check share and reconstruction---------
 
   std::vector<leath_maced_share_with_VID_t> shares;
@@ -1035,7 +1044,14 @@ static int test_leath_client_server()
   raw_data_ = server0_share.maced_share.share + server1_share.maced_share.share;
   assert(raw_data_ == bn_t(789));
 
+end = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
   //----------------data reconstruction--------------------
+
+begin = std::chrono::high_resolution_clock::now();
 
   leath_maced_share_t cipher_share_s0, cipher_share_s1;
   std::vector<leath_maced_share_t> cipher_share_vector;
@@ -1063,10 +1079,17 @@ static int test_leath_client_server()
   logger::log(logger::INFO) << "reconstruct data: " << data.to_string() << std::endl;
   assert(data == bn_t(789));
 
+end = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
   std::ifstream is("/home/jason/Desktop/blockchain-crypto-mpc/src/test.txt", std::ios::binary);
   std::stringstream ifs_stream;
   ifs_stream << is.rdbuf();
   logger::log(logger::INFO) << ifs_stream.str() << std::endl;
+
+
 
 //   is.seekg(0, is.end);
 //   int length = is.tellg();
@@ -1134,7 +1157,7 @@ static int test_leath_client_rpc()
   addresses.push_back("localhost:7788");
   addresses.push_back("localhost:7788");
 
-  client_runner.reset(new mpc::LeathClientRunner(addresses, ""));
+  client_runner.reset(new mpc::LeathClientRunner(addresses, "", 1024));
   // std::cout << "INFO:" << "before setup." << std::endl;
   client_runner->setup();
 
@@ -1156,10 +1179,11 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::vector<std::string> addresses;
   addresses.push_back("localhost:7000");
   addresses.push_back("localhost:7001");
-  addresses.push_back("localhost:7002");
-  addresses.push_back("localhost:7003");
+  // addresses.push_back("localhost:7002");
+  // addresses.push_back("localhost:7003");
 
-  client_runner.reset(new mpc::LeathClientRunner(addresses, ""));
+  int bits = 1024;
+  client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
 
   opterr = 0;
   int c;
@@ -1192,6 +1216,22 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
     default:
       exit(-1);
     }
+  error_t rv = 0;
+
+  uint64_t vid = 123;
+  bn_t raw_data = bn_t(456);
+
+  rv = client_runner->share(vid, raw_data);
+assert(rv == 0);
+
+  sleep(2);
+  bn_t rec_data;
+  rv = client_runner->reconstruct(vid, rec_data);
+assert(rv == 0);
+
+  logger::log(logger::INFO) << rec_data.to_string() << std::endl;
+
+  assert(rec_data == raw_data);
 
   logger::log(logger::INFO) << "Done." << std::endl;
 
@@ -1241,7 +1281,7 @@ MPCCRYPTO_API int leath_server(int argc, char *argv[])
       exit(-1);
     }
 
-  mpc::run_leath_server(server_address, server_id, "", &server_ptr__);
+  mpc::run_leath_server(server_address, server_id, "test-server", &server_ptr__);
 
   std::cout << "INFO:"
             << "Done." << std::endl;

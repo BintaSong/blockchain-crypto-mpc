@@ -52,6 +52,6 @@ namespace mpc {
 
     // template <typename T> SetupMessage struct_to_message(T &struct_msg, int step);
 
-    void run_leath_server(const std::string &address, uint8_t server_id, const std::string& server_db_path, grpc::Server **server_ptr);
+    void run_leath_server(const std::string &address, uint8_t server_id, const std::string& server_path, grpc::Server **server_ptr);
 
 } // namespace mpc
