@@ -1177,8 +1177,8 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::unique_ptr<mpc::LeathClientRunner> client_runner;
 
   std::vector<std::string> addresses;
-  addresses.push_back("localhost:7000");
-  addresses.push_back("localhost:7001");
+  addresses.push_back("localhost:70000");
+  addresses.push_back("localhost:70001");
   // addresses.push_back("localhost:7002");
   // addresses.push_back("localhost:7003");
 
@@ -1192,7 +1192,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
     switch (c)
     {
     case 'i':
-      client_runner->setup();
+      client_runner->simple_setup();
       break;
 
     case 's':
@@ -1216,6 +1216,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
     default:
       exit(-1);
     }
+    /*
   error_t rv = 0;
 
   uint64_t vid = 123;
@@ -1233,7 +1234,23 @@ assert(rv == 0);
 
   assert(rec_data == raw_data);
 
+
+  rv = client_runner->share(vid, raw_data);
+assert(rv == 0);
+
+  sleep(2);
+  rv = client_runner->reconstruct(vid, rec_data);
+assert(rv == 0);
+
+  logger::log(logger::INFO) << rec_data.to_string() << std::endl;
+
+  assert(rec_data == raw_data);
+
+
   logger::log(logger::INFO) << "Done." << std::endl;
+*/
+
+  client_runner->test_rpc();
 
   return 0;
 }

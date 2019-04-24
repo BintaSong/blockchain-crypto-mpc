@@ -50,6 +50,8 @@ uint64_t xor_mask(const uint64_t in, const std::array<uint8_t, N>& mask)
     ^ (mask[7]);
 }
 
+// get_time
+
 // added by Xiangfu Song
 template <size_t N>
 std::string xor_mask(const std::string in, const std::array<uint8_t, N>& mask)

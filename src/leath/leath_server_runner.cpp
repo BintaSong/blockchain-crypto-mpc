@@ -28,6 +28,9 @@ namespace mpc {
         logger::log(logger::INFO)<< "SETUP RECEIVED." <<std::endl;
         if (already_setup) return grpc::Status::CANCELLED;
 
+time_t now = time(0); 
+logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
+
         {// atomic operation
             //std::lock_guard<std::mutex> lock(mtx_);
             

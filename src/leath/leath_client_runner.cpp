@@ -9,10 +9,14 @@ namespace mpc
 {
 LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, const std::string client_path, const int bits) : client_dir(client_path), current_step(1), already_setup(false), abort(false)
 {
-    for (auto &address : addresses)
+    stub_vector = new std::unique_ptr<leath::LeathRPC::Stub>[addresses.size()];
+    addr_vector = addresses;
+
+    for (int i = 0; i < addresses.size(); i++)
     {
-        std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-        stub_vector.push_back((leath::LeathRPC::NewStub(channel)));
+        std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(addresses[i], grpc::InsecureChannelCredentials()));
+        // channel_vector.push_back(channel);
+        stub_vector[i] = leath::LeathRPC::NewStub(channel);
     }
 
     number_of_servers = addresses.size();
@@ -41,6 +45,10 @@ LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, 
     }
 }
 
+LeathClientRunner::~LeathClientRunner(){
+    //delete [] stub_vector;
+}
+/*
 void LeathClientRunner::setup()
 {
     logger::log(logger::INFO) << "Setup begins ... " << std::endl;
@@ -130,13 +138,12 @@ double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(
 logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " ms" <<std::endl;
 
 } //setup
-
+*/
 
 void LeathClientRunner::simple_setup()
 {
 
-std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     if (already_setup)
     {
         logger::log(logger::ERROR) << "Setup is already finished!" << std::endl;
@@ -145,18 +152,49 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
     leath_setup_message1_t out1;
     client_->leath_setup_peer1_step1(mem_t::from_string("setup_session"), out1);
 
-    logger::log(logger::INFO) << "Before simple setup..." << std::endl;
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " ms" <<std::endl;
 
-    for(int id =0; id < number_of_servers; id++) {
-        logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " begins" << std::endl;
+    // logger::log(logger::INFO) << "Before simple setup..." << std::endl;
 
+    // std::unique_ptr<leath::LeathRPC::Stub>;
+    // std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
+    // stub_vector.push_back(leath::LeathRPC::NewStub(channel));
+    // std::string addresses[2] = {"0.0.0.0:7000", "0.0.0.0:7001"};
+
+
+    for(int id =0; id < number_of_servers; id++) 
+    { 
+// std::shared_ptr<grpc::Channel> channel0(grpc::CreateChannel(addresses[0], grpc::InsecureChannelCredentials()));
+// std::unique_ptr<leath::LeathRPC::Stub> stub_0= leath::LeathRPC::NewStub(channel0);
+
+        
+
+std::chrono::high_resolution_clock::time_point t3_ = std::chrono::high_resolution_clock::now();
         grpc::ClientContext context1;
         leath::SetupMessage request, response;
         grpc::Status status;
 
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+
         request.set_msg_id(1);
         request.set_msg(ub::convert(out1).to_string());
+
+std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
+logger::log(logger::INFO)<< "Time for setup message `leath_setup_message1_t` encoding:"  << d2  << " ms" <<std::endl;
+
+time_t now = time(0); 
+logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
+
         status = stub_vector[id]->setup(&context1, request, &response);
+        //status = setup_rpc(id, request, &response);
+
+std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+double d3 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
+logger::log(logger::INFO)<< "Time for setup message `leath_setup_message1_t` rpc:"  << d3  << " ms" <<std::endl;
+
         if (!status.ok())
         {
             logger::log(logger::ERROR) << "Setup for server " << (int)id << " failed." << std::endl;
@@ -169,27 +207,51 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
             return;
         }
 
-        logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step2(): "
-                                  << " begin..." << std::endl;
+        // logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step2(): "
+        //                           << " begin..." << std::endl;
+
 
         leath_setup_message2_t in;
         ub::convert(in, mem_t::from_string(response.msg()));
-        client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
 
-        logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step2(): "
-                                  << " done." << std::endl;
+std::chrono::high_resolution_clock::time_point t6 = std::chrono::high_resolution_clock::now();
+double d4 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t6 - t5).count();
+logger::log(logger::INFO)<< "Time for setup message `leath_setup_message2_t` encoding:"  << d4  << " ms" <<std::endl;
+
+        client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
+std::chrono::high_resolution_clock::time_point t7 = std::chrono::high_resolution_clock::now();
+double d5 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t7 - t6).count();
+logger::log(logger::INFO)<< "Time for `leath_setup_peer1_step2`:"  << d5  << " ms" <<std::endl;
+
+        // logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step2(): "
+        //                          << " done." << std::endl;
 
         // send mac share
-        logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step3(): "
-                                  << " begin..." << std::endl;
-
+        //logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step3(): "
+        //                          << " begin..." << std::endl;
         leath_setup_message3_t out3;
         client_->leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), id, out3);
+
+std::chrono::high_resolution_clock::time_point t8 = std::chrono::high_resolution_clock::now();
+double d6 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t8 - t7).count();
+logger::log(logger::INFO)<< "Time for `leath_setup_peer1_step3`:"  << d6  << " ms" <<std::endl;
 
         grpc::ClientContext context2;
         request.set_msg_id(3);
         request.set_msg(ub::convert(out3).to_string());
+
+std::chrono::high_resolution_clock::time_point t9 = std::chrono::high_resolution_clock::now();
+double d7 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t9 - t8).count();
+logger::log(logger::INFO)<< "Time for `leath_setup_message2_t` encoding:"  << d7  << " ms" <<std::endl;
+
+
         status = stub_vector[id]->setup(&context2, request, &response);
+        // status = setup_rpc(id, request, &response);
+
+std::chrono::high_resolution_clock::time_point t10 = std::chrono::high_resolution_clock::now();
+double d8 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t10 - t9).count();
+logger::log(logger::INFO)<< "Time for `leath_setup_message2_t` rpc:"  << d8  << " ms" <<std::endl;
+
         if (!status.ok())
         {
             logger::log(logger::ERROR) << "Setup for server " << id << " failed." << std::endl;
@@ -197,16 +259,19 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         }
 
         logger::log(logger::INFO) << "simple setup for server " << (int)id << ", leath_setup_peer1_step3(): "
-                                  << " done." << std::endl;
-    }
+                                  << " done. \n\n\n\n" << std::endl;
+       // stub_vector[id]->
+    } //end of for
+
+std::chrono::high_resolution_clock::time_point t11 = std::chrono::high_resolution_clock::now();
 
     // in the end, store client share !
     already_setup = true;
     client_->write_share();
 
-std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for simple Setup with network:"  << duration  << " ms" <<std::endl;
+std::chrono::high_resolution_clock::time_point t12 = std::chrono::high_resolution_clock::now();
+double d9 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t11 - t12).count();
+logger::log(logger::INFO)<< "Time for write_share():"  << d9  << " ms" <<std::endl;
 
 } //setup
 
@@ -237,6 +302,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         request.set_value_share(ub::convert(out_vector[id].share).to_string());
         request.set_mac_share(ub::convert(out_vector[id].mac_share).to_string());
         status = stub_vector[id]->share(&context, request, &response);
+        // status = share_rpc(id, request);
         if (!status.ok())
         {
             logger::log(logger::ERROR) << "Share for server " << id << " failed." << std::endl;
@@ -287,6 +353,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         request.set_value_id(val_id);
 
         status = stub_vector[id]->reconstruct(&context, request, &response);
+        // status = reconstruct_rpc(id, request, &response);
         if (!status.ok())
         {
             logger::log(logger::ERROR) << "Reoncstruct for server: " << (int)id << " failed." << std::endl;
@@ -298,8 +365,8 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         
         in_share.share = bn_t::from_string(response.value_share().c_str());
         in_share.mac_share = bn_t::from_string(response.mac_share().c_str());
-        logger::log(logger::INFO) << "Thread " << id << ": Reoncstruct received value_share size: " << in_share.share.to_bin().size() << std::endl;
-        logger::log(logger::INFO) << "Thread " << id << ": Reoncstruct received mac_share size: " << in_share.mac_share.to_bin().size() << std::endl;
+       // logger::log(logger::INFO) << "Thread " << id << ": Reoncstruct received value_share size: " << in_share.share.to_bin().size() << std::endl;
+       // logger::log(logger::INFO) << "Thread " << id << ": Reoncstruct received mac_share size: " << in_share.mac_share.to_bin().size() << std::endl;
         // ub::convert(share.share, mem_t::from_string(response.value_share()));
         // ub::convert(share.mac_share, mem_t::from_string(response.mac_share()));
 
@@ -335,11 +402,82 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 logger::log(logger::INFO)<< "Time for reconstruct with network:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
-
-
     return 0;
 } //reconstruction
 
+void LeathClientRunner::test_rpc() {
+    grpc::ClientContext context1;
+    grpc::ClientContext context2;
+    grpc::ClientContext context3;
+    grpc::ClientContext context4;
 
+    leath::ShareRequestMessage request;
+    google::protobuf::Empty response;    
+    grpc::Status status;
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    stub_vector[0]->share(&context1, request, &response);
+
+//std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+//double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+//logger::log(logger::INFO)<< "Time for stub 0:"  << d1  << " ms" <<std::endl;
+
+    // stub_vector[1]->share(&context2, request, &response);
+//std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+//double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+//logger::log(logger::INFO)<< "Time for stub 1:"  << d2  << " ms" <<std::endl;
+
+    // stub_vector[0]->share(&context3, request, &response);
+
+//std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+//double d3 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
+//logger::log(logger::INFO)<< "Time for stub 0:"  << d3  << " ms" <<std::endl;
+
+   // stub_vector[1]->share(&context4, request, &response);
+std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+double d4 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t1).count();
+logger::log(logger::INFO)<< "Time for stub 1:"  << d4  << " ms" <<std::endl;
+
+
+}
+
+
+grpc::Status LeathClientRunner::setup_rpc(const int id, const leath::SetupMessage& request, leath::SetupMessage *response) {
+    std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(addr_vector[id], grpc::InsecureChannelCredentials()));
+    std::unique_ptr<leath::LeathRPC::Stub> stub = leath::LeathRPC::NewStub(channel);
+
+    grpc::ClientContext context;
+    grpc::Status status;
+
+    status = stub->setup(&context, request, response);
+    
+    return status;
+}
+grpc::Status LeathClientRunner::share_rpc(const int id, const leath::ShareRequestMessage& request) {
+    
+    std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(addr_vector[id], grpc::InsecureChannelCredentials()));
+    std::unique_ptr<leath::LeathRPC::Stub> stub = leath::LeathRPC::NewStub(channel);
+
+    grpc::ClientContext context;
+    google::protobuf::Empty response;
+    grpc::Status status;
+
+    status = stub->share(&context, request, &response);
+
+    return status;
+}
+grpc::Status LeathClientRunner::reconstruct_rpc(const int id, const leath::ReconstructRequestMessage& request, leath::ReconstructReply *response) {
+
+    std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(addr_vector[id], grpc::InsecureChannelCredentials()));
+    std::unique_ptr<leath::LeathRPC::Stub> stub = leath::LeathRPC::NewStub(channel);
+
+    grpc::ClientContext context;
+    grpc::Status status;
+    
+    status = stub->reconstruct(&context, request, response);
+
+    return status;
+}
 
 } // namespace mpc
