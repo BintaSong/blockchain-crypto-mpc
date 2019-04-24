@@ -208,7 +208,6 @@ TEST_LDFLAGS = \
 	-lmpc_crypto
 
 
-
 test/%.o: test/%.cpp
 	$(CXX) $(TEST_CPPFLAGS) $(TEST_INCLUDES) -o $@ -c $<
 
@@ -219,7 +218,7 @@ mpc_crypto_test: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cpp  leath.grpc.pb.cpp
 leath_rpc_server: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cpp  leath.grpc.pb.cpp
 	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
 
-leath_rpc_client: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cpp  leath.grpc.pb.cpp
+leath_rpc_client: $(TEST_OBJ) libmpc_crypto.so # leath.pb.cc  leath.grpc.pb.cc
 	$(CXX) -o $@ $^ $(TEST_LDFLAGS)
 
 #----------------------- BENCH --------------------------	

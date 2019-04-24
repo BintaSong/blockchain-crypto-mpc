@@ -273,6 +273,10 @@ std::chrono::high_resolution_clock::time_point t12 = std::chrono::high_resolutio
 double d9 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t11 - t12).count();
 logger::log(logger::INFO)<< "Time for write_share():"  << d9  << " ms" <<std::endl;
 
+double d10 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t12 - t1).count();
+logger::log(logger::INFO)<< "TOTAL TIME FOR SETUP:"  << d10  << " ms" <<std::endl;
+
+
 } //setup
 
 error_t LeathClientRunner::share(const uint64_t val_id, const bn_t& val)
@@ -409,7 +413,7 @@ void LeathClientRunner::test_rpc() {
     grpc::ClientContext context1;
     grpc::ClientContext context2;
     grpc::ClientContext context3;
-    grpc::ClientContext context4;
+    grpc::ClientContext context4, context5, context6, context7, context8, context9;
 
     leath::ShareRequestMessage request;
     google::protobuf::Empty response;    
@@ -419,26 +423,33 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 
     stub_vector[0]->share(&context1, request, &response);
 
-//std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-//double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-//logger::log(logger::INFO)<< "Time for stub 0:"  << d1  << " ms" <<std::endl;
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "Time for stub 0:"  << d1  << " ms" <<std::endl;
 
-    // stub_vector[1]->share(&context2, request, &response);
-//std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
-//double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
-//logger::log(logger::INFO)<< "Time for stub 1:"  << d2  << " ms" <<std::endl;
+     stub_vector[1]->share(&context2, request, &response);
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+logger::log(logger::INFO)<< "Time for stub 1:"  << d2  << " ms" <<std::endl;
 
-    // stub_vector[0]->share(&context3, request, &response);
+     stub_vector[0]->share(&context3, request, &response);
 
-//std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-//double d3 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
-//logger::log(logger::INFO)<< "Time for stub 0:"  << d3  << " ms" <<std::endl;
+std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+double d3 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
+logger::log(logger::INFO)<< "Time for stub 0:"  << d3  << " ms" <<std::endl;
 
-   // stub_vector[1]->share(&context4, request, &response);
+    stub_vector[1]->share(&context4, request, &response);
 std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
-double d4 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t1).count();
+double d4 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
 logger::log(logger::INFO)<< "Time for stub 1:"  << d4  << " ms" <<std::endl;
 
+    for(int i = 0; i < 10000; i++) {
+        grpc::ClientContext context9, context10;
+        logger::log(logger::INFO)<< "i = "  << i  <<std::endl;
+        stub_vector[0]->share(&context9, request, &response);
+        stub_vector[1]->share(&context10, request, &response);
+    }
+   
 
 }
 

@@ -962,7 +962,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
   std::string server_path = "test-server", client_path = "test-client";
 
   mpc::LeathServer server0(server_path + "_0", 0), server1(server_path + "_1", 1);
-  mpc::LeathClient client(client_path, 2, 3072);
+  mpc::LeathClient client(client_path, 2, 1024);
 
   mpc::leath_setup_message1_t client_setup_msg1;
   mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2;
@@ -1216,7 +1216,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
     default:
       exit(-1);
     }
-    /*
+
   error_t rv = 0;
 
   uint64_t vid = 123;
@@ -1235,22 +1235,10 @@ assert(rv == 0);
   assert(rec_data == raw_data);
 
 
-  rv = client_runner->share(vid, raw_data);
-assert(rv == 0);
-
-  sleep(2);
-  rv = client_runner->reconstruct(vid, rec_data);
-assert(rv == 0);
-
-  logger::log(logger::INFO) << rec_data.to_string() << std::endl;
-
-  assert(rec_data == raw_data);
-
-
   logger::log(logger::INFO) << "Done." << std::endl;
-*/
 
-  client_runner->test_rpc();
+
+//  client_runner->test_rpc();
 
   return 0;
 }
