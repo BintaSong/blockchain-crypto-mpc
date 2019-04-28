@@ -52,11 +52,11 @@ class LeathRPC GRPC_FINAL {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::mpc::leath::ReconstructReply>> Asyncreconstruct(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::mpc::leath::ReconstructReply>>(AsyncreconstructRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> bulk_reconstruct(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(bulk_reconstructRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> batch_reconstruct(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(batch_reconstructRaw(context));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> Asyncbulk_reconstruct(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(Asyncbulk_reconstructRaw(context, cq, tag));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> Asyncbatch_reconstruct(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(Asyncbatch_reconstructRaw(context, cq, tag));
     }
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::mpc::leath::SetupMessage>* AsyncsetupRaw(::grpc::ClientContext* context, const ::mpc::leath::SetupMessage& request, ::grpc::CompletionQueue* cq) = 0;
@@ -64,8 +64,8 @@ class LeathRPC GRPC_FINAL {
     virtual ::grpc::ClientWriterInterface< ::mpc::leath::ShareRequestMessage>* batch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response) = 0;
     virtual ::grpc::ClientAsyncWriterInterface< ::mpc::leath::ShareRequestMessage>* Asyncbatch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::mpc::leath::ReconstructReply>* AsyncreconstructRaw(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* bulk_reconstructRaw(::grpc::ClientContext* context) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* Asyncbulk_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* batch_reconstructRaw(::grpc::ClientContext* context) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* Asyncbatch_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
   };
   class Stub GRPC_FINAL : public StubInterface {
    public:
@@ -88,11 +88,11 @@ class LeathRPC GRPC_FINAL {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::mpc::leath::ReconstructReply>> Asyncreconstruct(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::mpc::leath::ReconstructReply>>(AsyncreconstructRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> bulk_reconstruct(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(bulk_reconstructRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> batch_reconstruct(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(batch_reconstructRaw(context));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> Asyncbulk_reconstruct(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(Asyncbulk_reconstructRaw(context, cq, tag));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>> Asyncbatch_reconstruct(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>>(Asyncbatch_reconstructRaw(context, cq, tag));
     }
 
    private:
@@ -102,13 +102,13 @@ class LeathRPC GRPC_FINAL {
     ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>* batch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response) GRPC_OVERRIDE;
     ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>* Asyncbatch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) GRPC_OVERRIDE;
     ::grpc::ClientAsyncResponseReader< ::mpc::leath::ReconstructReply>* AsyncreconstructRaw(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::grpc::CompletionQueue* cq) GRPC_OVERRIDE;
-    ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* bulk_reconstructRaw(::grpc::ClientContext* context) GRPC_OVERRIDE;
-    ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* Asyncbulk_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) GRPC_OVERRIDE;
+    ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* batch_reconstructRaw(::grpc::ClientContext* context) GRPC_OVERRIDE;
+    ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* Asyncbatch_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) GRPC_OVERRIDE;
     const ::grpc::RpcMethod rpcmethod_setup_;
     const ::grpc::RpcMethod rpcmethod_share_;
     const ::grpc::RpcMethod rpcmethod_batch_share_;
     const ::grpc::RpcMethod rpcmethod_reconstruct_;
-    const ::grpc::RpcMethod rpcmethod_bulk_reconstruct_;
+    const ::grpc::RpcMethod rpcmethod_batch_reconstruct_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -123,7 +123,7 @@ class LeathRPC GRPC_FINAL {
     virtual ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::google::protobuf::Empty* response);
     // Update
     virtual ::grpc::Status reconstruct(::grpc::ServerContext* context, const ::mpc::leath::ReconstructRequestMessage* request, ::mpc::leath::ReconstructReply* response);
-    virtual ::grpc::Status bulk_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream);
+    virtual ::grpc::Status batch_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream);
   };
   template <class BaseClass>
   class WithAsyncMethod_setup : public BaseClass {
@@ -206,26 +206,26 @@ class LeathRPC GRPC_FINAL {
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_bulk_reconstruct : public BaseClass {
+  class WithAsyncMethod_batch_reconstruct : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_bulk_reconstruct() {
+    WithAsyncMethod_batch_reconstruct() {
       ::grpc::Service::MarkMethodAsync(4);
     }
-    ~WithAsyncMethod_bulk_reconstruct() GRPC_OVERRIDE {
+    ~WithAsyncMethod_batch_reconstruct() GRPC_OVERRIDE {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status bulk_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream) GRPC_FINAL GRPC_OVERRIDE {
+    ::grpc::Status batch_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream) GRPC_FINAL GRPC_OVERRIDE {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void Requestbulk_reconstruct(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void Requestbatch_reconstruct(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(4, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_setup<WithAsyncMethod_share<WithAsyncMethod_batch_share<WithAsyncMethod_reconstruct<WithAsyncMethod_bulk_reconstruct<Service > > > > > AsyncService;
+  typedef WithAsyncMethod_setup<WithAsyncMethod_share<WithAsyncMethod_batch_share<WithAsyncMethod_reconstruct<WithAsyncMethod_batch_reconstruct<Service > > > > > AsyncService;
   template <class BaseClass>
   class WithGenericMethod_setup : public BaseClass {
    private:
@@ -295,18 +295,18 @@ class LeathRPC GRPC_FINAL {
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_bulk_reconstruct : public BaseClass {
+  class WithGenericMethod_batch_reconstruct : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithGenericMethod_bulk_reconstruct() {
+    WithGenericMethod_batch_reconstruct() {
       ::grpc::Service::MarkMethodGeneric(4);
     }
-    ~WithGenericMethod_bulk_reconstruct() GRPC_OVERRIDE {
+    ~WithGenericMethod_batch_reconstruct() GRPC_OVERRIDE {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status bulk_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream) GRPC_FINAL GRPC_OVERRIDE {
+    ::grpc::Status batch_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream) GRPC_FINAL GRPC_OVERRIDE {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }

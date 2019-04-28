@@ -159,7 +159,7 @@ void protobuf_AddDesc_leath_2eproto() {
     "\022\021\n\tmac_share\030\003 \001(\014\"-\n\031ReconstructReques"
     "tMessage\022\020\n\010value_id\030\001 \001(\004\"L\n\020Reconstruc"
     "tReply\022\020\n\010value_id\030\001 \001(\004\022\023\n\013value_share\030"
-    "\002 \001(\014\022\021\n\tmac_share\030\003 \001(\0142\206\003\n\010LeathRPC\022;\n"
+    "\002 \001(\014\022\021\n\tmac_share\030\003 \001(\0142\207\003\n\010LeathRPC\022;\n"
     "\005setup\022\027.mpc.leath.SetupMessage\032\027.mpc.le"
     "ath.SetupMessage\"\000\022A\n\005share\022\036.mpc.leath."
     "ShareRequestMessage\032\026.google.protobuf.Em"
@@ -167,9 +167,9 @@ void protobuf_AddDesc_leath_2eproto() {
     "questMessage\032\026.google.protobuf.Empty\"\000(\001"
     "\022R\n\013reconstruct\022$.mpc.leath.ReconstructR"
     "equestMessage\032\033.mpc.leath.ReconstructRep"
-    "ly\"\000\022[\n\020bulk_reconstruct\022$.mpc.leath.Rec"
-    "onstructRequestMessage\032\033.mpc.leath.Recon"
-    "structReply\"\000(\0010\001b\006proto3", 705);
+    "ly\"\000\022\\\n\021batch_reconstruct\022$.mpc.leath.Re"
+    "constructRequestMessage\032\033.mpc.leath.Reco"
+    "nstructReply\"\000(\0010\001b\006proto3", 706);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "leath.proto", &protobuf_RegisterTypes);
   SetupMessage::default_instance_ = new SetupMessage();

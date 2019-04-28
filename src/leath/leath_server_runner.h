@@ -34,10 +34,17 @@ namespace mpc {
                            const ShareRequestMessage* request,
                            google::protobuf::Empty* response) override;
 
+        grpc::Status batch_share(grpc::ServerContext* context, 
+                            grpc::ServerReader< leath::ShareRequestMessage>* reader, 
+                            google::protobuf::Empty* response) override; 
+
         grpc::Status reconstruct(grpc::ServerContext* context,
                            const ReconstructRequestMessage* request,
                            ReconstructReply* response) override;       
         
+        grpc::Status batch_reconstruct(grpc::ServerContext* context, 
+                            grpc::ServerReaderWriter<ReconstructReply, ReconstructRequestMessage>* stream) override;
+
     private:
         std::unique_ptr<LeathServer> server_;
 

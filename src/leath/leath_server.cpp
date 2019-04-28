@@ -128,6 +128,7 @@ logger::log(logger::INFO)<< "Time for RG proof:"  << duration << " ms" <<std::en
 
     // TODO: store locally
     server_share.N = in.N;
+    server_share.N2 = in.N * in.N;
     server_share.c_1 = in.c_1;
     server_share.c_2 = in.c_2;
     server_share.h_1 = in.h_1;
@@ -195,8 +196,8 @@ error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint6
         return rv;
     }
 
-    bn_t N2 = server_share.N * server_share.N;
-    MODULO(N2) out.share = server_share.c_2.pow(tmp.share);
+    // bn_t N2 = server_share.N * server_share.N;
+    MODULO(server_share.N2) out.share = server_share.c_2.pow(tmp.share);
     out.mac_share = tmp.mac_share;
 
     // crypto::paillier_t p; 

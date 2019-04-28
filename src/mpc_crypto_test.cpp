@@ -956,13 +956,15 @@ static int test_leath_share_reconstruct()
 static int test_leath_client_server()
 {
 
-std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-
   error_t rv = 0;
   std::string server_path = "test-server", client_path = "test-client";
 
   mpc::LeathServer server0(server_path + "_0", 0), server1(server_path + "_1", 1);
-  mpc::LeathClient client(client_path, 2, 1024);
+  mpc::LeathClient client(client_path, 2, 3072);
+
+
+  rv = client.leath_setup_paillier_generation();
+  assert(rv == 0);
 
   mpc::leath_setup_message1_t client_setup_msg1;
   mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2;
@@ -970,6 +972,8 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
 
   rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), client_setup_msg1);
   assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
   //---------------------------------
   rv = server0.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, client_setup_msg1, server0_setup_msg2);
@@ -1122,6 +1126,292 @@ logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:
   return 0;
 }
 
+static int test_leath_client_3server()
+{
+
+
+  error_t rv = 0;
+  std::string server_path = "test-server", client_path = "test-client";
+
+  mpc::LeathServer server0(server_path + "_0", 0), server1(server_path + "_1", 1), server2(server_path + "_2", 2);
+  mpc::LeathClient client(client_path, 3, 2048);
+
+  rv = client.leath_setup_paillier_generation();
+  assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
+
+  mpc::leath_setup_message1_t client_setup_msg1;
+  mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2, server2_setup_msg2;
+  mpc::leath_setup_message3_t server0_setup_msg3, server1_setup_msg3, server2_setup_msg3;
+
+  rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), client_setup_msg1);
+  assert(rv == 0);
+
+
+
+  //---------------------------------
+  rv = server0.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, client_setup_msg1, server0_setup_msg2);
+  assert(rv == 0);
+
+
+  rv = server1.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 1, client_setup_msg1, server1_setup_msg2);
+  assert(rv == 0);
+
+  rv = server2.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 2, client_setup_msg1, server2_setup_msg2);
+  assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg2);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg2);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 2, server2_setup_msg2);
+  assert(rv == 0);
+
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg3);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 2, server2_setup_msg3);
+  assert(rv == 0);
+
+
+
+  rv = server0.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg3);
+  assert(rv == 0);
+
+
+  rv = server1.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
+  assert(rv == 0);
+
+  rv = server2.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 2, server2_setup_msg3);
+  assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2 + t1 - t0).count();
+logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+t0 = std::chrono::high_resolution_clock::now();
+  //----------------check share and reconstruction---------
+
+  std::vector<leath_maced_share_with_VID_t> shares;
+  leath_maced_share_with_VID_t server0_share;
+  leath_maced_share_with_VID_t server1_share;
+  leath_maced_share_with_VID_t server2_share;
+
+  rv = client.leath_share_peer1_step1(ub::mem_t::from_string("share_session"), 1, bn_t(789), shares);
+
+
+
+  server0.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[0], server0_share);
+  server1.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[1], server1_share);
+  server2.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[2], server2_share);
+
+t1 = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+  //----------------data reconstruction--------------------
+
+
+  leath_maced_share_t cipher_share_s0, cipher_share_s1, cipher_share_s2;
+  std::vector<leath_maced_share_t> cipher_share_vector;
+  bn_t data = 0;
+
+t0 = std::chrono::high_resolution_clock::now();
+
+  server0.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s0);
+  server1.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s1);
+  server2.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s2);
+
+
+  cipher_share_vector.push_back(cipher_share_s0);
+  cipher_share_vector.push_back(cipher_share_s1);
+  cipher_share_vector.push_back(cipher_share_s2);
+
+
+  rv = client.leath_reconstruct_peer1_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_vector, data);
+
+t1 = std::chrono::high_resolution_clock::now();
+
+  assert(rv == 0); // error!
+
+  logger::log(logger::INFO) << "reconstruct data: " << data.to_string() << std::endl;
+  assert(data == bn_t(789));
+
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+  return 0;
+}
+
+
+
+static int test_leath_client_4server()
+{
+
+
+  error_t rv = 0;
+  std::string server_path = "test-server", client_path = "test-client";
+
+  mpc::LeathServer server0(server_path + "_0", 0), server1(server_path + "_1", 1), server2(server_path + "_2", 2), server3(server_path + "_3", 3);
+  mpc::LeathClient client(client_path, 4, 3072);
+
+  rv = client.leath_setup_paillier_generation();
+  assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
+
+  mpc::leath_setup_message1_t client_setup_msg1;
+  mpc::leath_setup_message2_t server0_setup_msg2, server1_setup_msg2, server2_setup_msg2, server3_setup_msg2;
+  mpc::leath_setup_message3_t server0_setup_msg3, server1_setup_msg3, server2_setup_msg3, server3_setup_msg3;
+
+  rv = client.leath_setup_peer1_step1(ub::mem_t::from_string("setup_session"), client_setup_msg1);
+  assert(rv == 0);
+
+
+
+  //---------------------------------
+  rv = server0.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 0, client_setup_msg1, server0_setup_msg2);
+  assert(rv == 0);
+
+
+  rv = server1.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 1, client_setup_msg1, server1_setup_msg2);
+  assert(rv == 0);
+
+  rv = server2.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 2, client_setup_msg1, server2_setup_msg2);
+  assert(rv == 0);
+
+  rv = server3.leath_setup_peer2_step1(ub::mem_t::from_string("setup_session"), 3, client_setup_msg1, server3_setup_msg2);
+  assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg2);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg2);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 2, server2_setup_msg2);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step2(ub::mem_t::from_string("setup_session"), 3, server3_setup_msg2);
+  assert(rv == 0);
+
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg3);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 2, server2_setup_msg3);
+  assert(rv == 0);
+
+  rv = client.leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), 3, server3_setup_msg3);
+  assert(rv == 0);
+
+
+
+  rv = server0.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 0, server0_setup_msg3);
+  assert(rv == 0);
+
+
+  rv = server1.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 1, server1_setup_msg3);
+  assert(rv == 0);
+
+  rv = server2.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 2, server2_setup_msg3);
+  assert(rv == 0);
+
+  rv = server3.leath_setup_peer2_step2(ub::mem_t::from_string("setup_session"), 3, server3_setup_msg3);
+  assert(rv == 0);
+
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2 + t1 - t0).count();
+logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+t0 = std::chrono::high_resolution_clock::now();
+  //----------------check share and reconstruction---------
+
+  std::vector<leath_maced_share_with_VID_t> shares;
+  leath_maced_share_with_VID_t server0_share;
+  leath_maced_share_with_VID_t server1_share;
+  leath_maced_share_with_VID_t server2_share;
+  leath_maced_share_with_VID_t server3_share;
+
+  rv = client.leath_share_peer1_step1(ub::mem_t::from_string("share_session"), 1, bn_t(789), shares);
+
+
+
+  server0.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[0], server0_share);
+  server1.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[1], server1_share);
+  server2.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[2], server2_share);
+  server3.leath_share_peer2_step1(ub::mem_t::from_string("share_session"), shares[3], server3_share);
+
+t1 = std::chrono::high_resolution_clock::now();
+
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+  //----------------data reconstruction--------------------
+
+
+  leath_maced_share_t cipher_share_s0, cipher_share_s1, cipher_share_s2, cipher_share_s3;
+  std::vector<leath_maced_share_t> cipher_share_vector;
+  bn_t data = 0;
+
+t0 = std::chrono::high_resolution_clock::now();
+
+  server0.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s0);
+  server1.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s1);
+  server2.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s2);
+  server3.leath_reconstruct_peer2_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_s3);
+
+
+  cipher_share_vector.push_back(cipher_share_s0);
+  cipher_share_vector.push_back(cipher_share_s1);
+  cipher_share_vector.push_back(cipher_share_s2);
+  cipher_share_vector.push_back(cipher_share_s3);
+
+
+  rv = client.leath_reconstruct_peer1_step1(ub::mem_t::from_string("reconstruction_session"), 1, cipher_share_vector, data);
+
+t1 = std::chrono::high_resolution_clock::now();
+
+  assert(rv == 0); // error!
+
+  logger::log(logger::INFO) << "reconstruct data: " << data.to_string() << std::endl;
+  assert(data == bn_t(789));
+
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+  return 0;
+}
+
+
+
 //-----------------leath rpc client and server--------------------------
 grpc::Server *server_ptr__ = NULL;
 
@@ -1179,10 +1469,10 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::vector<std::string> addresses;
   addresses.push_back("localhost:70000");
   addresses.push_back("localhost:70001");
-  // addresses.push_back("localhost:7002");
-  // addresses.push_back("localhost:7003");
+  addresses.push_back("localhost:70002");
+  addresses.push_back("localhost:70003");
 
-  int bits = 1024;
+  int bits = 3072;
   client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
 
   opterr = 0;
@@ -1192,7 +1482,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
     switch (c)
     {
     case 'i':
-      client_runner->simple_setup();
+      client_runner->setup();
       break;
 
     case 's':
@@ -1225,7 +1515,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   rv = client_runner->share(vid, raw_data);
 assert(rv == 0);
 
-  sleep(2);
+  // sleep(2);
   bn_t rec_data;
   rv = client_runner->reconstruct(vid, rec_data);
 assert(rv == 0);
@@ -1319,7 +1609,7 @@ MPCCRYPTO_API int MPCCrypto_test()
   t = ub::read_timer_ms() - t; */
 
   // test_paillier();
-  rv = test_leath_client_server();
+  rv = test_leath_client_4server();
   assert(rv == 0);
   logger::log(logger::INFO) << "ALL GOOD !" << std::endl;
   /*

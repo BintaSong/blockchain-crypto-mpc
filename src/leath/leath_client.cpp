@@ -53,28 +53,68 @@ std::unique_ptr<LeathClient> LeathClient::init_in_directory(const std::string di
     return std::unique_ptr<LeathClient>(new LeathClient(dir_path, number_of_servers, bits));
 }
 
-error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out)
-{
+error_t LeathClient::leath_setup_paillier_generation(){
     crypto::paillier_t paillier, _paillier;
     paillier.generate(paillier_keysize, true);
     _paillier.generate(paillier_keysize, true);
 
     client_share.paillier = paillier;
-    out.N = client_share.N = paillier.get_N();
+    client_share.N = paillier.get_N();
 
     // auxulary value
-    out._N = client_share._N = _paillier.get_N();
-    out.h_1 = client_share.h_1 = bn_t::rand(out._N);
-    out.h_2 = client_share.h_2 = bn_t::rand(out._N);
+    client_share._N = _paillier.get_N();
+    client_share.h_1 = bn_t::rand(client_share.N);
+    client_share.h_2 = bn_t::rand(client_share.N);
 
-    assert(out.N == paillier.get_N());
+
+    bn_t lambda, mu;
+    bn_t r = eGCD(client_share.N, paillier.get_p(), paillier.get_q(), mu, lambda);
+    assert(r == bn_t(1));
+
+    bn_t r_1, r_2;
+    r_1 = bn_t::rand(client_share.N);
+    r_2 = bn_t::rand(client_share.N);
+    // r_3 = bn_t::rand(client_share.N);
+
+    bn_t m1, m2;
+    m1 = mu * paillier.get_p();
+    m2 = lambda * paillier.get_q();
+
+    client_share.c_1 = paillier.encrypt(m1, r_1);
+    client_share.c_2 = paillier.encrypt(m2, r_2);
+    client_share.x_1 = m1;
+    client_share.x_2 = m2;
+    client_share.r_1 = r_1;
+    client_share.r_2 = r_2;
+
+    return 0;
+}
+
+error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out)
+{
+    /* crypto::paillier_t paillier, _paillier;
+    paillier.generate(paillier_keysize, true);
+    _paillier.generate(paillier_keysize, true);
+
+    client_share.paillier = paillier;
+    out.N = client_share.N = paillier.get_N(); */
+
+    // auxulary value
+    out.N = client_share.N;
+    out._N = client_share._N; // = _paillier.get_N();
+    out.h_1 = client_share.h_1; // = bn_t::rand(out._N);
+    out.h_2 = client_share.h_2; // = bn_t::rand(out._N);
+
+    // assert(out.N == paillier.get_N());
 std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-    out.pi_RN = ZK_PAILLIER_P_non_interactive(out.N, paillier.get_phi_N(), session_id);
+  
+    out.pi_RN = ZK_PAILLIER_P_non_interactive(out.N, client_share.paillier.get_phi_N(), session_id);
+
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
-    bn_t lambda, mu;
+/*     bn_t lambda, mu;
     bn_t r = eGCD(out.N, paillier.get_p(), paillier.get_q(), mu, lambda);
     assert(r == bn_t(1));
 
@@ -89,24 +129,24 @@ logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " ms" <<std::e
     MODULO(out.N)
     m2 = lambda * paillier.get_q();
 
-    // bn_t s, m;
-    // MODULO(out.N) s = m1 + m2;
-    // MODULO(out.N) m = m1 * m2;
-    // assert( m1 %  paillier.get_q()  == bn_t(1));
-    // assert( m1 %  paillier.get_p()  == bn_t(0));
-
     client_share.c_1 = out.c_1 = paillier.encrypt(m1, r_1);
     client_share.c_2 = out.c_2 = paillier.encrypt(m2, r_2);
     client_share.x_1 = m1;
     client_share.x_2 = m2;
 
-    out.c_3 = paillier.encrypt(0, r_3);
+    out.c_3 = paillier.encrypt(0, r_3); */
+
+    out.c_1 = client_share.c_1;
+    out.c_2 = client_share.c_2;
+
+    bn_t r_3 = bn_t::rand(out.N);
+    out.c_3 = client_share.paillier.encrypt(0, r_3);
 
 begin = std::chrono::high_resolution_clock::now();
 
-    out.zk_paillier_m.p(out.N, paillier.add_ciphers(out.c_1, out.c_2), bn_t(1), session_id, 1, r_1 * r_2);
+    out.zk_paillier_m.p(out.N, client_share.paillier.add_ciphers(out.c_1, out.c_2), bn_t(1), session_id, 1, client_share.r_1 * client_share.r_2);
     out.zk_paillier_zero.p(out.N, out.c_3, session_id, 1, r_3);
-    out.zk_paillier_mult.p(out.N, out.c_1, out.c_2, out.c_3, session_id, 1, m1, m2, bn_t(0), r_1, r_2, r_3);
+    out.zk_paillier_mult.p(out.N, out.c_1, out.c_2, out.c_3, session_id, 1, client_share.x_1, client_share.x_2, bn_t(0), client_share.r_1, client_share.r_2, r_3);
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
@@ -114,7 +154,7 @@ logger::log(logger::INFO)<< "Time for RG proof:" << duration <<std::endl;
 
     client_share.mac_key = 0; // TODO: set mac key to zero!
     
-    logger::log(logger::INFO) << "Init from dir, N =  " << client_share.N.to_string() << std::endl; 
+    logger::log(logger::INFO) << "Init from dir, |N| =  " << client_share.N.get_bin_size() << std::endl; 
 
     return 0;
 }
@@ -136,7 +176,7 @@ error_t LeathClient::leath_setup_peer1_step2(mem_t session_id, int server_id, co
         return rv = ub::error(E_BADARG);
     int bits = curve.bits();
 
-    // FIXME: mayber return the share is better ?
+    // FIXME: maybe return the share is better ?
     client_share_mutx_.lock();
     client_share.keys_share += x_i * bn_t(2).pow_mod(bn_t(bits * server_id), client_share.paillier.get_N());
     client_share_mutx_.unlock();

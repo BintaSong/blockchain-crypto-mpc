@@ -92,6 +92,27 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
         return grpc::Status::OK;
     }
 
+    grpc::Status LeathServerImpl::batch_share(grpc::ServerContext* context, grpc::ServerReader< ShareRequestMessage>* reader, google::protobuf::Empty* response) {
+        
+        ShareRequestMessage mes;
+        
+        ThreadPool share_pool(4);
+
+        auto share = [this](ShareRequestMessage *receive_msg) {
+            leath_maced_share_t in, out;
+            ub::convert(in.share, mem_t::from_string(receive_msg->value_share()));
+            ub::convert(in.mac_share, mem_t::from_string(receive_msg->mac_share()));
+            server_->leath_share_peer2_step1(mem_t::from_string("share_session"), receive_msg->value_id(), in, out);
+        };
+
+        while (reader->Read(&mes)) {
+            share_pool.enqueue(share, &mes);
+        }
+
+        share_pool.join();
+        return grpc::Status::OK;
+    }
+
     grpc::Status LeathServerImpl::reconstruct(grpc::ServerContext* context,  const ReconstructRequestMessage* request, ReconstructReply* response) {
         error_t rv = 0;
         
@@ -111,6 +132,11 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
 
         return grpc::Status::OK;
     }  
+
+    grpc::Status LeathServerImpl::batch_reconstruct(grpc::ServerContext* context, grpc::ServerReaderWriter<ReconstructReply, ReconstructRequestMessage>* stream) {
+        // TODO: 
+        return  grpc::Status::OK;
+    }
 
     void run_leath_server(const std::string &address, uint8_t server_id,  const std::string& server_path, grpc::Server **server_ptr) {
         std::string server_address(address);

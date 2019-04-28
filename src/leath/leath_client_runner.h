@@ -18,21 +18,28 @@ namespace mpc {
     class LeathClientRunner {
     public:    
         LeathClientRunner(const std::vector<std::string>& addresses, const std::string client_path, const int bits);
-        ~LeathClientRunner();
+        // ~LeathClientRunner();
         
+        //void generate_parameter();
+
         void setup();
+        void parallel_setup();
         void simple_setup();
 
         error_t share(const uint64_t val_id, const bn_t& val);
+        error_t share_benchmark(int counter);
+        error_t batch_share_benchmark(int counter);
+
 
         error_t reconstruct(const uint64_t val_id, bn_t& raw_data);
-
-        void test_rpc();
+        // error_t batch_reconstruct(const uint64_t val_id, bn_t& raw_data);
+        error_t reconstruct_benchmark(int shares_number);
+        // void test_rpc();
 
     private:
-        std::vector<std::string> addr_vector;
+        // std::vector<std::string> addr_vector;
         // std::vector<std::shared_ptr<grpc::Channel>> channel_vector;
-        std::unique_ptr<leath::LeathRPC::Stub> *stub_vector;
+        std::vector< std::unique_ptr<leath::LeathRPC::Stub>> stub_vector;
 
         std::unique_ptr<LeathClient> client_;
         std::string client_dir;
@@ -41,9 +48,23 @@ namespace mpc {
         int32_t number_of_servers;
         bool already_setup, abort;
 
-        grpc::Status setup_rpc(const int id, const leath::SetupMessage& request, leath::SetupMessage *response);
-        grpc::Status share_rpc(const int id, const leath::ShareRequestMessage& request);
-        grpc::Status reconstruct_rpc(const int id, const leath::ReconstructRequestMessage& request, leath::ReconstructReply *response);
+        struct {
+            std::unique_ptr<grpc::ClientWriter<leath::ShareRequestMessage>> writer;
+            std::unique_ptr<::grpc::ClientContext> context;
+            google::protobuf::Empty response;
+            
+            std::mutex mtx;
+            bool is_up;
+        } batch_update_state_;
+
+        struct reconstruct_bench_t{
+            std::vector<bn_t> shares;
+            std::mutex mtx;
+        };
+
+        //grpc::Status setup_rpc(const int id, const leath::SetupMessage& request, leath::SetupMessage *response);
+        //grpc::Status share_rpc(const int id, const leath::ShareRequestMessage& request);
+        //grpc::Status reconstruct_rpc(const int id, const leath::ReconstructRequestMessage& request, leath::ReconstructReply *response);
     }; //class LeathClientRunner
 
 

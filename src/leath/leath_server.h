@@ -1,6 +1,8 @@
 #pragma once
 #include "mpc_leath.h"
 
+#include "thread_pool.h"
+
 #include "utils.h"
 
 #include <iostream>

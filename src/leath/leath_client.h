@@ -17,6 +17,7 @@ public:
     static std::unique_ptr<LeathClient> init_in_directory(const std::string dir_path, const int number_of_servers, const int bits);
 
     //----------client setup step functions---------------
+    error_t leath_setup_paillier_generation();
     error_t leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out);
     error_t leath_setup_peer1_step2(mem_t session_id, int server_id, const leath_setup_message2_t &in);
     error_t leath_setup_peer1_step3(mem_t session_id, int server_id, leath_setup_message3_t &out);

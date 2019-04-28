@@ -21,7 +21,7 @@ static const char* LeathRPC_method_names[] = {
   "/mpc.leath.LeathRPC/share",
   "/mpc.leath.LeathRPC/batch_share",
   "/mpc.leath.LeathRPC/reconstruct",
-  "/mpc.leath.LeathRPC/bulk_reconstruct",
+  "/mpc.leath.LeathRPC/batch_reconstruct",
 };
 
 std::unique_ptr< LeathRPC::Stub> LeathRPC::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -34,7 +34,7 @@ LeathRPC::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   , rpcmethod_share_(LeathRPC_method_names[1], ::grpc::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_batch_share_(LeathRPC_method_names[2], ::grpc::RpcMethod::CLIENT_STREAMING, channel)
   , rpcmethod_reconstruct_(LeathRPC_method_names[3], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_bulk_reconstruct_(LeathRPC_method_names[4], ::grpc::RpcMethod::BIDI_STREAMING, channel)
+  , rpcmethod_batch_reconstruct_(LeathRPC_method_names[4], ::grpc::RpcMethod::BIDI_STREAMING, channel)
   {}
 
 ::grpc::Status LeathRPC::Stub::setup(::grpc::ClientContext* context, const ::mpc::leath::SetupMessage& request, ::mpc::leath::SetupMessage* response) {
@@ -69,12 +69,12 @@ LeathRPC::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   return new ::grpc::ClientAsyncResponseReader< ::mpc::leath::ReconstructReply>(channel_.get(), cq, rpcmethod_reconstruct_, context, request);
 }
 
-::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* LeathRPC::Stub::bulk_reconstructRaw(::grpc::ClientContext* context) {
-  return new ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(channel_.get(), rpcmethod_bulk_reconstruct_, context);
+::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* LeathRPC::Stub::batch_reconstructRaw(::grpc::ClientContext* context) {
+  return new ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(channel_.get(), rpcmethod_batch_reconstruct_, context);
 }
 
-::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* LeathRPC::Stub::Asyncbulk_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-  return new ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(channel_.get(), cq, rpcmethod_bulk_reconstruct_, context, tag);
+::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* LeathRPC::Stub::Asyncbatch_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+  return new ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(channel_.get(), cq, rpcmethod_batch_reconstruct_, context, tag);
 }
 
 LeathRPC::Service::Service() {
@@ -103,7 +103,7 @@ LeathRPC::Service::Service() {
       LeathRPC_method_names[4],
       ::grpc::RpcMethod::BIDI_STREAMING,
       new ::grpc::BidiStreamingHandler< LeathRPC::Service, ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(
-          std::mem_fn(&LeathRPC::Service::bulk_reconstruct), this)));
+          std::mem_fn(&LeathRPC::Service::batch_reconstruct), this)));
 }
 
 LeathRPC::Service::~Service() {
@@ -137,7 +137,7 @@ LeathRPC::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status LeathRPC::Service::bulk_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream) {
+::grpc::Status LeathRPC::Service::batch_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream) {
   (void) context;
   (void) stream;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");

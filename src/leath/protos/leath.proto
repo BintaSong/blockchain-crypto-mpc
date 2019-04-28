@@ -16,7 +16,7 @@ rpc batch_share (stream ShareRequestMessage) returns (google.protobuf.Empty) {}
 
 // Update
 rpc reconstruct (ReconstructRequestMessage) returns (ReconstructReply) {}
-rpc bulk_reconstruct (stream ReconstructRequestMessage) returns (stream ReconstructReply) {}
+rpc batch_reconstruct (stream ReconstructRequestMessage) returns (stream ReconstructReply) {}
 
 }
 
