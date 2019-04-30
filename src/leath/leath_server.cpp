@@ -190,21 +190,31 @@ error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint6
     error_t rv = 0;
     leath_maced_share_t tmp;
 
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+
     rv = get_maced_share(vid, tmp);
+
     if (rv != 0) {
         logger::log(logger::ERROR) << "leath_reconstruct_peer2_step1(): Get Share Failed!" <<std::endl;
         return rv;
     }
 
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
     // bn_t N2 = server_share.N * server_share.N;
     MODULO(server_share.N2) out.share = server_share.c_2.pow(tmp.share);
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+
     out.mac_share = tmp.mac_share;
 
-    // crypto::paillier_t p; 
-    // p.create_pub(server_share.N);
-    // bn_t test = p.mul_scalar(server_share.c_2, tmp.share);
 
-    // assert(out.share == test);
+double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+
+double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+
+logger::log(logger::INFO)<< "Time for get_maced_share():"  << d1 << std::endl;
+logger::log(logger::INFO)<< "Time for MODULO:"  << d2 << std::endl;
 
     return 0;
 }

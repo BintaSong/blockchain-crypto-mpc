@@ -31,6 +31,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* ReconstructRequestMessage_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ReconstructRequestMessage_reflection_ = NULL;
+const ::google::protobuf::Descriptor* ReconstructRangeMessage_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  ReconstructRangeMessage_reflection_ = NULL;
 const ::google::protobuf::Descriptor* ReconstructReply_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ReconstructReply_reflection_ = NULL;
@@ -92,7 +95,23 @@ void protobuf_AssignDesc_leath_2eproto() {
       sizeof(ReconstructRequestMessage),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRequestMessage, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRequestMessage, _is_default_instance_));
-  ReconstructReply_descriptor_ = file->message_type(3);
+  ReconstructRangeMessage_descriptor_ = file->message_type(3);
+  static const int ReconstructRangeMessage_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, begin_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, end_id_),
+  };
+  ReconstructRangeMessage_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      ReconstructRangeMessage_descriptor_,
+      ReconstructRangeMessage::default_instance_,
+      ReconstructRangeMessage_offsets_,
+      -1,
+      -1,
+      -1,
+      sizeof(ReconstructRangeMessage),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, _internal_metadata_),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, _is_default_instance_));
+  ReconstructReply_descriptor_ = file->message_type(4);
   static const int ReconstructReply_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructReply, value_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructReply, value_share_),
@@ -128,6 +147,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       ReconstructRequestMessage_descriptor_, &ReconstructRequestMessage::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      ReconstructRangeMessage_descriptor_, &ReconstructRangeMessage::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       ReconstructReply_descriptor_, &ReconstructReply::default_instance());
 }
 
@@ -140,6 +161,8 @@ void protobuf_ShutdownFile_leath_2eproto() {
   delete ShareRequestMessage_reflection_;
   delete ReconstructRequestMessage::default_instance_;
   delete ReconstructRequestMessage_reflection_;
+  delete ReconstructRangeMessage::default_instance_;
+  delete ReconstructRangeMessage_reflection_;
   delete ReconstructReply::default_instance_;
   delete ReconstructReply_reflection_;
 }
@@ -157,28 +180,34 @@ void protobuf_AddDesc_leath_2eproto() {
     "\001 \001(\004\022\013\n\003msg\030\002 \001(\014\"O\n\023ShareRequestMessag"
     "e\022\020\n\010value_id\030\001 \001(\004\022\023\n\013value_share\030\002 \001(\014"
     "\022\021\n\tmac_share\030\003 \001(\014\"-\n\031ReconstructReques"
-    "tMessage\022\020\n\010value_id\030\001 \001(\004\"L\n\020Reconstruc"
-    "tReply\022\020\n\010value_id\030\001 \001(\004\022\023\n\013value_share\030"
-    "\002 \001(\014\022\021\n\tmac_share\030\003 \001(\0142\207\003\n\010LeathRPC\022;\n"
-    "\005setup\022\027.mpc.leath.SetupMessage\032\027.mpc.le"
-    "ath.SetupMessage\"\000\022A\n\005share\022\036.mpc.leath."
-    "ShareRequestMessage\032\026.google.protobuf.Em"
-    "pty\"\000\022I\n\013batch_share\022\036.mpc.leath.ShareRe"
-    "questMessage\032\026.google.protobuf.Empty\"\000(\001"
-    "\022R\n\013reconstruct\022$.mpc.leath.ReconstructR"
-    "equestMessage\032\033.mpc.leath.ReconstructRep"
-    "ly\"\000\022\\\n\021batch_reconstruct\022$.mpc.leath.Re"
-    "constructRequestMessage\032\033.mpc.leath.Reco"
-    "nstructReply\"\000(\0010\001b\006proto3", 706);
+    "tMessage\022\020\n\010value_id\030\001 \001(\004\";\n\027Reconstruc"
+    "tRangeMessage\022\020\n\010begin_id\030\001 \001(\004\022\016\n\006end_i"
+    "d\030\002 \001(\004\"L\n\020ReconstructReply\022\020\n\010value_id\030"
+    "\001 \001(\004\022\023\n\013value_share\030\002 \001(\014\022\021\n\tmac_share\030"
+    "\003 \001(\0142\340\003\n\010LeathRPC\022;\n\005setup\022\027.mpc.leath."
+    "SetupMessage\032\027.mpc.leath.SetupMessage\"\000\022"
+    "A\n\005share\022\036.mpc.leath.ShareRequestMessage"
+    "\032\026.google.protobuf.Empty\"\000\022I\n\013batch_shar"
+    "e\022\036.mpc.leath.ShareRequestMessage\032\026.goog"
+    "le.protobuf.Empty\"\000(\001\022R\n\013reconstruct\022$.m"
+    "pc.leath.ReconstructRequestMessage\032\033.mpc"
+    ".leath.ReconstructReply\"\000\022\\\n\021batch_recon"
+    "struct\022$.mpc.leath.ReconstructRequestMes"
+    "sage\032\033.mpc.leath.ReconstructReply\"\000(\0010\001\022"
+    "W\n\020bulk_reconstruct\022\".mpc.leath.Reconstr"
+    "uctRangeMessage\032\033.mpc.leath.ReconstructR"
+    "eply\"\0000\001b\006proto3", 856);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "leath.proto", &protobuf_RegisterTypes);
   SetupMessage::default_instance_ = new SetupMessage();
   ShareRequestMessage::default_instance_ = new ShareRequestMessage();
   ReconstructRequestMessage::default_instance_ = new ReconstructRequestMessage();
+  ReconstructRangeMessage::default_instance_ = new ReconstructRangeMessage();
   ReconstructReply::default_instance_ = new ReconstructReply();
   SetupMessage::default_instance_->InitAsDefaultInstance();
   ShareRequestMessage::default_instance_->InitAsDefaultInstance();
   ReconstructRequestMessage::default_instance_->InitAsDefaultInstance();
+  ReconstructRangeMessage::default_instance_->InitAsDefaultInstance();
   ReconstructReply::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_leath_2eproto);
 }
@@ -1158,6 +1187,312 @@ void ReconstructRequestMessage::clear_value_id() {
   
   value_id_ = value;
   // @@protoc_insertion_point(field_set:mpc.leath.ReconstructRequestMessage.value_id)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ReconstructRangeMessage::kBeginIdFieldNumber;
+const int ReconstructRangeMessage::kEndIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ReconstructRangeMessage::ReconstructRangeMessage()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:mpc.leath.ReconstructRangeMessage)
+}
+
+void ReconstructRangeMessage::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+ReconstructRangeMessage::ReconstructRangeMessage(const ReconstructRangeMessage& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:mpc.leath.ReconstructRangeMessage)
+}
+
+void ReconstructRangeMessage::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+  begin_id_ = GOOGLE_ULONGLONG(0);
+  end_id_ = GOOGLE_ULONGLONG(0);
+}
+
+ReconstructRangeMessage::~ReconstructRangeMessage() {
+  // @@protoc_insertion_point(destructor:mpc.leath.ReconstructRangeMessage)
+  SharedDtor();
+}
+
+void ReconstructRangeMessage::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void ReconstructRangeMessage::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* ReconstructRangeMessage::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return ReconstructRangeMessage_descriptor_;
+}
+
+const ReconstructRangeMessage& ReconstructRangeMessage::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_leath_2eproto();
+  return *default_instance_;
+}
+
+ReconstructRangeMessage* ReconstructRangeMessage::default_instance_ = NULL;
+
+ReconstructRangeMessage* ReconstructRangeMessage::New(::google::protobuf::Arena* arena) const {
+  ReconstructRangeMessage* n = new ReconstructRangeMessage;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void ReconstructRangeMessage::Clear() {
+// @@protoc_insertion_point(message_clear_start:mpc.leath.ReconstructRangeMessage)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(ReconstructRangeMessage, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<ReconstructRangeMessage*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(begin_id_, end_id_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
+}
+
+bool ReconstructRangeMessage::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:mpc.leath.ReconstructRangeMessage)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional uint64 begin_id = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &begin_id_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_end_id;
+        break;
+      }
+
+      // optional uint64 end_id = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_end_id:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &end_id_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:mpc.leath.ReconstructRangeMessage)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:mpc.leath.ReconstructRangeMessage)
+  return false;
+#undef DO_
+}
+
+void ReconstructRangeMessage::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:mpc.leath.ReconstructRangeMessage)
+  // optional uint64 begin_id = 1;
+  if (this->begin_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(1, this->begin_id(), output);
+  }
+
+  // optional uint64 end_id = 2;
+  if (this->end_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(2, this->end_id(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:mpc.leath.ReconstructRangeMessage)
+}
+
+::google::protobuf::uint8* ReconstructRangeMessage::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:mpc.leath.ReconstructRangeMessage)
+  // optional uint64 begin_id = 1;
+  if (this->begin_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(1, this->begin_id(), target);
+  }
+
+  // optional uint64 end_id = 2;
+  if (this->end_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(2, this->end_id(), target);
+  }
+
+  // @@protoc_insertion_point(serialize_to_array_end:mpc.leath.ReconstructRangeMessage)
+  return target;
+}
+
+int ReconstructRangeMessage::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:mpc.leath.ReconstructRangeMessage)
+  int total_size = 0;
+
+  // optional uint64 begin_id = 1;
+  if (this->begin_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->begin_id());
+  }
+
+  // optional uint64 end_id = 2;
+  if (this->end_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->end_id());
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ReconstructRangeMessage::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:mpc.leath.ReconstructRangeMessage)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const ReconstructRangeMessage* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const ReconstructRangeMessage>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:mpc.leath.ReconstructRangeMessage)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:mpc.leath.ReconstructRangeMessage)
+    MergeFrom(*source);
+  }
+}
+
+void ReconstructRangeMessage::MergeFrom(const ReconstructRangeMessage& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mpc.leath.ReconstructRangeMessage)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  if (from.begin_id() != 0) {
+    set_begin_id(from.begin_id());
+  }
+  if (from.end_id() != 0) {
+    set_end_id(from.end_id());
+  }
+}
+
+void ReconstructRangeMessage::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:mpc.leath.ReconstructRangeMessage)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ReconstructRangeMessage::CopyFrom(const ReconstructRangeMessage& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mpc.leath.ReconstructRangeMessage)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ReconstructRangeMessage::IsInitialized() const {
+
+  return true;
+}
+
+void ReconstructRangeMessage::Swap(ReconstructRangeMessage* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ReconstructRangeMessage::InternalSwap(ReconstructRangeMessage* other) {
+  std::swap(begin_id_, other->begin_id_);
+  std::swap(end_id_, other->end_id_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata ReconstructRangeMessage::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = ReconstructRangeMessage_descriptor_;
+  metadata.reflection = ReconstructRangeMessage_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// ReconstructRangeMessage
+
+// optional uint64 begin_id = 1;
+void ReconstructRangeMessage::clear_begin_id() {
+  begin_id_ = GOOGLE_ULONGLONG(0);
+}
+ ::google::protobuf::uint64 ReconstructRangeMessage::begin_id() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.ReconstructRangeMessage.begin_id)
+  return begin_id_;
+}
+ void ReconstructRangeMessage::set_begin_id(::google::protobuf::uint64 value) {
+  
+  begin_id_ = value;
+  // @@protoc_insertion_point(field_set:mpc.leath.ReconstructRangeMessage.begin_id)
+}
+
+// optional uint64 end_id = 2;
+void ReconstructRangeMessage::clear_end_id() {
+  end_id_ = GOOGLE_ULONGLONG(0);
+}
+ ::google::protobuf::uint64 ReconstructRangeMessage::end_id() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.ReconstructRangeMessage.end_id)
+  return end_id_;
+}
+ void ReconstructRangeMessage::set_end_id(::google::protobuf::uint64 value) {
+  
+  end_id_ = value;
+  // @@protoc_insertion_point(field_set:mpc.leath.ReconstructRangeMessage.end_id)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

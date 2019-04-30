@@ -38,6 +38,7 @@ void protobuf_AddDesc_leath_2eproto();
 void protobuf_AssignDesc_leath_2eproto();
 void protobuf_ShutdownFile_leath_2eproto();
 
+class ReconstructRangeMessage;
 class ReconstructReply;
 class ReconstructRequestMessage;
 class SetupMessage;
@@ -312,6 +313,91 @@ class ReconstructRequestMessage : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static ReconstructRequestMessage* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ReconstructRangeMessage : public ::google::protobuf::Message {
+ public:
+  ReconstructRangeMessage();
+  virtual ~ReconstructRangeMessage();
+
+  ReconstructRangeMessage(const ReconstructRangeMessage& from);
+
+  inline ReconstructRangeMessage& operator=(const ReconstructRangeMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ReconstructRangeMessage& default_instance();
+
+  void Swap(ReconstructRangeMessage* other);
+
+  // implements Message ----------------------------------------------
+
+  inline ReconstructRangeMessage* New() const { return New(NULL); }
+
+  ReconstructRangeMessage* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ReconstructRangeMessage& from);
+  void MergeFrom(const ReconstructRangeMessage& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(ReconstructRangeMessage* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional uint64 begin_id = 1;
+  void clear_begin_id();
+  static const int kBeginIdFieldNumber = 1;
+  ::google::protobuf::uint64 begin_id() const;
+  void set_begin_id(::google::protobuf::uint64 value);
+
+  // optional uint64 end_id = 2;
+  void clear_end_id();
+  static const int kEndIdFieldNumber = 2;
+  ::google::protobuf::uint64 end_id() const;
+  void set_end_id(::google::protobuf::uint64 value);
+
+  // @@protoc_insertion_point(class_scope:mpc.leath.ReconstructRangeMessage)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::uint64 begin_id_;
+  ::google::protobuf::uint64 end_id_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_leath_2eproto();
+  friend void protobuf_AssignDesc_leath_2eproto();
+  friend void protobuf_ShutdownFile_leath_2eproto();
+
+  void InitAsDefaultInstance();
+  static ReconstructRangeMessage* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -607,6 +693,38 @@ inline void ReconstructRequestMessage::set_value_id(::google::protobuf::uint64 v
 
 // -------------------------------------------------------------------
 
+// ReconstructRangeMessage
+
+// optional uint64 begin_id = 1;
+inline void ReconstructRangeMessage::clear_begin_id() {
+  begin_id_ = GOOGLE_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 ReconstructRangeMessage::begin_id() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.ReconstructRangeMessage.begin_id)
+  return begin_id_;
+}
+inline void ReconstructRangeMessage::set_begin_id(::google::protobuf::uint64 value) {
+  
+  begin_id_ = value;
+  // @@protoc_insertion_point(field_set:mpc.leath.ReconstructRangeMessage.begin_id)
+}
+
+// optional uint64 end_id = 2;
+inline void ReconstructRangeMessage::clear_end_id() {
+  end_id_ = GOOGLE_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 ReconstructRangeMessage::end_id() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.ReconstructRangeMessage.end_id)
+  return end_id_;
+}
+inline void ReconstructRangeMessage::set_end_id(::google::protobuf::uint64 value) {
+  
+  end_id_ = value;
+  // @@protoc_insertion_point(field_set:mpc.leath.ReconstructRangeMessage.end_id)
+}
+
+// -------------------------------------------------------------------
+
 // ReconstructReply
 
 // optional uint64 value_id = 1;
@@ -712,6 +830,8 @@ inline void ReconstructReply::set_allocated_mac_share(::std::string* mac_share) 
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

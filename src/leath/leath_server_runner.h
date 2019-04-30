@@ -44,6 +44,12 @@ namespace mpc {
         
         grpc::Status batch_reconstruct(grpc::ServerContext* context, 
                             grpc::ServerReaderWriter<ReconstructReply, ReconstructRequestMessage>* stream) override;
+    
+        grpc::Status bulk_reconstruct(grpc::ServerContext* context, 
+                        const leath::ReconstructRangeMessage* request, grpc::ServerWriter< ::mpc::leath::ReconstructReply>* writer) override;
+
+        //grpc::Status bulk_reconstruct_parallel(grpc::ServerContext* context, 
+        //               const leath::ReconstructRangeMessage* request, grpc::ServerWriter<leath::ReconstructReply>* writer) override;
 
     private:
         std::unique_ptr<LeathServer> server_;

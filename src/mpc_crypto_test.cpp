@@ -699,22 +699,25 @@ static int test_bip()
 }
 
 // added by XF Song
+
 static int test_paillier()
 {
-  crypto::paillier_t p_1024, p_2048, p_3072, p_4096, p_5120, p_6144;
+  crypto::paillier_t p_1024, p_2048, p_3027;
 
   p_1024.generate(1024, true);
   p_2048.generate(2048, true);
-  p_3072.generate(3072, true);
-  p_4096.generate(4096, true);
-  p_5120.generate(5120, true);
-  p_6144.generate(6144, true);
+  p_3027.generate(3027, true);
+  // p_4096.generate(4096, true);
+  // p_5120.generate(5120, true);
+  // p_6144.generate(6144, true);
 
   // p_1024
-  crypto::bn_t N = p_1024.get_N();
-  u_int count = 20;
+  crypto::bn_t N = p_1024.get_N(), N2 = N * N;
 
+  u_int count = 30;
   crypto::bn_t m[count], c[count];
+
+  //--------1024---------
   for (int i = 0; i < count; i++)
   {
     m[i] = crypto::bn_t::rand(N);
@@ -737,7 +740,23 @@ static int test_paillier()
   duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   printf("p_1024 decryption: %f ms \n", duration / count);
 
-  // p_2048
+  begin = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < count; i++)
+  {
+    MODULO(N2) c[i] = c[i].pow(m[i]);
+  }
+  end = std::chrono::high_resolution_clock::now();
+  duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+  printf("p_1024 raw pow: %f ms \n", duration / count);
+
+  // -------2048---------
+  N = p_2048.get_N();
+  N2 = N * N;
+  for (int i = 0; i < count; i++)
+  {
+    m[i] = crypto::bn_t::rand(N);
+  }
+
   begin = std::chrono::high_resolution_clock::now();
   for (int i = 0; i < count; i++)
   {
@@ -756,11 +775,27 @@ static int test_paillier()
   duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   printf("p_2048 encryption: %f ms \n", duration / count);
 
-  // p_3072
+  
   begin = std::chrono::high_resolution_clock::now();
   for (int i = 0; i < count; i++)
   {
-    c[i] = p_3072.encrypt(m[i]);
+    MODULO(N2) c[i] = c[i].pow(m[i]);
+  }
+  end = std::chrono::high_resolution_clock::now();
+  duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+  printf("p_2048 raw pow: %f ms \n", duration / count);
+
+  //----------3027-----------
+  N = p_3027.get_N();
+  N = N * N;
+  for (int i = 0; i < count; i++)
+  {
+    m[i] = crypto::bn_t::rand(N);
+  }
+  begin = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < count; i++)
+  {
+    c[i] = p_3027.encrypt(m[i]);
   }
   end = std::chrono::high_resolution_clock::now();
   duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
@@ -769,11 +804,20 @@ static int test_paillier()
   begin = std::chrono::high_resolution_clock::now();
   for (int i = 0; i < count; i++)
   {
-    m[i] = p_3072.decrypt(c[i]);
+    m[i] = p_3027.decrypt(c[i]);
   }
   end = std::chrono::high_resolution_clock::now();
   duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   printf("p_3072 decryption: %f ms \n", duration / count);
+
+  begin = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < count; i++)
+  {
+    MODULO(N2) c[i] = c[i].pow(m[i]);
+  }
+  end = std::chrono::high_resolution_clock::now();
+  duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+  printf("p_3027 raw pow: %f ms \n", duration / count);
 /*
   // p_4096
   begin = std::chrono::high_resolution_clock::now();
@@ -1469,10 +1513,10 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::vector<std::string> addresses;
   addresses.push_back("localhost:70000");
   addresses.push_back("localhost:70001");
-  addresses.push_back("localhost:70002");
-  addresses.push_back("localhost:70003");
+  //addresses.push_back("localhost:70002");
+  //addresses.push_back("localhost:70003");
 
-  int bits = 3072;
+  int bits = 3027;
   client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
 
   opterr = 0;
@@ -1509,24 +1553,13 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
   error_t rv = 0;
 
-  uint64_t vid = 123;
-  bn_t raw_data = bn_t(456);
+  rv = client_runner->share_benchmark(1, 2);
 
-  rv = client_runner->share(vid, raw_data);
-assert(rv == 0);
+  rv = client_runner->bulk_reconstruct(1, 2);
 
-  // sleep(2);
-  bn_t rec_data;
-  rv = client_runner->reconstruct(vid, rec_data);
-assert(rv == 0);
-
-  logger::log(logger::INFO) << rec_data.to_string() << std::endl;
-
-  assert(rec_data == raw_data);
-
+  // assert(rv == 0);
 
   logger::log(logger::INFO) << "Done." << std::endl;
-
 
 //  client_runner->test_rpc();
 
@@ -1609,7 +1642,7 @@ MPCCRYPTO_API int MPCCrypto_test()
   t = ub::read_timer_ms() - t; */
 
   // test_paillier();
-  rv = test_leath_client_4server();
+  rv = test_paillier();
   assert(rv == 0);
   logger::log(logger::INFO) << "ALL GOOD !" << std::endl;
   /*

@@ -27,13 +27,15 @@ namespace mpc {
         void simple_setup();
 
         error_t share(const uint64_t val_id, const bn_t& val);
-        error_t share_benchmark(int counter);
-        error_t batch_share_benchmark(int counter);
+        error_t share_benchmark(uint64_t begin, uint64_t end);
+        error_t batch_share_benchmark(uint64_t counter);
 
 
         error_t reconstruct(const uint64_t val_id, bn_t& raw_data);
+        // error_t simple_reconstruct(const uint64_t val_id, bn_t& raw_data);
         // error_t batch_reconstruct(const uint64_t val_id, bn_t& raw_data);
         error_t reconstruct_benchmark(int shares_number);
+        error_t bulk_reconstruct(const uint64_t begin, const uint64_t end);
         // void test_rpc();
 
     private:

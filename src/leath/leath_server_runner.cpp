@@ -81,14 +81,14 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
 
         leath_maced_share_t in, out;
 
-        logger::log(logger::INFO) << "Received share..." << std::endl;
+        // logger::log(logger::INFO) << "Received share..." << std::endl;
         
         ub::convert(in.share, mem_t::from_string(request->value_share()));
         ub::convert(in.mac_share, mem_t::from_string(request->mac_share()));
 
         server_->leath_share_peer2_step1(mem_t::from_string("share_session"), request->value_id(), in, out);  // from `in` to get complete share, and store `out`
         //server_->leath_share_peer2_step1(mem_t::from_string("share_session"), request->value_id(), in, out);  // from `in` to get complete share, and store `out`
-        logger::log(logger::INFO) << "...end share." << std::endl;
+        // logger::log(logger::INFO) << "...end share." << std::endl;
         return grpc::Status::OK;
     }
 
@@ -135,6 +135,91 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
 
     grpc::Status LeathServerImpl::batch_reconstruct(grpc::ServerContext* context, grpc::ServerReaderWriter<ReconstructReply, ReconstructRequestMessage>* stream) {
         // TODO: 
+        return  grpc::Status::OK;
+    }
+
+// grpc::Status LeathServerImpl::bulk_reconstruct_parallel(grpc::ServerContext* context, const leath::ReconstructRangeMessage* request, grpc::ServerWriter<leath::ReconstructReply>* writer) {
+//         //int threads_number = 2;
+//         error_t rv = 0;
+
+//         logger::log(logger::INFO) << "Received reconstruct." << std::endl;
+        
+//         leath_maced_share_t out;
+//         double sum = 0.0, sum_com = 0.0;
+        
+// std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();        
+//         int threads_number = ;
+//         for(uint64_t vid = request->begin_id(); vid < request->end_id(); vid++) {
+//             leath::ReconstructReply reply;
+
+// std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+//             rv =  server_->leath_reconstruct_peer2_step1(mem_t::from_string("reconstruction_session"), vid, out);
+//             if (rv != 0 ) {
+//                 logger::log(logger::INFO) << "bulk_reconstruct() error, vid: " << vid <<std::endl;
+//                 return grpc::Status::CANCELLED;
+//             }
+
+// std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+//             reply.set_value_id(vid);
+//             reply.set_value_share(out.share.to_string());
+//             reply.set_mac_share(out.mac_share.to_string());
+//             writer->Write(reply);
+// std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+// sum_com += (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+// sum += (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
+//         }
+
+// logger::log(logger::INFO)<< "Time for bulk_reconstruct() computation time:"  << sum_com / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+// logger::log(logger::INFO)<< "Time for bulk_reconstruct() encoding & RPC time:"  << sum / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+// std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+// double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t1).count();
+// logger::log(logger::INFO)<< "Time for bulk_reconstruct() with Network:"  << duration / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+//         return  grpc::Status::OK;
+//     }
+
+
+    grpc::Status LeathServerImpl::bulk_reconstruct(grpc::ServerContext* context, const leath::ReconstructRangeMessage* request, grpc::ServerWriter<leath::ReconstructReply>* writer) {
+        //int threads_number = 2;
+        error_t rv = 0;
+
+        logger::log(logger::INFO) << "Received reconstruct." << std::endl;
+        
+        leath_maced_share_t out;
+        double sum = 0.0, sum_com = 0.0;
+        
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();        
+
+        for(uint64_t vid = request->begin_id(); vid < request->end_id(); vid++) {
+            leath::ReconstructReply reply;
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+            rv =  server_->leath_reconstruct_peer2_step1(mem_t::from_string("reconstruction_session"), vid, out);
+            if (rv != 0 ) {
+                logger::log(logger::INFO) << "bulk_reconstruct() error, vid: " << vid <<std::endl;
+                return grpc::Status::CANCELLED;
+            }
+
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+            reply.set_value_id(vid);
+            reply.set_value_share(out.share.to_string());
+            reply.set_mac_share(out.mac_share.to_string());
+            writer->Write(reply);
+std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+sum_com += (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+sum += (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
+        }
+
+logger::log(logger::INFO)<< "Time for bulk_reconstruct() computation time:"  << sum_com / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for bulk_reconstruct() encoding & RPC time:"  << sum / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t1).count();
+logger::log(logger::INFO)<< "Time for bulk_reconstruct() with Network:"  << duration / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
         return  grpc::Status::OK;
     }
 

@@ -17,6 +17,7 @@ rpc batch_share (stream ShareRequestMessage) returns (google.protobuf.Empty) {}
 // Update
 rpc reconstruct (ReconstructRequestMessage) returns (ReconstructReply) {}
 rpc batch_reconstruct (stream ReconstructRequestMessage) returns (stream ReconstructReply) {}
+rpc bulk_reconstruct (ReconstructRangeMessage) returns (stream ReconstructReply) {}
 
 }
 
@@ -36,6 +37,12 @@ message ShareRequestMessage
 message ReconstructRequestMessage
 {
     uint64 value_id = 1;
+}
+
+message ReconstructRangeMessage
+{
+    uint64 begin_id = 1;
+    uint64 end_id = 2;
 }
 
 message ReconstructReply
