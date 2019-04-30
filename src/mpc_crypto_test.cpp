@@ -1516,7 +1516,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   //addresses.push_back("localhost:70002");
   //addresses.push_back("localhost:70003");
 
-  int bits = 3027;
+  int bits = 2048;
   client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
 
   opterr = 0;
@@ -1553,9 +1553,9 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
   error_t rv = 0;
 
-  rv = client_runner->share_benchmark(1, 2);
+  rv = client_runner->share_benchmark(0, 10);
 
-  rv = client_runner->bulk_reconstruct(1, 2);
+  rv = client_runner->bulk_reconstruct(0, 10);
 
   // assert(rv == 0);
 

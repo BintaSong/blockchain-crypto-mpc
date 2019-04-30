@@ -48,7 +48,7 @@ namespace mpc {
         grpc::Status bulk_reconstruct(grpc::ServerContext* context, 
                         const leath::ReconstructRangeMessage* request, grpc::ServerWriter< ::mpc::leath::ReconstructReply>* writer) override;
 
-        //grpc::Status bulk_reconstruct_parallel(grpc::ServerContext* context, 
+        // grpc::Status bulk_reconstruct_parallel(grpc::ServerContext* context, 
         //               const leath::ReconstructRangeMessage* request, grpc::ServerWriter<leath::ReconstructReply>* writer) override;
 
     private:
