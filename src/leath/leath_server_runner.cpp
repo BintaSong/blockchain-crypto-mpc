@@ -185,6 +185,36 @@ logger::log(logger::INFO)<< "Time for bulk_reconstruct() with Network:"  << dura
               
         error_t rv = 0;
         
+        std::mutex writer_lock;
+    
+        auto post_callback = [&writer, &writer_lock](const uint64_t vid, const leath_maced_share_t &out)
+        {
+            leath::ReconstructReply reply;
+            reply.set_value_id(vid);
+            reply.set_value_share(out.share.to_string());
+            reply.set_mac_share(out.mac_share.to_string());
+            
+            writer_lock.lock();
+            writer->Write(reply);
+            writer_lock.unlock();
+        };
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+        server_->leath_reconstruct_peer2_step1_parallel(mem_t::from_string("reconstruction_session"), request->begin_id(), request->end_id(), post_callback);
+        
+std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t1).count();
+
+logger::log(logger::INFO)<< "Time for PARALLEL bulk_reconstruct() with Network:"  << duration / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+        return  grpc::Status::OK;
+    }
+
+/*     grpc::Status LeathServerImpl::bulk_reconstruct(grpc::ServerContext* context, const leath::ReconstructRangeMessage* request, grpc::ServerWriter<leath::ReconstructReply>* writer) {
+              
+        error_t rv = 0;
+        
         std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         
         std::mutex writer_mutex;
@@ -246,7 +276,7 @@ double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(
 logger::log(logger::INFO)<< "Time for bulk_reconstruct() with Network:"  << duration / (request->end_id() - request->begin_id())  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
         return  grpc::Status::OK;
-    }
+    } */
 
     void run_leath_server(const std::string &address, uint8_t server_id,  const std::string& server_path, grpc::Server **server_ptr) {
         std::string server_address(address);

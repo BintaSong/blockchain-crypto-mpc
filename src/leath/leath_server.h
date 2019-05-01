@@ -35,6 +35,7 @@ public:
     //-------------------for reconstruct------------
     // error_t leath_reconstruct_peer2_step1(mem_t session_id, const leath_maced_share_t &in, leath_maced_share_t &out);
     error_t leath_reconstruct_peer2_step1(mem_t session_id, const uint64_t vid, leath_maced_share_t &out);
+    error_t leath_reconstruct_peer2_step1_parallel(mem_t session_id, const uint64_t begin_vid, const uint64_t end_vid, std::function<void(uint64_t, leath_maced_share_t)> post_callback);
 
 
     //-------------------computation on shares------

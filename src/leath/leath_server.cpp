@@ -186,7 +186,7 @@ error_t LeathServer::leath_share_peer2_step1(mem_t session_id, const leath_maced
 }
 
 error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint64_t vid, leath_maced_share_t &out)
-{/*
+{
     error_t rv = 0;
     leath_maced_share_t tmp;
 
@@ -201,8 +201,7 @@ error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint6
 
 // std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 
-    // bn_t N2 = server_share.N * server_share.N;
-    // MODULO(server_share.N2) out.share = server_share.c_2.pow(tmp.share);
+    MODULO(server_share.N2) out.share = server_share.c_2.pow(tmp.share);
 // std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
     out.mac_share = tmp.mac_share;
@@ -214,7 +213,43 @@ error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint6
 
 // logger::log(logger::INFO)<< "Time for get_maced_share():"  << d1 << std::endl;
 // logger::log(logger::INFO)<< "Time for MODULO:"  << d2 << std::endl;
-*/
+
+    return 0;
+}
+
+
+error_t  LeathServer::leath_reconstruct_peer2_step1_parallel(mem_t session_id, const uint64_t begin_vid, const uint64_t end_vid, std::function<void(uint64_t, leath_maced_share_t)> post_callback) {
+
+    auto reconstruct_job = [this, &post_callback](uint64_t begin, uint64_t end, uint64_t step){
+        for(uint64_t vid = begin; vid < end; vid += step){
+            
+            error_t rv = 0;
+
+            leath_maced_share_t out;
+            rv = get_maced_share(vid, out);
+
+            if (rv != 0) {
+                logger::log(logger::ERROR) << "leath_reconstruct_peer2_step1_parallel(): Get Share Failed!" <<std::endl;
+                return rv;
+            }
+
+            MODULO(server_share.N2) out.share = server_share.c_2.pow(out.share);
+
+            post_callback(vid, out);
+        }
+    };
+
+    std::vector<std::thread> reconstruct_threads;       
+
+    unsigned n_threads = std::thread::hardware_concurrency() - 1;
+        
+    for (uint8_t t = 0; t < n_threads; t++) {
+        reconstruct_threads.push_back(std::thread(reconstruct_job, t, end_vid, n_threads));
+    }     
+    for (auto& t : reconstruct_threads) {
+        t.join();
+    }
+
     return 0;
 }
 
