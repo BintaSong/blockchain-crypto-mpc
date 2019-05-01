@@ -321,7 +321,7 @@ error_t LeathServer::store_maced_share( const uint64_t vid, const leath_maced_sh
 
     share_map[vid] = s;
 
-    logger::log(logger::INFO) << "store vid = "<< vid << std::endl;
+    // logger::log(logger::INFO) << "store vid = "<< vid << std::endl;
 
     //FIXME: store (share, mac_share) to file
 
