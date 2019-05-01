@@ -568,6 +568,11 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
     double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     logger::log(logger::INFO)<< "Time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 */
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "Time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
     delete [] writer_array;
 
     return 0;
