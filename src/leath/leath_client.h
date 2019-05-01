@@ -1,6 +1,8 @@
 #pragma once
 #include "mpc_leath.h"
 
+#include "thread_pool.h"
+
 #include "utils.h"
 
 #include <mutex>
@@ -24,6 +26,9 @@ public:
 
     //----------client share step function----------------
     error_t leath_share_peer1_step1(mem_t session_id, const bn_t raw_data, std::vector<leath_maced_share_t>& out);
+    error_t leath_share_peer1_step1_callback(mem_t session_id, const uint64_t vid, const bn_t raw_data,  std::function<void(uint64_t, leath_maced_share_with_VID_t)> call_back);
+    // error_t leath_share_peer1_step1_callback(mem_t session_id, const uint64_t begin_vid, const uint64_t end_vid, std::function<void(leath_maced_share_t)> call_back);
+
     error_t leath_share_peer1_step1(mem_t session_id, uint64_t vid, const bn_t raw_data, std::vector<leath_maced_share_with_VID_t> &out);
 
     //----------client reconstruct step function----------
@@ -40,6 +45,7 @@ public:
     // error_t split_data(const bn_t raw_data, std::vector<bn_t>& data_shares);
     error_t split_data_mac(const bn_t raw_data, std::vector<leath_maced_share_t>& data_mac_shares);
     error_t split_data_mac_with_VID(const uint64_t vid, const bn_t raw_data, std::vector<leath_maced_share_with_VID_t>& data_mac_shares);
+    error_t split_data_mac_with_VID_callback(const uint64_t vid, const bn_t raw_data, std::function<void(uint64_t, leath_maced_share_with_VID_t)> post_back);
 
     // bn_t reconstruct_data(const std::vector<bn_t>& data_shares);  
     error_t reconstruct_data_mac(const std::vector<leath_maced_share_t>& data_mac_shares, bn_t& raw_data);

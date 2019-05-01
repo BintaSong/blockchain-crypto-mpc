@@ -1553,9 +1553,9 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
   error_t rv = 0;
 
-  rv = client_runner->share_benchmark(0, 2000);
-
-  rv = client_runner->bulk_reconstruct(0, 2000);
+  rv = client_runner->share_benchmark(0, 1000);
+  sleep(2);
+  rv = client_runner->bulk_reconstruct(0, 1000);
 
   // assert(rv == 0);
 

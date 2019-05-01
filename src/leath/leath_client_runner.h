@@ -59,8 +59,10 @@ namespace mpc {
             bool is_up;
         } batch_update_state_;
 
-        struct reconstruct_bench_t{
-            std::vector<bn_t> shares;
+        struct leath_share_writers_t{
+            std::unique_ptr<::grpc::ClientContext> context;
+            google::protobuf::Empty response;
+            std::unique_ptr<grpc::ClientWriter<leath::ShareRequestMessage>> writer_;
             std::mutex mtx;
         };
 

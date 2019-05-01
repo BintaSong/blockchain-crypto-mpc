@@ -513,6 +513,70 @@ error_t LeathClientRunner::share(const uint64_t val_id, const bn_t& val)
 error_t LeathClientRunner::share_benchmark(uint64_t begin, uint64_t end) {
     bn_t p = client_->client_share.paillier.get_p();
 
+    // std::vector<leath_share_writers_t> writer_vector;
+
+    leath_share_writers_t *writer_array = new leath_share_writers_t[number_of_servers];
+
+    for(uint64_t i = 0; i < number_of_servers; i++) {
+        writer_array[i].context.reset(new grpc::ClientContext());
+        writer_array[i].writer_ = stub_vector[i]->batch_share(writer_array[i].context.get(), &writer_array[i].response);
+    }
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    std::mutex mtx;
+    auto share_callback = [&writer_array](const uint64_t server_id, const leath_maced_share_with_VID_t out_share){
+        leath::ShareRequestMessage request;
+
+        request.set_value_id(out_share.val_id);
+        request.set_value_share(ub::convert(out_share.maced_share.share).to_string());
+        request.set_mac_share(ub::convert(out_share.maced_share.mac_share).to_string());
+
+        writer_array[server_id].mtx.lock();
+        if(! writer_array[server_id].writer_->Write(request))
+        {
+            logger::log(logger::ERROR) << "share session: broken stream." << std::endl;
+        }
+        writer_array[server_id].mtx.unlock();
+    };
+/*
+    auto share_job = [this, &p, &share_callback](const uint64_t begin_vid, const uint64_t end_vid, const uint64_t step){
+        for(uint64_t vid = begin_vid; vid < end_vid; vid += step){
+            bn_t raw_data = bn_t::rand(p);
+            client_->leath_share_peer1_step1_callback(ub::mem_t::from_string("share_session"), vid, raw_data, share_callback);
+        }
+    };
+*/
+    for(uint64_t vid = begin; vid < end; vid++) {
+        bn_t raw_data =  bn_t::rand(p);
+        client_->leath_share_peer1_step1_callback(ub::mem_t::from_string("share_session"), vid, raw_data, share_callback);
+    }
+/*
+    std::vector<std::thread> share_threads;
+
+    unsigned n_threads = 1; //std::thread::hardware_concurrency() - 1;
+    
+    for (uint8_t t = 0; t < n_threads; t++) {
+        share_threads.push_back(std::thread(share_job, t, end, n_threads));
+    }     
+    for (auto& t : share_threads) {
+        t.join();
+    }
+
+
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    logger::log(logger::INFO)<< "Time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+*/
+    delete [] writer_array;
+
+    return 0;
+}
+
+
+/* error_t LeathClientRunner::share_benchmark(uint64_t begin, uint64_t end) {
+    bn_t p = client_->client_share.paillier.get_p();
+
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
     for (uint64_t i = begin; i < end; i++) {
@@ -524,7 +588,7 @@ error_t LeathClientRunner::share_benchmark(uint64_t begin, uint64_t end) {
 
     return 0;
 }
-
+ */
 error_t LeathClientRunner::reconstruct_benchmark(int counter) {
     // // bn_t p = client_->client_share.paillier.get_p();
     // // bn_t raw_data;

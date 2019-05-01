@@ -94,7 +94,7 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
 
     grpc::Status LeathServerImpl::batch_share(grpc::ServerContext* context, grpc::ServerReader< ShareRequestMessage>* reader, google::protobuf::Empty* response) {
         
-        ShareRequestMessage mes;
+        /* ShareRequestMessage mes;
         
         ThreadPool share_pool(4);
 
@@ -110,6 +110,16 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
         }
 
         share_pool.join();
+        return grpc::Status::OK; */
+        ShareRequestMessage mes;
+        
+        leath_maced_share_t in, out;
+        while (reader->Read(&mes)) {
+            ub::convert(in.share, mem_t::from_string(mes.value_share()));
+            ub::convert(in.mac_share, mem_t::from_string(mes.mac_share()));
+            server_->leath_share_peer2_step1(mem_t::from_string("share_session"), mes.value_id(), in, out);
+        }
+
         return grpc::Status::OK;
     }
 

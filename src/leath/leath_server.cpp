@@ -249,7 +249,7 @@ error_t  LeathServer::leath_reconstruct_peer2_step1_parallel(mem_t session_id, c
     for (auto& t : reconstruct_threads) {
         t.join();
     }
-
+    logger::log(logger::ERROR) << "reconstruction thread number:"<< n_threads <<std::endl;
     return 0;
 }
 
@@ -321,6 +321,8 @@ error_t LeathServer::store_maced_share( const uint64_t vid, const leath_maced_sh
 
     share_map[vid] = s;
 
+    logger::log(logger::INFO) << "store vid = "<< vid << std::endl;
+
     //FIXME: store (share, mac_share) to file
 
     return 0;
@@ -332,7 +334,7 @@ error_t LeathServer::get_maced_share(const uint64_t vid, leath_maced_share_t &s)
     std::map<uint64_t, leath_maced_share_t>::iterator it;
     it = share_map.find(vid);
     if (it == share_map.end()){
-        logger::log(logger::ERROR) << "get_maced_share(): Not find the matching share" << std::endl;
+        logger::log(logger::ERROR) << "get_maced_share(): Not find vid = "<< vid << std::endl;
         return error(E_NOT_FOUND);
     }
     s = it->second;

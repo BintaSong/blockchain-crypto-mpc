@@ -203,6 +203,22 @@ error_t LeathClient::leath_share_peer1_step1(mem_t session_id, const bn_t raw_da
 
     return split_data_mac(raw_data, out);
 }
+
+error_t LeathClient::leath_share_peer1_step1_callback(mem_t session_id, const uint64_t vid, const bn_t raw_data, std::function<void(uint64_t, leath_maced_share_with_VID_t)> post_back) 
+{
+    error_t rv = 0;
+
+    std::vector<leath_maced_share_with_VID_t> out;
+    rv = split_data_mac_with_VID_callback(vid, raw_data, post_back);
+    if (rv != 0)
+    {
+        logger::log(logger::ERROR) << "leath_share_peer1_step1_callback(): split data eror" << std::endl;
+        return rv = error(E_GENERAL);
+    }
+
+    return 0;
+}
+
 error_t LeathClient::leath_share_peer1_step1(mem_t session_id, uint64_t vid, const bn_t raw_data, std::vector<leath_maced_share_with_VID_t> &out)
 {
     return split_data_mac_with_VID(vid, raw_data, out);
@@ -326,8 +342,7 @@ error_t LeathClient::split_data_mac(const bn_t raw_data, std::vector<leath_maced
 
     bn_t data = get_partial_data(raw_data);
     bn_t mac;
-    MODULO(client_share.N)
-    mac = raw_data * client_share.x_2 * client_share.mac_key;
+    MODULO(client_share.N) mac = raw_data * client_share.x_2 * client_share.mac_key;
 
     for (int i = 0; i < number_of_server - 1; i++)
     {
@@ -338,10 +353,8 @@ error_t LeathClient::split_data_mac(const bn_t raw_data, std::vector<leath_maced
 
         data_mac_shares.push_back(maced_share_i);
 
-        MODULO(client_share.N)
-        data = data - maced_share_i.share;
-        MODULO(client_share.N)
-        mac = mac - maced_share_i.mac_share;
+        MODULO(client_share.N) data = data - maced_share_i.share;
+        MODULO(client_share.N) mac = mac - maced_share_i.mac_share;
     }
     // push the last shares and mac share
     data_mac_shares.push_back({data, mac});
@@ -360,7 +373,7 @@ error_t LeathClient::split_data_mac_with_VID(const uint64_t vid, const bn_t raw_
     }
 
     bn_t mac, data = get_partial_data(raw_data);
-    bn_t tmp1 = 0, tmp2 = 0;
+    // bn_t tmp1 = 0, tmp2 = 0;
 
     // MODULO(client_share.N) tmp1 = (data - client_share.keys_share);
     // assert(tmp == ((data - client_share.keys_share) % client_share.N));
@@ -389,6 +402,38 @@ error_t LeathClient::split_data_mac_with_VID(const uint64_t vid, const bn_t raw_
     }
     // push the final shares and mac share
     data_mac_shares.push_back({vid, {data, mac}});
+
+    return 0;
+}
+
+error_t LeathClient::split_data_mac_with_VID_callback(const uint64_t vid, const bn_t raw_data, std::function<void(uint64_t, leath_maced_share_with_VID_t)> post_back) {
+    error_t rv = 0;
+
+    if (number_of_server < 2)
+    {
+        logger::log(logger::ERROR) << "Number of server must >= 2!" << std::endl;
+        return rv = error(E_BADARG);
+    }
+
+    bn_t mac, data = get_partial_data(raw_data);
+
+    MODULO(client_share.N) mac = raw_data * client_share.x_2 * client_share.mac_key; // raw_data * crt(1, 0) * mac_key
+
+    for (int i = 0; i < number_of_server - 1; i++)
+    {
+        leath_maced_share_with_VID_t maced_share_i;
+        maced_share_i.val_id = vid;
+        maced_share_i.maced_share = {bn_t::rand(client_share.N), bn_t::rand(client_share.N)};
+        // post_back
+        post_back(i, maced_share_i);
+
+        MODULO(client_share.N)
+        data = data - maced_share_i.maced_share.share;
+        MODULO(client_share.N)
+        mac = mac - maced_share_i.maced_share.mac_share;
+    }
+    // post_back
+    post_back(number_of_server - 1, {vid, {data, mac}});
 
     return 0;
 }
