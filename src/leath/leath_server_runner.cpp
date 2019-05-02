@@ -50,6 +50,8 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
                 // response client 
                 response->set_msg_id(2);
                 response->set_msg(ub::convert(out).to_string());
+                
+                logger::log(logger::INFO) << "message length for leath_setup_peer2_step1: " << response->msg().size() << std::endl;
 
                 current_step++;
                 // already_setup = true; 
