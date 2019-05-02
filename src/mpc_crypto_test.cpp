@@ -1511,32 +1511,41 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::unique_ptr<mpc::LeathClientRunner> client_runner;
 
   std::vector<std::string> addresses;
-  addresses.push_back("54.91.19.211:70000");
-  addresses.push_back("54.91.19.211:70001");
-  //addresses.push_back("54.91.19.211:70002");
-  //addresses.push_back("54.183.199.211:70003");
+  //addresses.push_back("localhost:70000");
+  //addresses.push_back("localhost:70001");
+  addresses.push_back("18.232.147.74:70000");
+  addresses.push_back("3.14.68.118:70001");
+  //addresses.push_back("13.57.199.203:70002");
+  //addresses.push_back("54.211.152.248:70003");
+  //addresses.push_back("13.58.41.77:70004");
+  //addresses.push_back("13.56.249.230:70005");
 
   int bits = 2048;
-  client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
+  int counter = 0;
+  
 
   opterr = 0;
   int c;
   uint8_t server_id;
-  while ((c = getopt(argc, argv, "is:r:")) != -1)
+  while ((c = getopt(argc, argv, "is:r:b:")) != -1)
     switch (c)
     {
+    case 'b':
+      bits = atoi(optarg);
+      client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
+      break;
+
     case 'i':
       client_runner->setup();
       break;
 
     case 's':
-      //TODO:
+      counter = atoi(optarg);
       break;
 
     case 'r':
       //TODO:
       break;
-
     // case '?':
     //     if (optopt == 'i')
     //         fprintf (stderr, "Option -%c requires an argument.\n", optopt);
@@ -1553,10 +1562,12 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
   error_t rv = 0;
 
-  rv = client_runner->share_benchmark(0, 1000);
+  rv = client_runner->share_benchmark(0, counter);
   sleep(2);
-  rv = client_runner->bulk_reconstruct(0, 1000);
 
+  // bn_t raw_data;
+  // rv = client_runner->reconstruct(2, raw_data);
+  rv = client_runner->bulk_reconstruct(0, counter);
   // assert(rv == 0);
 
   logger::log(logger::INFO) << "Done." << std::endl;

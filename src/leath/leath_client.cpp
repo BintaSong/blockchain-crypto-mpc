@@ -59,7 +59,10 @@ error_t LeathClient::leath_setup_paillier_generation(){
     _paillier.generate(paillier_keysize, true);
 
     client_share.paillier = paillier;
+    client_share.p = paillier.get_p();
+    client_share.q = paillier.get_q();
     client_share.N = paillier.get_N();
+    client_share.N2 = client_share.N * client_share.N;
 
     // auxulary value
     client_share._N = _paillier.get_N();
@@ -318,11 +321,10 @@ bn_t LeathClient::get_partial_data(const bn_t raw_data) // partial_data = raw_da
 
 error_t LeathClient::check_data(const bn_t e_, const bn_t mac)
 {
-    bn_t tmp = 0;
-    MODULO(client_share.N)
-    tmp = e_ * client_share.mac_key;
+    bn_t tmp = -1;
+    MODULO(client_share.N)  tmp = (e_ * client_share.mac_key - mac);
 
-    if (tmp != mac)
+    if (tmp != 0)
     {
         logger::log(logger::ERROR) << "check_data(): MAC Check Failed!" << std::endl;
         return error(E_AUTH);
@@ -442,9 +444,6 @@ error_t LeathClient::reconstruct_data_mac(const std::vector<leath_maced_share_t>
 {
     error_t rv = 0;
 
-    bn_t N, N2;
-    N = client_share.N;
-    N2 = N * N;
 
     if (number_of_server != cipher_maced_shares.size())
     {
@@ -454,9 +453,9 @@ error_t LeathClient::reconstruct_data_mac(const std::vector<leath_maced_share_t>
     bn_t e_ = 1, mac_tmp = 0;
     for (int i = 0; i < number_of_server; i++)
     {
-        MODULO(N2)
+        MODULO(client_share.N2)
         e_ *= cipher_maced_shares[i].share; // FIXME: also can decrypt cipher_maced_shares[i].share, and add the decrypted plaintext together
-        MODULO(N)
+        MODULO(client_share.N)
         mac_tmp += cipher_maced_shares[i].mac_share;
     }
 

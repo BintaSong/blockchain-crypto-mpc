@@ -7,6 +7,8 @@
 
 #include <mutex>
 
+#include "thread_pool.h"
+
 namespace mpc
 {
 

@@ -47,17 +47,9 @@ namespace mpc {
         std::string client_dir;
 
         int32_t current_step;
-        int32_t number_of_servers;
+        uint32_t number_of_servers;
         bool already_setup, abort;
 
-        struct {
-            std::unique_ptr<grpc::ClientWriter<leath::ShareRequestMessage>> writer;
-            std::unique_ptr<::grpc::ClientContext> context;
-            google::protobuf::Empty response;
-            
-            std::mutex mtx;
-            bool is_up;
-        } batch_update_state_;
 
         struct leath_share_writers_t{
             std::unique_ptr<::grpc::ClientContext> context;
@@ -65,6 +57,7 @@ namespace mpc {
             std::unique_ptr<grpc::ClientWriter<leath::ShareRequestMessage>> writer_;
             std::mutex mtx;
         };
+
 
         //grpc::Status setup_rpc(const int id, const leath::SetupMessage& request, leath::SetupMessage *response);
         //grpc::Status share_rpc(const int id, const leath::ShareRequestMessage& request);
