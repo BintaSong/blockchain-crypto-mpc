@@ -33,8 +33,7 @@ namespace mpc {
 
         error_t reconstruct(const uint64_t val_id, bn_t& raw_data);
         // error_t simple_reconstruct(const uint64_t val_id, bn_t& raw_data);
-        // error_t batch_reconstruct(const uint64_t val_id, bn_t& raw_data);
-        error_t reconstruct_benchmark(int shares_number);
+        // error_t reconstruct_benchmark(int shares_number);
         error_t bulk_reconstruct(const uint64_t begin, const uint64_t end);
         // void test_rpc();
 

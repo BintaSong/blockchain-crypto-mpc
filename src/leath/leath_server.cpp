@@ -105,7 +105,7 @@ begin = std::chrono::high_resolution_clock::now();
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RG proof:"  << duration << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for RG verification:"  << duration << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 
@@ -137,9 +137,23 @@ logger::log(logger::INFO)<< "Time for RG proof:"  << duration << " ms" <<std::en
     server_share.pk = pk;
     server_share.sk = sk;
 
+begin = std::chrono::high_resolution_clock::now();
+
+
     out._c_i = paillier.add_ciphers(paillier.mul_scalar(in.c_1, sk), paillier.encrypt(r, r_r));
 
+    int bits = curve.bits();
+    if (server_id < 0){
+        return rv = error(E_BADARG);
+    }
+    MODULO(in.N) server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
 
+end = std::chrono::high_resolution_clock::now();
+duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Server-side time for [crt(0, sk)] generation:"  << duration << " ms" <<std::endl;
+
+
+//-----------------------zk_pdl_mult------------------------
 begin = std::chrono::high_resolution_clock::now();
 
     out.pk_i = pk;
@@ -147,13 +161,7 @@ begin = std::chrono::high_resolution_clock::now();
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RS proof:"  << duration << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
-
-
-    int bits = curve.bits();
-    if (server_id < 0)
-        return rv = error(E_BADARG);
-    MODULO(in.N) server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
+logger::log(logger::INFO)<< "Time for RS proof:"  << duration << " ms" <<std::endl; 
 
     return 0;
 }

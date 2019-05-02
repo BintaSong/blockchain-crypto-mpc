@@ -1513,6 +1513,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::vector<std::string> addresses;
   addresses.push_back("localhost:70000");
   addresses.push_back("localhost:70001");
+  addresses.push_back("localhost:70002");
   //addresses.push_back("18.232.147.74:70000");
   //addresses.push_back("3.14.68.118:70001");
   //addresses.push_back("13.57.199.203:70002");

@@ -61,16 +61,18 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "Time for paillier key and parameters generation:"  << d2  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters generation:"  << d2  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
+
+
+std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
 
 
     leath_setup_message1_t out1;
     client_->leath_setup_peer1_step1(mem_t::from_string("setup_session"), out1);
 
-std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
-
-    // logger::log(logger::INFO) << "Before thread" << std::endl;
 
     int8_t id = 0;
     auto p2p_setup = [this, &out1](int id) {
@@ -100,16 +102,14 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         //logger::log(logger::INFO) << "Thread " << (int)id << " leath_setup_peer1_step2(): "
          //                         << " begin..." << std::endl;
 
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         leath_setup_message2_t in;
         ub::convert(in, mem_t::from_string(response.msg()));
         client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d2 << " ms" <<std::endl;
 
-        //logger::log(logger::INFO) << "Thread " << (int)id << " leath_setup_peer1_step2(): "
-         //                         << " done." << std::endl;
-
-        // send mac share
-        //logger::log(logger::INFO) << "Thread " << (int)id << " leath_setup_peer1_step3(): "
-        //                          << " begin..." << std::endl;
 
         leath_setup_message3_t out3;
         client_->leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), id, out3);
@@ -246,7 +246,6 @@ logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " ms
 
 void LeathClientRunner::simple_setup()
 {
-
     if (already_setup)
     {
         logger::log(logger::ERROR) << "Setup is already finished!" << std::endl;
@@ -515,6 +514,11 @@ error_t LeathClientRunner::share_benchmark(uint64_t begin, uint64_t end) {
 
     // std::vector<leath_share_writers_t> writer_vector;
 
+    if (begin >= end)
+    {
+        return 0;
+    }
+
     leath_share_writers_t *writer_array = new leath_share_writers_t[number_of_servers];
 
     for(uint64_t i = 0; i < number_of_servers; i++) {
@@ -541,24 +545,26 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         writer_array[server_id].mtx.unlock();
     };
 
-    auto share_job = [this, &p, &share_size, &share_callback](const uint64_t begin_vid, const uint64_t end_vid, const uint64_t step){
+     auto share_job = [this, &p, &share_size, &share_callback](const uint64_t begin_vid, const uint64_t end_vid, const uint64_t step){
         for(uint64_t vid = begin_vid; vid < end_vid; vid += step){
             bn_t raw_data = bn_t::rand(p);
             client_->leath_share_peer1_step1_callback(ub::mem_t::from_string("share_session"), vid, raw_data, share_callback);
             share_size++;
         }
-    };
-/*
+    }; 
+
+//-------------------------single thread for share----------------------------
     for(uint64_t vid = begin; vid < end; vid++) {
         bn_t raw_data =  bn_t::rand(p);
         client_->leath_share_peer1_step1_callback(ub::mem_t::from_string("share_session"), vid, raw_data, share_callback);
     }
-*/
 
+//--------------------multi threads option for share------------------
 
+/*
     std::vector<std::thread> share_threads;
 
-    unsigned n_threads = std::thread::hardware_concurrency() - 2;
+    unsigned n_threads = 2;
     // unsigned n_threads = number > 0 ? number : (std::thread::hardware_concurrency()  -1);
     
     for (uint8_t t = 0; t < n_threads; t++) {
@@ -571,6 +577,12 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 logger::log(logger::INFO)<< "threads number: "<< n_threads <<", shared size: "<< share_size <<", time for share_benchmark() with Network:"  << duration /(share_size)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+*/
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+logger::log(logger::INFO)<<"SINGLE THREAD SHARE_BENCHMARK: Shared size: "<< (end - begin) <<", time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+
 
     delete [] writer_array;
 
@@ -593,17 +605,6 @@ logger::log(logger::INFO)<< "threads number: "<< n_threads <<", shared size: "<<
     return 0;
 }
  */
-error_t LeathClientRunner::reconstruct_benchmark(int counter) {
-    // // bn_t p = client_->client_share.paillier.get_p();
-    // // bn_t raw_data;
-    // bn_t shares[counter][number_of_servers];
-    // bool finished[counter];
-    // memset(finished, 0, counter);
-    
-    // TODO: 
-
-    return 0;
-}
 
 error_t LeathClientRunner::reconstruct(const uint64_t val_id, bn_t& raw_data)
 {
@@ -640,10 +641,6 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
 
         in_share.share = bn_t::from_string(response.value_share().c_str());
         in_share.mac_share = bn_t::from_string(response.mac_share().c_str());
-       // logger::log(logger::INFO) << "Thread " << id << ": Reoncstruct received value_share size: " << in_share.share.to_bin().size() << std::endl;
-       // logger::log(logger::INFO) << "Thread " << id << ": Reoncstruct received mac_share size: " << in_share.mac_share.to_bin().size() << std::endl;
-        // ub::convert(share.share, mem_t::from_string(response.value_share()));
-        // ub::convert(share.mac_share, mem_t::from_string(response.mac_share()));
 
         cipher_in_mutex.lock();
         cipher_in.push_back(in_share);
@@ -666,7 +663,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         exit(-1);
     }
     rv = client_->leath_reconstruct_peer1_step1(mem_t::from_string("reconstruction_session"), val_id, cipher_in, raw_data);
-    // raw_data.to_bin().data();
+
     assert(rv == 0);
     if (rv != 0) {
         logger::log(logger::ERROR) << "LeathClientRunner::reconstruct(): failed!" << raw_data.to_string() << std::endl;
@@ -679,6 +676,10 @@ logger::log(logger::INFO)<< "Time for reconstruct with network:"  << duration  <
     return 0;
 } //reconstruction
 
+
+
+//------------------------bulk_reconstruct--------------------------
+
 error_t LeathClientRunner::bulk_reconstruct(const uint64_t begin, const uint64_t end) {
 
     error_t rv = 0;
@@ -688,33 +689,43 @@ error_t LeathClientRunner::bulk_reconstruct(const uint64_t begin, const uint64_t
         return ub::error(E_NOT_READY);
     }
 
+    if (begin >= end)
+    {
+        return 0;
+    }
+
     struct data_with_counter_t {
         leath_maced_share_t in_share{1, 0};
         std::atomic_uint received_share_counter{0};
         std::mutex mtx;
     };
 
+    uint64_t range = end - begin;
+
     data_with_counter_t *data_ = new data_with_counter_t[end - begin];
     // bn_t *raw_data_array = new bn_t[end - begin];
 
-// logger::log(logger::INFO)<< data_[0].in_share.share.to_string()<<std::endl;
-// logger::log(logger::INFO)<< data_[0].in_share.mac_share.to_string()<<std::endl;
-// logger::log(logger::INFO)<< data_[0].received_share_counter<<std::endl;
 
 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-    std::atomic_uint reconstruct_size(0), fuck(0);
+    std::atomic_uint reconstruct_size(0);
+    std::atomic<std::int32_t> total_decryption_time(0);
+    std::atomic<std::int32_t> total_decoding_time(0);
 
-    uint pool_size = std::thread::hardware_concurrency() - 5;
+    uint pool_size = 1;
     ThreadPool reconstruct_pool(pool_size);
-    ThreadPool decoding_pool(3);
+    ThreadPool decoding_pool(1);
 
     auto post_back = [this] (bn_t raw_data) {
         //TODO: 
     };
 
-    auto reconstruct_job = [this, &reconstruct_size, &post_back](const uint64_t vid, const leath_maced_share_t maced_share) {
+
+    auto reconstruct_job = [this, &reconstruct_size, &total_decryption_time, &post_back](const uint64_t vid, const leath_maced_share_t maced_share) {
         error_t rv = 0;
+
+            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
         bn_t e_data = client_->client_share.paillier.decrypt(maced_share.share);
 
         rv = client_->check_data(e_data, maced_share.mac_share);
@@ -725,13 +736,21 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         }
 
         MODULO(client_->client_share.p) e_data = e_data - 0;
+
+            std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+            int64_t d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+            total_decryption_time += d;
+
         post_back(e_data);
 
         reconstruct_size++;
-        if(reconstruct_size % 10000 == 0)  logger::log(logger::INFO) << "Just reconstruct" << reconstruct_size << "..." << std::endl;
+        if(reconstruct_size % 10000 == 0)  logger::log(logger::INFO) << "Just reconstruct " << reconstruct_size << " shares..." << std::endl;
     };
 
-    auto decoding_job = [this, &data_, &fuck,  &reconstruct_pool, &reconstruct_job](const leath::ReconstructReply reply) {
+    auto decoding_job = [this, &data_, &total_decoding_time, &reconstruct_pool, &reconstruct_job](const leath::ReconstructReply reply) {
+
+            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
         uint64_t vid = reply.value_id();
 
         data_[vid].mtx.lock();       
@@ -739,14 +758,16 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         data_[vid].in_share.mac_share += bn_t::from_string(reply.mac_share().c_str());
         data_[vid].mtx.unlock();
         
+            std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+            int64_t d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+            total_decoding_time += d;
+
         data_[vid].received_share_counter++;
         
         if (data_[vid].received_share_counter == number_of_servers) {
             reconstruct_pool.enqueue(reconstruct_job, vid, data_[vid].in_share);
         }
     };
-
-    // std::vector<leath_maced_share_t> shares = new [number_of_servers];
 
     auto p2p_reconstruct = [this, &begin, &end, &decoding_pool, &decoding_job](int server_id) {
         logger::log(logger::INFO) << "Reconstruction Thread " << (int)server_id << " begins" << std::endl;
@@ -761,14 +782,15 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         std::unique_ptr<grpc::ClientReaderInterface<leath::ReconstructReply>> reader(stub_vector[server_id]->bulk_reconstruct(&context, request));
 
         while (reader->Read(&reply)) {
-            //if(reply.value_id() % 499 == 0) logger::log(logger::INFO)<< reply.value_id() <<std::endl;
+
             decoding_pool.enqueue(decoding_job, reply);
-            // decoding_job(reply);
+
         }
+
         grpc::Status status = reader->Finish();
 
         if (status.ok()) {
-            logger::log(logger::TRACE) << "Reconstruct RPC succeeded." << std::endl;
+            logger::log(logger::TRACE) << "Reconstruct RPC succee." << std::endl;
         } else {
             logger::log(logger::ERROR) << "Reconstruct RPC failed:" << std::endl;
             logger::log(logger::ERROR) << status.error_message() << std::endl;
@@ -789,11 +811,17 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
     decoding_pool.join();
     reconstruct_pool.join();
 
+logger::log(logger::INFO)<< "benchmark size: " << range <<" ,total_decryption_time:"  << (double)total_decryption_time << " ms" <<std::endl;
+
+logger::log(logger::INFO)<< "benchmark size: " << range <<" ,total_decoding_time:"  << (double)total_decoding_time << " ms" <<std::endl;
+
+
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double duration = (double) std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "reconstruct_pool size: "<< pool_size << ", Reconstructed " << reconstruct_size <<" data, time for per reconstruct with network:"  << duration / reconstruct_size << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
-   
 
+logger::log(logger::INFO)<<" total reconstruction time:"  << (double) duration << " ms" <<std::endl;
+
+logger::log(logger::INFO)<< "reconstruct_pool size: "<< pool_size << ", Reconstructed " << reconstruct_size <<" data, time for per reconstruct with network:"  << duration / reconstruct_size << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
     
     delete [] data_;
     // delete [] raw_data_array;

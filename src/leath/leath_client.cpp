@@ -55,8 +55,24 @@ std::unique_ptr<LeathClient> LeathClient::init_in_directory(const std::string di
 
 error_t LeathClient::leath_setup_paillier_generation(){
     crypto::paillier_t paillier, _paillier;
+
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
     paillier.generate(paillier_keysize, true);
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "Time for paillier key N generation:"  << d2  << " ms" <<std::endl;
+
+
     _paillier.generate(paillier_keysize, true);
+
+std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+double d32 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+logger::log(logger::INFO)<< "Time for paillier key _N generation:"  << d32  << " ms" <<std::endl;
+
+
 
     client_share.paillier = paillier;
     client_share.p = paillier.get_p();
@@ -64,11 +80,16 @@ error_t LeathClient::leath_setup_paillier_generation(){
     client_share.N = paillier.get_N();
     client_share.N2 = client_share.N * client_share.N;
 
+
+
+
     // auxulary value
     client_share._N = _paillier.get_N();
     client_share.h_1 = bn_t::rand(client_share.N);
     client_share.h_2 = bn_t::rand(client_share.N);
 
+
+std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
 
     bn_t lambda, mu;
     bn_t r = eGCD(client_share.N, paillier.get_p(), paillier.get_q(), mu, lambda);
@@ -85,6 +106,11 @@ error_t LeathClient::leath_setup_paillier_generation(){
 
     client_share.c_1 = paillier.encrypt(m1, r_1);
     client_share.c_2 = paillier.encrypt(m2, r_2);
+
+std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+double d5 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
+logger::log(logger::INFO)<< "Time for (c_1, c_2) generation:"  << d5  << " ms" <<std::endl;
+
     client_share.x_1 = m1;
     client_share.x_2 = m2;
     client_share.r_1 = r_1;
@@ -153,7 +179,7 @@ begin = std::chrono::high_resolution_clock::now();
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RG proof:" << duration <<std::endl;
+logger::log(logger::INFO)<< "Time for RG proof:" << duration << " ms" <<std::endl;
 
     client_share.mac_key = 0; // TODO: set mac key to zero!
     
