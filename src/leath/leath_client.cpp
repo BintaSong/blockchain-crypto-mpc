@@ -192,8 +192,14 @@ error_t LeathClient::leath_setup_peer1_step2(mem_t session_id, int server_id, co
 {
     error_t rv = 0;
 
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
     if (!in.zk_pdl_mult.v(in.pk_i.get_curve(), in.pk_i, client_share.paillier.get_N(), client_share.c_1, in._c_i, client_share.h_1, client_share.h_2, client_share._N, session_id, 1))
         return rv = error(E_CRYPTO);
+
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    logger::log(logger::INFO)<< "time for RS verification:"  << d2 << " ms" <<std::endl;
 
     bn_t x_i = client_share.paillier.decrypt(in._c_i);
 

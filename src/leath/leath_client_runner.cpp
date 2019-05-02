@@ -67,11 +67,12 @@ logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters genera
 
 std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
-
-
     leath_setup_message1_t out1;
     client_->leath_setup_peer1_step1(mem_t::from_string("setup_session"), out1);
 
+std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+double d0 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t0 - begin).count();
+logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " ms" <<std::endl;
 
 
     int8_t id = 0;
@@ -85,13 +86,23 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         request.set_msg_id(1);
         request.set_msg(ub::convert(out1).to_string());
         // request.set_msg();
-        logger::log(logger::INFO) << "leath_setup_peer1_step1 message length:" << request.msg().size() << std::endl;
+    logger::log(logger::INFO) << "leath_setup_peer1_step1 message length:" << request.msg().size() << std::endl;
+
+
+
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
         status = stub_vector[id]->setup(&context1, request, &response);
         if (!status.ok())
         {
             logger::log(logger::ERROR) << "Setup for server " << (int)id << " failed." << std::endl;
             return;
         }
+
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    double d21 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step() RPC time:"  << d21 << " ms" <<std::endl;
+
 
         if (response.msg_id() != 2)
         {
@@ -102,22 +113,33 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         //logger::log(logger::INFO) << "Thread " << (int)id << " leath_setup_peer1_step2(): "
          //                         << " begin..." << std::endl;
 
-    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
         leath_setup_message2_t in;
         ub::convert(in, mem_t::from_string(response.msg()));
         client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
-    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-    double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d2 << " ms" <<std::endl;
+    std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+    double d43 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d43 << " ms" <<std::endl;
 
 
         leath_setup_message3_t out3;
         client_->leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), id, out3);
 
+    std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
+    double d54 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3():"  << d54 << " ms" <<std::endl;
+
+
         grpc::ClientContext context2;
         request.set_msg_id(3);
         request.set_msg(ub::convert(out3).to_string());
         status = stub_vector[id]->setup(&context2, request, &response);
+
+    std::chrono::high_resolution_clock::time_point t6 = std::chrono::high_resolution_clock::now();
+    double d65 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t6 - t5).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3() RPC time:"  << d65 << " ms" <<std::endl;
+
+
         if (!status.ok())
         {
             logger::log(logger::ERROR) << "Setup for server " << id << " failed." << std::endl;
