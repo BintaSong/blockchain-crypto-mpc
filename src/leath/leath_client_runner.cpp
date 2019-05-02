@@ -728,6 +728,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         post_back(e_data);
 
         reconstruct_size++;
+        if(reconstruct_size % 10000 == 0)  logger::log(logger::INFO) << "Just reconstruct" << reconstruct_size << "..." << std::endl;
     };
 
     auto decoding_job = [this, &data_, &fuck,  &reconstruct_pool, &reconstruct_job](const leath::ReconstructReply reply) {
