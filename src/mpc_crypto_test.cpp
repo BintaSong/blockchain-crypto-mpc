@@ -1066,7 +1066,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
 
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 begin = std::chrono::high_resolution_clock::now();
@@ -1094,7 +1094,7 @@ begin = std::chrono::high_resolution_clock::now();
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
   //----------------data reconstruction--------------------
@@ -1129,7 +1129,7 @@ begin = std::chrono::high_resolution_clock::now();
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
   std::ifstream is("/home/jason/Desktop/blockchain-crypto-mpc/src/test.txt", std::ios::binary);
@@ -1244,7 +1244,7 @@ std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution
 
 std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2 + t1 - t0).count();
-logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 t0 = std::chrono::high_resolution_clock::now();
@@ -1265,7 +1265,7 @@ t0 = std::chrono::high_resolution_clock::now();
 
 t1 = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
   //----------------data reconstruction--------------------
@@ -1297,7 +1297,7 @@ t1 = std::chrono::high_resolution_clock::now();
   assert(data == bn_t(789));
 
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
   return 0;
 }
@@ -1391,7 +1391,7 @@ std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution
 std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
 double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2 + t1 - t0).count();
-logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for setup without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 t0 = std::chrono::high_resolution_clock::now();
@@ -1415,7 +1415,7 @@ t0 = std::chrono::high_resolution_clock::now();
 t1 = std::chrono::high_resolution_clock::now();
 
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for share without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
   //----------------data reconstruction--------------------
@@ -1449,7 +1449,7 @@ t1 = std::chrono::high_resolution_clock::now();
   assert(data == bn_t(789));
 
 duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "Time for reconstruction without network & encoding:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
   return 0;
 }
@@ -1522,13 +1522,16 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   //addresses.push_back("13.56.249.230:70005");
 
   int bits = 2048;
-  int counter = 0;
-  
+  int share_counter = 0, reconstruction_counter = 0;
+
+  bool is_share = false;
+  bool is_reconstruction = false;
 
   opterr = 0;
   int c;
-  uint8_t server_id;
-  while ((c = getopt(argc, argv, "is:r:b:")) != -1)
+  int setup_way = 1;
+  
+  while ((c = getopt(argc, argv, "i:s:r:b:")) != -1)
     switch (c)
     {
     case 'b':
@@ -1537,43 +1540,39 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
       break;
 
     case 'i':
-      client_runner->setup();
+      setup_way = atoi(optarg);
+
+      if (setup_way == 1) client_runner->setup();
+      if (setup_way == 2) client_runner->simple_setup();
       break;
 
     case 's':
-      counter = atoi(optarg);
+      is_share = true;
+      share_counter = atoi(optarg);
       break;
 
     case 'r':
       //TODO:
+      is_reconstruction = true;
+      reconstruction_counter = atoi(optarg);
       break;
-    // case '?':
-    //     if (optopt == 'i')
-    //         fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-    //     else if (isprint (optopt))
-    //         fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-    //     else
-    //         fprintf (stderr,
-    //                  "Unknown option character `\\x%x'.\n",
-    //                  optopt);
-    //     return 1;
+
     default:
       exit(-1);
     }
 
   error_t rv = 0;
 
-  rv = client_runner->share_benchmark(0, counter);
-  sleep(2);
+  if(is_share){
+    rv = client_runner->share_benchmark(0, share_counter);
+    sleep(2);
+  }
 
-  // bn_t raw_data;
-  // rv = client_runner->reconstruct(2, raw_data);
-  rv = client_runner->bulk_reconstruct(0, counter);
-  // assert(rv == 0);
-
+  if (is_reconstruction) {
+    rv = client_runner->bulk_reconstruct(0,  reconstruction_counter);
+  }
   logger::log(logger::INFO) << "Done." << std::endl;
 
-//  client_runner->test_rpc();
 
   return 0;
 }

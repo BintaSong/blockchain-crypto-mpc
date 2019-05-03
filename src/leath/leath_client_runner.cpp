@@ -60,8 +60,8 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
     client_->leath_setup_paillier_generation();
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters generation:"  << d2  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters generation:"  << d2  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 
@@ -71,8 +71,8 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
     client_->leath_setup_peer1_step1(mem_t::from_string("setup_session"), out1);
 
 std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
-double d0 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t0 - begin).count();
-logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " ms" <<std::endl;
+double d0 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t0 - begin).count();
+logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " us" <<std::endl;
 
 
     int8_t id = 0;
@@ -100,8 +100,8 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " m
         }
 
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-    double d21 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step() RPC time:"  << d21 << " ms" <<std::endl;
+    double d21 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step() RPC time:"  << d21 << " us" <<std::endl;
 
 
         if (response.msg_id() != 2)
@@ -118,16 +118,16 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " m
         ub::convert(in, mem_t::from_string(response.msg()));
         client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
     std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-    double d43 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d43 << " ms" <<std::endl;
+    double d43 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d43 << " us" <<std::endl;
 
 
         leath_setup_message3_t out3;
         client_->leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), id, out3);
 
     std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
-    double d54 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3():"  << d54 << " ms" <<std::endl;
+    double d54 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t4).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3():"  << d54 << " us" <<std::endl;
 
 
         grpc::ClientContext context2;
@@ -136,8 +136,8 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " m
         status = stub_vector[id]->setup(&context2, request, &response);
 
     std::chrono::high_resolution_clock::time_point t6 = std::chrono::high_resolution_clock::now();
-    double d65 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t6 - t5).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3() RPC time:"  << d65 << " ms" <<std::endl;
+    double d65 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t6 - t5).count();
+    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3() RPC time:"  << d65 << " us" <<std::endl;
 
 
         if (!status.ok())
@@ -161,13 +161,13 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " m
     }
 
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 
     // in the end, store client share !
     already_setup = true;
     client_->write_share();
 
-logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " ms" <<std::endl;
+logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " us" <<std::endl;
 
 } //setup
 
@@ -256,13 +256,13 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
     }
 
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 
     // in the end, store client share !
     already_setup = true;
     client_->write_share();
 
-logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " ms" <<std::endl;
+logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " us" <<std::endl;
 
 } //setup
 
@@ -279,16 +279,16 @@ std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution
     client_->leath_setup_paillier_generation();
 
 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-double d0 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-logger::log(logger::INFO)<< "Time for paillier key and parameters generation:"  << d0  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+double d0 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+logger::log(logger::INFO)<< "Time for paillier key and parameters generation:"  << d0  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
     leath_setup_message1_t out1;
     client_->leath_setup_peer1_step1(mem_t::from_string("setup_session"), out1);
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " ms" <<std::endl;
+double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " us" <<std::endl;
 
     // logger::log(logger::INFO) << "Before simple setup..." << std::endl;
 
@@ -317,8 +317,8 @@ std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution
         request.set_msg(ub::convert(out1).to_string());
 
 std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
-logger::log(logger::INFO)<< "Time for setup message `leath_setup_message1_t` encoding:"  << d2  << " ms" <<std::endl;
+double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count();
+logger::log(logger::INFO)<< "Server " << id <<", time for setup message `leath_setup_message1_t` encoding: "  << d2  << " us" <<std::endl;
 
 time_t now = time(0); 
 logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
@@ -327,8 +327,8 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
         //status = setup_rpc(id, request, &response);
 
 std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
-double d3 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
-logger::log(logger::INFO)<< "Time for setup message `leath_setup_message1_t` rpc:"  << d3  << " ms" <<std::endl;
+double d3 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t4).count();
+logger::log(logger::INFO)<< "Server " << id <<",Time for setup message `leath_setup_message1_t` RPC: "  << d3  << " us" <<std::endl;
 
         if (!status.ok())
         {
@@ -350,13 +350,13 @@ logger::log(logger::INFO)<< "Time for setup message `leath_setup_message1_t` rpc
         ub::convert(in, mem_t::from_string(response.msg()));
 
 std::chrono::high_resolution_clock::time_point t6 = std::chrono::high_resolution_clock::now();
-double d4 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t6 - t5).count();
-logger::log(logger::INFO)<< "Time for setup message `leath_setup_message2_t` encoding:"  << d4  << " ms" <<std::endl;
+double d4 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t6 - t5).count();
+logger::log(logger::INFO)<< "Server " << id <<", time for setup message `leath_setup_message2_t` encoding: "  << d4  << " us" <<std::endl;
 
         client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
 std::chrono::high_resolution_clock::time_point t7 = std::chrono::high_resolution_clock::now();
-double d5 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t7 - t6).count();
-logger::log(logger::INFO)<< "Time for `leath_setup_peer1_step2`:"  << d5  << " ms" <<std::endl;
+double d5 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t7 - t6).count();
+logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_peer1_step2`: "  << d5  << " us" <<std::endl;
 
         // logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step2(): "
         //                          << " done." << std::endl;
@@ -368,24 +368,24 @@ logger::log(logger::INFO)<< "Time for `leath_setup_peer1_step2`:"  << d5  << " m
         client_->leath_setup_peer1_step3(ub::mem_t::from_string("setup_session"), id, out3);
 
 std::chrono::high_resolution_clock::time_point t8 = std::chrono::high_resolution_clock::now();
-double d6 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t8 - t7).count();
-logger::log(logger::INFO)<< "Time for `leath_setup_peer1_step3`:"  << d6  << " ms" <<std::endl;
+double d6 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t8 - t7).count();
+logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_peer1_step3`: "  << d6  << " us" <<std::endl;
 
         grpc::ClientContext context2;
         request.set_msg_id(3);
         request.set_msg(ub::convert(out3).to_string());
 
 std::chrono::high_resolution_clock::time_point t9 = std::chrono::high_resolution_clock::now();
-double d7 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t9 - t8).count();
-logger::log(logger::INFO)<< "Time for `leath_setup_message2_t` encoding:"  << d7  << " ms" <<std::endl;
+double d7 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t9 - t8).count();
+logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_message3_t` encoding: "  << d7  << " us" <<std::endl;
 
 
         status = stub_vector[id]->setup(&context2, request, &response);
         // status = setup_rpc(id, request, &response);
 
 std::chrono::high_resolution_clock::time_point t10 = std::chrono::high_resolution_clock::now();
-double d8 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t10 - t9).count();
-logger::log(logger::INFO)<< "Time for `leath_setup_message2_t` rpc:"  << d8  << " ms" <<std::endl;
+double d8 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t10 - t9).count();
+logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_message3_t` RPC: "  << d8  << " us" <<std::endl;
 
         if (!status.ok())
         {
@@ -393,8 +393,7 @@ logger::log(logger::INFO)<< "Time for `leath_setup_message2_t` rpc:"  << d8  << 
             return;
         }
 
-        logger::log(logger::INFO) << "simple setup for server " << (int)id << ", leath_setup_peer1_step3(): "
-                                  << " done. \n\n\n\n" << std::endl;
+        logger::log(logger::INFO) << "Simple setup for server " << (int)id << ", Done. \n" << std::endl;
        // stub_vector[id]->
     } //end of for
 
@@ -405,11 +404,11 @@ std::chrono::high_resolution_clock::time_point t11 = std::chrono::high_resolutio
     client_->write_share();
 
 std::chrono::high_resolution_clock::time_point t12 = std::chrono::high_resolution_clock::now();
-double d9 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t11 - t12).count();
-logger::log(logger::INFO)<< "Time for write_share():"  << d9  << " ms" <<std::endl;
+double d9 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t12 - t11).count();
+logger::log(logger::INFO)<< "Time for write_share():"  << d9  << " us" <<std::endl;
 
-double d10 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t12 - t1).count();
-logger::log(logger::INFO)<< "TOTAL TIME FOR SETUP:"  << d10  << " ms" <<std::endl;
+double d10 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t12 - t1).count();
+logger::log(logger::INFO)<< "TOTAL TIME FOR SIMPLE SETUP:"  << d10  << " us" <<std::endl;
 
 
 } //setup
@@ -462,8 +461,8 @@ error_t LeathClientRunner::share(const uint64_t val_id, const bn_t& val)
 
 
 //std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-//double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-//logger::log(logger::INFO)<< "Time for Share with Network:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+//double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//logger::log(logger::INFO)<< "Time for Share with Network:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
     return 0;
 } // share
@@ -525,8 +524,8 @@ error_t LeathClientRunner::share(const uint64_t val_id, const bn_t& val)
 
 
 // std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-// double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-// logger::log(logger::INFO)<< "Time for Share with Network:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+// double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+// logger::log(logger::INFO)<< "Time for Share with Network:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 //     return 0;
 // }
@@ -597,12 +596,12 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
     }
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 logger::log(logger::INFO)<< "threads number: "<< n_threads <<", shared size: "<< share_size <<", time for share_benchmark() with Network:"  << duration /(share_size)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 */
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 logger::log(logger::INFO)<<"SINGLE THREAD SHARE_BENCHMARK: Shared size: "<< (end - begin) <<", time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
@@ -621,7 +620,7 @@ logger::log(logger::INFO)<<"SINGLE THREAD SHARE_BENCHMARK: Shared size: "<< (end
         share(i, bn_t(i));
     }
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-    double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
     logger::log(logger::INFO)<< "Time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
     return 0;
@@ -693,8 +692,8 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
     }
 
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for reconstruct with network:"  << duration  << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for reconstruct with network:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
     return 0;
 } //reconstruction
 
@@ -760,7 +759,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         MODULO(client_->client_share.p) e_data = e_data - 0;
 
             std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-            int64_t d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+            int64_t d = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
             total_decryption_time += d;
 
         post_back(e_data);
@@ -781,7 +780,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         data_[vid].mtx.unlock();
         
             std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-            int64_t d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+            int64_t d = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
             total_decoding_time += d;
 
         data_[vid].received_share_counter++;
@@ -833,17 +832,17 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
     decoding_pool.join();
     reconstruct_pool.join();
 
-logger::log(logger::INFO)<< "benchmark size: " << range <<" ,total_decryption_time:"  << (double)total_decryption_time << " ms" <<std::endl;
+logger::log(logger::INFO)<< "benchmark size: " << range <<" ,total_decryption_time:"  << (double)total_decryption_time << " us" <<std::endl;
 
-logger::log(logger::INFO)<< "benchmark size: " << range <<" ,total_decoding_time:"  << (double)total_decoding_time << " ms" <<std::endl;
+logger::log(logger::INFO)<< "benchmark size: " << range <<" ,total_decoding_time:"  << (double)total_decoding_time << " us" <<std::endl;
 
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double duration = (double) std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+double duration = (double) std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
-logger::log(logger::INFO)<<" total reconstruction time:"  << (double) duration << " ms" <<std::endl;
+logger::log(logger::INFO)<<" total reconstruction time:"  << (double) duration << " us" <<std::endl;
 
-logger::log(logger::INFO)<< "reconstruct_pool size: "<< pool_size << ", Reconstructed " << reconstruct_size <<" data, time for per reconstruct with network:"  << duration / reconstruct_size << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "reconstruct_pool size: "<< pool_size << ", Reconstructed " << reconstruct_size <<" data, time for per reconstruct with network:"  << duration / reconstruct_size << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
     
     delete [] data_;
     // delete [] raw_data_array;
@@ -867,24 +866,24 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
     stub_vector[0]->share(&context1, request, &response);
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "Time for stub 0:"  << d1  << " ms" <<std::endl;
+double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+logger::log(logger::INFO)<< "Time for stub 0:"  << d1  << " us" <<std::endl;
 
      stub_vector[1]->share(&context2, request, &response);
 std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
-double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
-logger::log(logger::INFO)<< "Time for stub 1:"  << d2  << " ms" <<std::endl;
+double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count();
+logger::log(logger::INFO)<< "Time for stub 1:"  << d2  << " us" <<std::endl;
 
      stub_vector[0]->share(&context3, request, &response);
 
 std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-double d3 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
-logger::log(logger::INFO)<< "Time for stub 0:"  << d3  << " ms" <<std::endl;
+double d3 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count();
+logger::log(logger::INFO)<< "Time for stub 0:"  << d3  << " us" <<std::endl;
 
     stub_vector[1]->share(&context4, request, &response);
 std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
-double d4 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
-logger::log(logger::INFO)<< "Time for stub 1:"  << d4  << " ms" <<std::endl;
+double d4 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t4).count();
+logger::log(logger::INFO)<< "Time for stub 1:"  << d4  << " us" <<std::endl;
 
     for(int i = 0; i < 10000; i++) {
         grpc::ClientContext context9, context10;

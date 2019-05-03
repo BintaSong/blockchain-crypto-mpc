@@ -83,8 +83,8 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
         return rv = error(E_CRYPTO);
 
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RN verification:"  << duration << " ms"  <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RN verification:"  << duration << " us"  <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 
@@ -104,8 +104,8 @@ begin = std::chrono::high_resolution_clock::now();
         return rv = error(E_CRYPTO);
 
 end = std::chrono::high_resolution_clock::now();
-duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RG verification:"  << duration << " ms" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RG verification:"  << duration << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 
@@ -149,8 +149,8 @@ begin = std::chrono::high_resolution_clock::now();
     MODULO(in.N) server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
 
 end = std::chrono::high_resolution_clock::now();
-duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Server-side time for [crt(0, sk)] generation:"  << duration << " ms" <<std::endl;
+duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Server-side time for [crt(0, sk)] generation:"  << duration << " us" <<std::endl;
 
 
 //-----------------------zk_pdl_mult------------------------
@@ -160,8 +160,8 @@ begin = std::chrono::high_resolution_clock::now();
     out.zk_pdl_mult.p(curve, pk, in.c_1, out._c_i, paillier, server_share.h_1, server_share.h_2, server_share._N, session_id, 1, sk, r, r_r);
 
 end = std::chrono::high_resolution_clock::now();
-duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RS proof:"  << duration << " ms" <<std::endl; 
+duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+logger::log(logger::INFO)<< "Time for RS proof:"  << duration << " us" <<std::endl; 
 
     return 0;
 }
@@ -215,9 +215,9 @@ error_t LeathServer::leath_reconstruct_peer2_step1(mem_t session_id, const uint6
     out.mac_share = tmp.mac_share;
 
 
-// double d1 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+// double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
-// double d2 = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+// double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count();
 
 // logger::log(logger::INFO)<< "Time for get_maced_share():"  << d1 << std::endl;
 // logger::log(logger::INFO)<< "Time for MODULO:"  << d2 << std::endl;
