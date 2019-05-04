@@ -1511,13 +1511,13 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::unique_ptr<mpc::LeathClientRunner> client_runner;
 
   std::vector<std::string> addresses;
-  // addresses.push_back("localhost:70000");
-  // addresses.push_back("localhost:70001");
+   addresses.push_back("localhost:70000");
+   addresses.push_back("localhost:70001");
   // addresses.push_back("localhost:70002");
-  addresses.push_back("35.173.122.111:70000");
-  addresses.push_back("13.57.233.63:70001");
-  addresses.push_back("18.191.105.102:70002");
-  addresses.push_back("54.237.157.39:70003");
+  //addresses.push_back("35.173.122.111:70000");
+  //addresses.push_back("13.57.233.63:70001");
+  //addresses.push_back("18.191.105.102:70002");
+  //addresses.push_back("54.237.157.39:70003");
   //addresses.push_back("13.58.41.77:70004");
   //addresses.push_back("13.56.249.230:70005");
 
