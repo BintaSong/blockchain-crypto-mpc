@@ -544,7 +544,8 @@ error_t LeathClientRunner::share_benchmark(uint64_t begin, uint64_t end) {
 
     for(uint64_t i = 0; i < number_of_servers; i++) {
         writer_array[i].context.reset(new grpc::ClientContext());
-        writer_array[i].writer_ = stub_vector[i]->batch_share(writer_array[i].context.get(), &writer_array[i].response);
+        writer_array[i].response.reset(new leath::batchShareReply());
+        writer_array[i].writer_ = stub_vector[i]->batch_share(writer_array[i].context.get(), writer_array[i].response.get());
     }
 
 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();

@@ -12,7 +12,7 @@ rpc setup (SetupMessage) returns (SetupMessage) {}
 
 // Share
 rpc share (ShareRequestMessage) returns (google.protobuf.Empty) {}
-rpc batch_share (stream ShareRequestMessage) returns (google.protobuf.Empty) {}
+rpc batch_share (stream ShareRequestMessage) returns (batchShareReply) {}
 
 // Update
 rpc reconstruct (ReconstructRequestMessage) returns (ReconstructReply) {}
@@ -32,6 +32,11 @@ message ShareRequestMessage
     uint64 value_id = 1;
     bytes value_share = 2;
     bytes  mac_share = 3;
+}
+
+message batchShareReply
+{
+    uint64 counter = 1;
 }
 
 message ReconstructRequestMessage

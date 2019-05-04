@@ -55,11 +55,11 @@ LeathRPC::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   return new ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>(channel_.get(), cq, rpcmethod_share_, context, request);
 }
 
-::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>* LeathRPC::Stub::batch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response) {
+::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>* LeathRPC::Stub::batch_shareRaw(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response) {
   return new ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>(channel_.get(), rpcmethod_batch_share_, context, response);
 }
 
-::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>* LeathRPC::Stub::Asyncbatch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) {
+::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>* LeathRPC::Stub::Asyncbatch_shareRaw(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response, ::grpc::CompletionQueue* cq, void* tag) {
   return new ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>(channel_.get(), cq, rpcmethod_batch_share_, context, response, tag);
 }
 
@@ -102,7 +102,7 @@ LeathRPC::Service::Service() {
   AddMethod(new ::grpc::RpcServiceMethod(
       LeathRPC_method_names[2],
       ::grpc::RpcMethod::CLIENT_STREAMING,
-      new ::grpc::ClientStreamingHandler< LeathRPC::Service, ::mpc::leath::ShareRequestMessage, ::google::protobuf::Empty>(
+      new ::grpc::ClientStreamingHandler< LeathRPC::Service, ::mpc::leath::ShareRequestMessage, ::mpc::leath::batchShareReply>(
           std::mem_fn(&LeathRPC::Service::batch_share), this)));
   AddMethod(new ::grpc::RpcServiceMethod(
       LeathRPC_method_names[3],
@@ -138,7 +138,7 @@ LeathRPC::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status LeathRPC::Service::batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::google::protobuf::Empty* response) {
+::grpc::Status LeathRPC::Service::batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::mpc::leath::batchShareReply* response) {
   (void) context;
   (void) reader;
   (void) response;

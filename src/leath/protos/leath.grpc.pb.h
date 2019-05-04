@@ -41,10 +41,10 @@ class LeathRPC GRPC_FINAL {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> Asyncshare(::grpc::ClientContext* context, const ::mpc::leath::ShareRequestMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(AsyncshareRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientWriterInterface< ::mpc::leath::ShareRequestMessage>> batch_share(::grpc::ClientContext* context, ::google::protobuf::Empty* response) {
+    std::unique_ptr< ::grpc::ClientWriterInterface< ::mpc::leath::ShareRequestMessage>> batch_share(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response) {
       return std::unique_ptr< ::grpc::ClientWriterInterface< ::mpc::leath::ShareRequestMessage>>(batch_shareRaw(context, response));
     }
-    std::unique_ptr< ::grpc::ClientAsyncWriterInterface< ::mpc::leath::ShareRequestMessage>> Asyncbatch_share(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) {
+    std::unique_ptr< ::grpc::ClientAsyncWriterInterface< ::mpc::leath::ShareRequestMessage>> Asyncbatch_share(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response, ::grpc::CompletionQueue* cq, void* tag) {
       return std::unique_ptr< ::grpc::ClientAsyncWriterInterface< ::mpc::leath::ShareRequestMessage>>(Asyncbatch_shareRaw(context, response, cq, tag));
     }
     // Update
@@ -67,8 +67,8 @@ class LeathRPC GRPC_FINAL {
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::mpc::leath::SetupMessage>* AsyncsetupRaw(::grpc::ClientContext* context, const ::mpc::leath::SetupMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncshareRaw(::grpc::ClientContext* context, const ::mpc::leath::ShareRequestMessage& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientWriterInterface< ::mpc::leath::ShareRequestMessage>* batch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response) = 0;
-    virtual ::grpc::ClientAsyncWriterInterface< ::mpc::leath::ShareRequestMessage>* Asyncbatch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientWriterInterface< ::mpc::leath::ShareRequestMessage>* batch_shareRaw(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response) = 0;
+    virtual ::grpc::ClientAsyncWriterInterface< ::mpc::leath::ShareRequestMessage>* Asyncbatch_shareRaw(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::mpc::leath::ReconstructReply>* AsyncreconstructRaw(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* batch_reconstructRaw(::grpc::ClientContext* context) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* Asyncbatch_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
@@ -86,10 +86,10 @@ class LeathRPC GRPC_FINAL {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> Asyncshare(::grpc::ClientContext* context, const ::mpc::leath::ShareRequestMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(AsyncshareRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>> batch_share(::grpc::ClientContext* context, ::google::protobuf::Empty* response) {
+    std::unique_ptr< ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>> batch_share(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response) {
       return std::unique_ptr< ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>>(batch_shareRaw(context, response));
     }
-    std::unique_ptr< ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>> Asyncbatch_share(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) {
+    std::unique_ptr< ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>> Asyncbatch_share(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response, ::grpc::CompletionQueue* cq, void* tag) {
       return std::unique_ptr< ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>>(Asyncbatch_shareRaw(context, response, cq, tag));
     }
     ::grpc::Status reconstruct(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::mpc::leath::ReconstructReply* response) GRPC_OVERRIDE;
@@ -113,8 +113,8 @@ class LeathRPC GRPC_FINAL {
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     ::grpc::ClientAsyncResponseReader< ::mpc::leath::SetupMessage>* AsyncsetupRaw(::grpc::ClientContext* context, const ::mpc::leath::SetupMessage& request, ::grpc::CompletionQueue* cq) GRPC_OVERRIDE;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncshareRaw(::grpc::ClientContext* context, const ::mpc::leath::ShareRequestMessage& request, ::grpc::CompletionQueue* cq) GRPC_OVERRIDE;
-    ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>* batch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response) GRPC_OVERRIDE;
-    ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>* Asyncbatch_shareRaw(::grpc::ClientContext* context, ::google::protobuf::Empty* response, ::grpc::CompletionQueue* cq, void* tag) GRPC_OVERRIDE;
+    ::grpc::ClientWriter< ::mpc::leath::ShareRequestMessage>* batch_shareRaw(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response) GRPC_OVERRIDE;
+    ::grpc::ClientAsyncWriter< ::mpc::leath::ShareRequestMessage>* Asyncbatch_shareRaw(::grpc::ClientContext* context, ::mpc::leath::batchShareReply* response, ::grpc::CompletionQueue* cq, void* tag) GRPC_OVERRIDE;
     ::grpc::ClientAsyncResponseReader< ::mpc::leath::ReconstructReply>* AsyncreconstructRaw(::grpc::ClientContext* context, const ::mpc::leath::ReconstructRequestMessage& request, ::grpc::CompletionQueue* cq) GRPC_OVERRIDE;
     ::grpc::ClientReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* batch_reconstructRaw(::grpc::ClientContext* context) GRPC_OVERRIDE;
     ::grpc::ClientAsyncReaderWriter< ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>* Asyncbatch_reconstructRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) GRPC_OVERRIDE;
@@ -137,7 +137,7 @@ class LeathRPC GRPC_FINAL {
     virtual ::grpc::Status setup(::grpc::ServerContext* context, const ::mpc::leath::SetupMessage* request, ::mpc::leath::SetupMessage* response);
     // Share
     virtual ::grpc::Status share(::grpc::ServerContext* context, const ::mpc::leath::ShareRequestMessage* request, ::google::protobuf::Empty* response);
-    virtual ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::google::protobuf::Empty* response);
+    virtual ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::mpc::leath::batchShareReply* response);
     // Update
     virtual ::grpc::Status reconstruct(::grpc::ServerContext* context, const ::mpc::leath::ReconstructRequestMessage* request, ::mpc::leath::ReconstructReply* response);
     virtual ::grpc::Status batch_reconstruct(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mpc::leath::ReconstructReply, ::mpc::leath::ReconstructRequestMessage>* stream);
@@ -195,11 +195,11 @@ class LeathRPC GRPC_FINAL {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::google::protobuf::Empty* response) GRPC_FINAL GRPC_OVERRIDE {
+    ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::mpc::leath::batchShareReply* response) GRPC_FINAL GRPC_OVERRIDE {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void Requestbatch_share(::grpc::ServerContext* context, ::grpc::ServerAsyncReader< ::google::protobuf::Empty, ::mpc::leath::ShareRequestMessage>* reader, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void Requestbatch_share(::grpc::ServerContext* context, ::grpc::ServerAsyncReader< ::mpc::leath::batchShareReply, ::mpc::leath::ShareRequestMessage>* reader, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncClientStreaming(2, context, reader, new_call_cq, notification_cq, tag);
     }
   };
@@ -310,7 +310,7 @@ class LeathRPC GRPC_FINAL {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::google::protobuf::Empty* response) GRPC_FINAL GRPC_OVERRIDE {
+    ::grpc::Status batch_share(::grpc::ServerContext* context, ::grpc::ServerReader< ::mpc::leath::ShareRequestMessage>* reader, ::mpc::leath::batchShareReply* response) GRPC_FINAL GRPC_OVERRIDE {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }

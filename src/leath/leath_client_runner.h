@@ -51,8 +51,8 @@ namespace mpc {
 
 
         struct leath_share_writers_t{
-            std::unique_ptr<::grpc::ClientContext> context;
-            google::protobuf::Empty response;
+            std::unique_ptr<grpc::ClientContext> context;
+            std::unique_ptr<leath::batchShareReply> response;
             std::unique_ptr<grpc::ClientWriter<leath::ShareRequestMessage>> writer_;
             std::mutex mtx;
         };

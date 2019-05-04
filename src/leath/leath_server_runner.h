@@ -36,7 +36,7 @@ namespace mpc {
 
         grpc::Status batch_share(grpc::ServerContext* context, 
                             grpc::ServerReader< leath::ShareRequestMessage>* reader, 
-                            google::protobuf::Empty* response) override; 
+                            leath::batchShareReply* response) override; 
 
         grpc::Status reconstruct(grpc::ServerContext* context,
                            const ReconstructRequestMessage* request,

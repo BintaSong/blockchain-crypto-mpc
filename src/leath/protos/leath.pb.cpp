@@ -28,6 +28,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* ShareRequestMessage_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ShareRequestMessage_reflection_ = NULL;
+const ::google::protobuf::Descriptor* batchShareReply_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  batchShareReply_reflection_ = NULL;
 const ::google::protobuf::Descriptor* ReconstructRequestMessage_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ReconstructRequestMessage_reflection_ = NULL;
@@ -80,7 +83,22 @@ void protobuf_AssignDesc_leath_2eproto() {
       sizeof(ShareRequestMessage),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ShareRequestMessage, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ShareRequestMessage, _is_default_instance_));
-  ReconstructRequestMessage_descriptor_ = file->message_type(2);
+  batchShareReply_descriptor_ = file->message_type(2);
+  static const int batchShareReply_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(batchShareReply, counter_),
+  };
+  batchShareReply_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      batchShareReply_descriptor_,
+      batchShareReply::default_instance_,
+      batchShareReply_offsets_,
+      -1,
+      -1,
+      -1,
+      sizeof(batchShareReply),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(batchShareReply, _internal_metadata_),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(batchShareReply, _is_default_instance_));
+  ReconstructRequestMessage_descriptor_ = file->message_type(3);
   static const int ReconstructRequestMessage_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRequestMessage, value_id_),
   };
@@ -95,7 +113,7 @@ void protobuf_AssignDesc_leath_2eproto() {
       sizeof(ReconstructRequestMessage),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRequestMessage, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRequestMessage, _is_default_instance_));
-  ReconstructRangeMessage_descriptor_ = file->message_type(3);
+  ReconstructRangeMessage_descriptor_ = file->message_type(4);
   static const int ReconstructRangeMessage_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, begin_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, end_id_),
@@ -111,7 +129,7 @@ void protobuf_AssignDesc_leath_2eproto() {
       sizeof(ReconstructRangeMessage),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructRangeMessage, _is_default_instance_));
-  ReconstructReply_descriptor_ = file->message_type(4);
+  ReconstructReply_descriptor_ = file->message_type(5);
   static const int ReconstructReply_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructReply, value_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReconstructReply, value_share_),
@@ -145,6 +163,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       ShareRequestMessage_descriptor_, &ShareRequestMessage::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      batchShareReply_descriptor_, &batchShareReply::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       ReconstructRequestMessage_descriptor_, &ReconstructRequestMessage::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       ReconstructRangeMessage_descriptor_, &ReconstructRangeMessage::default_instance());
@@ -159,6 +179,8 @@ void protobuf_ShutdownFile_leath_2eproto() {
   delete SetupMessage_reflection_;
   delete ShareRequestMessage::default_instance_;
   delete ShareRequestMessage_reflection_;
+  delete batchShareReply::default_instance_;
+  delete batchShareReply_reflection_;
   delete ReconstructRequestMessage::default_instance_;
   delete ReconstructRequestMessage_reflection_;
   delete ReconstructRangeMessage::default_instance_;
@@ -179,33 +201,36 @@ void protobuf_AddDesc_leath_2eproto() {
     "f/empty.proto\"+\n\014SetupMessage\022\016\n\006msg_id\030"
     "\001 \001(\004\022\013\n\003msg\030\002 \001(\014\"O\n\023ShareRequestMessag"
     "e\022\020\n\010value_id\030\001 \001(\004\022\023\n\013value_share\030\002 \001(\014"
-    "\022\021\n\tmac_share\030\003 \001(\014\"-\n\031ReconstructReques"
-    "tMessage\022\020\n\010value_id\030\001 \001(\004\";\n\027Reconstruc"
-    "tRangeMessage\022\020\n\010begin_id\030\001 \001(\004\022\016\n\006end_i"
-    "d\030\002 \001(\004\"L\n\020ReconstructReply\022\020\n\010value_id\030"
-    "\001 \001(\004\022\023\n\013value_share\030\002 \001(\014\022\021\n\tmac_share\030"
-    "\003 \001(\0142\340\003\n\010LeathRPC\022;\n\005setup\022\027.mpc.leath."
-    "SetupMessage\032\027.mpc.leath.SetupMessage\"\000\022"
-    "A\n\005share\022\036.mpc.leath.ShareRequestMessage"
-    "\032\026.google.protobuf.Empty\"\000\022I\n\013batch_shar"
-    "e\022\036.mpc.leath.ShareRequestMessage\032\026.goog"
-    "le.protobuf.Empty\"\000(\001\022R\n\013reconstruct\022$.m"
+    "\022\021\n\tmac_share\030\003 \001(\014\"\"\n\017batchShareReply\022\017"
+    "\n\007counter\030\001 \001(\004\"-\n\031ReconstructRequestMes"
+    "sage\022\020\n\010value_id\030\001 \001(\004\";\n\027ReconstructRan"
+    "geMessage\022\020\n\010begin_id\030\001 \001(\004\022\016\n\006end_id\030\002 "
+    "\001(\004\"L\n\020ReconstructReply\022\020\n\010value_id\030\001 \001("
+    "\004\022\023\n\013value_share\030\002 \001(\014\022\021\n\tmac_share\030\003 \001("
+    "\0142\344\003\n\010LeathRPC\022;\n\005setup\022\027.mpc.leath.Setu"
+    "pMessage\032\027.mpc.leath.SetupMessage\"\000\022A\n\005s"
+    "hare\022\036.mpc.leath.ShareRequestMessage\032\026.g"
+    "oogle.protobuf.Empty\"\000\022M\n\013batch_share\022\036."
+    "mpc.leath.ShareRequestMessage\032\032.mpc.leat"
+    "h.batchShareReply\"\000(\001\022R\n\013reconstruct\022$.m"
     "pc.leath.ReconstructRequestMessage\032\033.mpc"
     ".leath.ReconstructReply\"\000\022\\\n\021batch_recon"
     "struct\022$.mpc.leath.ReconstructRequestMes"
     "sage\032\033.mpc.leath.ReconstructReply\"\000(\0010\001\022"
     "W\n\020bulk_reconstruct\022\".mpc.leath.Reconstr"
     "uctRangeMessage\032\033.mpc.leath.ReconstructR"
-    "eply\"\0000\001b\006proto3", 856);
+    "eply\"\0000\001b\006proto3", 896);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "leath.proto", &protobuf_RegisterTypes);
   SetupMessage::default_instance_ = new SetupMessage();
   ShareRequestMessage::default_instance_ = new ShareRequestMessage();
+  batchShareReply::default_instance_ = new batchShareReply();
   ReconstructRequestMessage::default_instance_ = new ReconstructRequestMessage();
   ReconstructRangeMessage::default_instance_ = new ReconstructRangeMessage();
   ReconstructReply::default_instance_ = new ReconstructReply();
   SetupMessage::default_instance_->InitAsDefaultInstance();
   ShareRequestMessage::default_instance_->InitAsDefaultInstance();
+  batchShareReply::default_instance_->InitAsDefaultInstance();
   ReconstructRequestMessage::default_instance_->InitAsDefaultInstance();
   ReconstructRangeMessage::default_instance_->InitAsDefaultInstance();
   ReconstructReply::default_instance_->InitAsDefaultInstance();
@@ -953,6 +978,240 @@ void ShareRequestMessage::clear_mac_share() {
   }
   mac_share_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), mac_share);
   // @@protoc_insertion_point(field_set_allocated:mpc.leath.ShareRequestMessage.mac_share)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int batchShareReply::kCounterFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+batchShareReply::batchShareReply()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:mpc.leath.batchShareReply)
+}
+
+void batchShareReply::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+batchShareReply::batchShareReply(const batchShareReply& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:mpc.leath.batchShareReply)
+}
+
+void batchShareReply::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+  counter_ = GOOGLE_ULONGLONG(0);
+}
+
+batchShareReply::~batchShareReply() {
+  // @@protoc_insertion_point(destructor:mpc.leath.batchShareReply)
+  SharedDtor();
+}
+
+void batchShareReply::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void batchShareReply::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* batchShareReply::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return batchShareReply_descriptor_;
+}
+
+const batchShareReply& batchShareReply::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_leath_2eproto();
+  return *default_instance_;
+}
+
+batchShareReply* batchShareReply::default_instance_ = NULL;
+
+batchShareReply* batchShareReply::New(::google::protobuf::Arena* arena) const {
+  batchShareReply* n = new batchShareReply;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void batchShareReply::Clear() {
+// @@protoc_insertion_point(message_clear_start:mpc.leath.batchShareReply)
+  counter_ = GOOGLE_ULONGLONG(0);
+}
+
+bool batchShareReply::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:mpc.leath.batchShareReply)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional uint64 counter = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &counter_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:mpc.leath.batchShareReply)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:mpc.leath.batchShareReply)
+  return false;
+#undef DO_
+}
+
+void batchShareReply::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:mpc.leath.batchShareReply)
+  // optional uint64 counter = 1;
+  if (this->counter() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(1, this->counter(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:mpc.leath.batchShareReply)
+}
+
+::google::protobuf::uint8* batchShareReply::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:mpc.leath.batchShareReply)
+  // optional uint64 counter = 1;
+  if (this->counter() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(1, this->counter(), target);
+  }
+
+  // @@protoc_insertion_point(serialize_to_array_end:mpc.leath.batchShareReply)
+  return target;
+}
+
+int batchShareReply::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:mpc.leath.batchShareReply)
+  int total_size = 0;
+
+  // optional uint64 counter = 1;
+  if (this->counter() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->counter());
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void batchShareReply::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:mpc.leath.batchShareReply)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const batchShareReply* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const batchShareReply>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:mpc.leath.batchShareReply)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:mpc.leath.batchShareReply)
+    MergeFrom(*source);
+  }
+}
+
+void batchShareReply::MergeFrom(const batchShareReply& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mpc.leath.batchShareReply)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  if (from.counter() != 0) {
+    set_counter(from.counter());
+  }
+}
+
+void batchShareReply::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:mpc.leath.batchShareReply)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void batchShareReply::CopyFrom(const batchShareReply& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mpc.leath.batchShareReply)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool batchShareReply::IsInitialized() const {
+
+  return true;
+}
+
+void batchShareReply::Swap(batchShareReply* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void batchShareReply::InternalSwap(batchShareReply* other) {
+  std::swap(counter_, other->counter_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata batchShareReply::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = batchShareReply_descriptor_;
+  metadata.reflection = batchShareReply_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// batchShareReply
+
+// optional uint64 counter = 1;
+void batchShareReply::clear_counter() {
+  counter_ = GOOGLE_ULONGLONG(0);
+}
+ ::google::protobuf::uint64 batchShareReply::counter() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.batchShareReply.counter)
+  return counter_;
+}
+ void batchShareReply::set_counter(::google::protobuf::uint64 value) {
+  
+  counter_ = value;
+  // @@protoc_insertion_point(field_set:mpc.leath.batchShareReply.counter)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
