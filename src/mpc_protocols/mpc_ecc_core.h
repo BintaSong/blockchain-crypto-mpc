@@ -169,6 +169,31 @@ struct zk_pdl_mult_t
   bool v(ecurve_t curve, const ecc_point_t X, const bn_t N, const bn_t c_1, const bn_t c_2, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux) const;
 };
 
+struct zk_DF_nonneg_t
+{
+  ecc_point_t U;
+  bn_t z, _z, t, k, w, 
+       s, s_1, s_2, t_1, t_2;
+
+  void convert(ub::converter_t& converter)
+  {
+    converter.convert(U);
+    converter.convert(z);
+    converter.convert(_z);
+    converter.convert(t);
+    converter.convert(k);
+    converter.convert(w);
+    converter.convert(s);
+    converter.convert(s_1);
+    converter.convert(s_2);
+    converter.convert(t_1);
+    converter.convert(t_2);
+  }
+
+  void p(ecurve_t curve, const ecc_point_t X, const bn_t c_1, const bn_t c_2, const crypto::paillier_t& paillier, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux, 
+         const bn_t x, const bn_t y, const bn_t r);
+  bool v(ecurve_t curve, const ecc_point_t X, const bn_t N, const bn_t c_1, const bn_t c_2, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux) const;
+};
 
 
 struct zk_dl_t

@@ -64,6 +64,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 logger::log(logger::INFO)<< "Time for paillier key N generation:"  << d2  << " us" <<std::endl;
+logger::log(logger::INFO)<< "N:"  << paillier.get_N().to_string() <<std::endl;
 
 
     _paillier.generate(paillier_keysize, true);

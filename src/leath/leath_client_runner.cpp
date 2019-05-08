@@ -580,6 +580,15 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         bn_t raw_data =  bn_t::rand(p);
         client_->leath_share_peer1_step1_callback(ub::mem_t::from_string("share_session"), vid, raw_data, share_callback);
     }
+     for(uint64_t server_id = 0; server_id < number_of_servers; server_id++) {
+
+        writer_array[server_id].writer_->WritesDone();
+        grpc::Status status = writer_array[server_id].writer_->Finish();
+            
+        if (!status.ok()) {
+            logger::log(logger::ERROR) << "Status not OK for server "<< server_id <<", Status: " << status.error_message() << std::endl;
+        }
+     }
 
 //--------------------multi threads option for share------------------
 
