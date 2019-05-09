@@ -27,7 +27,6 @@
 
 #include "logger.h"
 
-
 namespace mpc
 {
 

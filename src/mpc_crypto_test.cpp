@@ -1631,6 +1631,69 @@ MPCCRYPTO_API int leath_server(int argc, char *argv[])
   return 0;
 }
 
+static int test_zk() 
+{
+  zk_DF_nonneg_t zk, zk_2;
+  crypto::paillier_t p_1024, _p_1024;
+  p_1024.generate(1024, true);
+  _p_1024.generate(1024, true);
+
+logger::log(logger::INFO) << "key generation done." <<std::endl;
+
+  bn_t G, H, _N;
+  _N = _p_1024.get_N();
+  G = bn_t::rand(_N);
+  H = bn_t::rand(_N);
+
+
+  MODULO(_N) G = G * G;
+  MODULO(_N) H = H * H;
+
+logger::log(logger::INFO) << "before com." <<std::endl;
+
+
+  bn_t msg, r_1, com;
+  msg = 123;
+  r_1 = bn_t::rand(_N);
+logger::log(logger::INFO) << "before fuck." <<std::endl;
+
+  MODULO(_N) com = G.pow(msg) * H.pow(r_1);
+
+logger::log(logger::INFO) << "before zk prove." <<std::endl;
+
+
+//----------------zk_DF_nonneg_t------------------
+
+  zk.p(com, G, H, _N, 1024, ub::mem_t::from_string("test"), 1, msg, r_1);
+  // ub::convert(zk_2, zk);
+  buf_t msg1_buf = ub::convert(zk);
+  ub::convert(zk_2, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
+
+  // logger::log(logger::INFO) << "prove done." <<std::endl;
+  bool error = zk.v(com, G, H, _N, ub::mem_t::from_string("test"), 1);
+  if (!error) 
+    logger::log(logger::ERROR) << "fucked" <<std::endl;
+  else {
+    logger::log(logger::INFO) << "good" <<std::endl;
+  }
+
+//--------------zk_DF_Paillier_equal_t--------------
+  zk_DF_Paillier_equal_t zk_3;
+  bn_t ciphertext, r_2;
+  r_2 = bn_t::rand(p_1024.get_N());
+  ciphertext = p_1024.encrypt(msg, r_2);
+
+  zk_3.p(com, ciphertext, G, H, _N, p_1024, 1024, ub::mem_t::from_string("test"), 1, msg, r_1+1, r_2);
+
+  error = zk_3.v(com, ciphertext, G, H, _N, p_1024.get_N(), 1024, ub::mem_t::from_string("test"), 1);
+  if (!error) 
+    logger::log(logger::ERROR) << "fucked" <<std::endl;
+  else {
+    logger::log(logger::INFO) << "good" <<std::endl;
+  }
+
+}
+
 MPCCRYPTO_API int MPCCrypto_test()
 {
   int rv = 0;
@@ -1656,9 +1719,11 @@ MPCCRYPTO_API int MPCCrypto_test()
   t = ub::read_timer_ms() - t; */
 
   // test_paillier();
-  rv = test_paillier();
-  assert(rv == 0);
-  logger::log(logger::INFO) << "ALL GOOD !" << std::endl;
+  test_zk();
+
+  // rv = test_paillier();
+  // assert(rv == 0);
+  // logger::log(logger::INFO) << "ALL GOOD !" << std::endl;
   /*
   if (rv = test_ecdsa_backup(ecdsa_key)) return rv;
   for (int i=0; i<3; i++)

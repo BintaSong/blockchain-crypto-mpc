@@ -24,6 +24,10 @@
 #pragma once
 #include "mpc_core.h"
 
+#include "logger.h"
+
+void RS(bn_t n, bn_t *ret);
+
 namespace mpc {
 
 buf_t ZK_PAILLIER_P_non_interactive(const crypto::bn_t& N, const crypto::bn_t& phi_N, mem_t session_id);
@@ -171,29 +175,49 @@ struct zk_pdl_mult_t
 
 struct zk_DF_nonneg_t
 {
-  ecc_point_t U;
-  bn_t z, _z, t, k, w, 
-       s, s_1, s_2, t_1, t_2;
+
+  bn_t c_1[4], c_2[4];
+  bn_t c_3;
+  bn_t m2_array[4], r4_array[4], r_5;
 
   void convert(ub::converter_t& converter)
   {
-    converter.convert(U);
-    converter.convert(z);
-    converter.convert(_z);
-    converter.convert(t);
-    converter.convert(k);
-    converter.convert(w);
-    converter.convert(s);
-    converter.convert(s_1);
-    converter.convert(s_2);
-    converter.convert(t_1);
-    converter.convert(t_2);
+    converter.convert(c_1);
+    converter.convert(c_2);
+    converter.convert(c_3);
+
+    converter.convert(m2_array);
+    converter.convert(r4_array);
+    converter.convert(r_5);
   }
 
-  void p(ecurve_t curve, const ecc_point_t X, const bn_t c_1, const bn_t c_2, const crypto::paillier_t& paillier, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux, 
-         const bn_t x, const bn_t y, const bn_t r);
-  bool v(ecurve_t curve, const ecc_point_t X, const bn_t N, const bn_t c_1, const bn_t c_2, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux) const;
+  void p(const bn_t c, const bn_t G, const bn_t H, const bn_t _N, const int bits, mem_t session_id, uint8_t aux, 
+         const bn_t u, const bn_t rho);
+  bool v(const bn_t c, const bn_t G, const bn_t H, const bn_t _N, mem_t session_id, uint8_t aux) const;
 };
+
+struct zk_DF_Paillier_equal_t
+{
+
+  bn_t c_3, c_4;
+  bn_t m_2, r_3, r_4;
+
+  void convert(ub::converter_t& converter)
+  {
+    converter.convert(c_3);
+    converter.convert(c_4);
+
+    converter.convert(m_2);
+    converter.convert(r_3);
+    converter.convert(r_4);
+
+  }
+
+  void p(const bn_t com, const bn_t ciphertext, const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const int bits, mem_t session_id, uint8_t aux, 
+         const bn_t u, const bn_t rho_1, const bn_t rho_2);
+  bool v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const;
+};
+
 
 
 struct zk_dl_t
