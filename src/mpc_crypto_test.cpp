@@ -1677,15 +1677,17 @@ logger::log(logger::INFO) << "before zk prove." <<std::endl;
     logger::log(logger::INFO) << "good" <<std::endl;
   }
 
+
+
 //--------------zk_DF_Paillier_equal_t--------------
   zk_DF_Paillier_equal_t zk_3;
   bn_t ciphertext, r_2;
   r_2 = bn_t::rand(p_1024.get_N());
   ciphertext = p_1024.encrypt(msg, r_2);
 
-  zk_3.p(com, ciphertext, G, H, _N, p_1024, 1024, ub::mem_t::from_string("test"), 1, msg, r_1+1, r_2);
+  zk_3.p(com, ciphertext, G, H, _N, p_1024, 1024, ub::mem_t::from_string("test"), 1, msg, r_1, r_2);
 
-  error = zk_3.v(com, ciphertext, G, H, _N, p_1024.get_N(), 1024, ub::mem_t::from_string("test"), 1);
+  error = zk_3.v(com, ciphertext, G, H, _N, p_1024, p_1024.get_N(), 1024, ub::mem_t::from_string("test"), 1);
   if (!error) 
     logger::log(logger::ERROR) << "fucked" <<std::endl;
   else {

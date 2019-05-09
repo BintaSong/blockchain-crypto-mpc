@@ -201,6 +201,7 @@ struct zk_DF_Paillier_equal_t
 
   bn_t c_3, c_4;
   bn_t m_2, r_3, r_4;
+  //crypto::paillier_t pa;
 
   void convert(ub::converter_t& converter)
   {
@@ -210,12 +211,11 @@ struct zk_DF_Paillier_equal_t
     converter.convert(m_2);
     converter.convert(r_3);
     converter.convert(r_4);
-
   }
 
   void p(const bn_t com, const bn_t ciphertext, const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const int bits, mem_t session_id, uint8_t aux, 
          const bn_t u, const bn_t rho_1, const bn_t rho_2);
-  bool v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const;
+  bool v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const;
 };
 
 

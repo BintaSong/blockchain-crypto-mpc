@@ -768,32 +768,34 @@ void zk_DF_nonneg_t::p(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
   bn_t R1, R2, R3, R4;
   R1 = bn_t(2).pow(B + t);
 
-logger::log(logger::INFO) << "in zk_DF_nonneg_t, R1 done." <<std::endl;
+// logger::log(logger::INFO) << "in zk_DF_nonneg_t, R1 done." <<std::endl;
 
 
   R2 = bn_t(2).pow(t) * F * bn_t(2).pow(bits/2);
 
-logger::log(logger::INFO) << "in zk_DF_nonneg_t, R2 done." <<std::endl;
+// logger::log(logger::INFO) << "in zk_DF_nonneg_t, R2 done." <<std::endl;
 
   R3 = bn_t(2).pow(B + t * 2) * F;
 
-logger::log(logger::INFO) << "in zk_DF_nonneg_t, R3 done." <<std::endl;
+// logger::log(logger::INFO) << "in zk_DF_nonneg_t, R3 done." <<std::endl;
 
   R4 = bn_t(2).pow(B + t * 2) * F *  bn_t(2).pow(bits/2);
 
-logger::log(logger::INFO) << "in zk_DF_nonneg_t, R4 done." <<std::endl;
+// logger::log(logger::INFO) << "in zk_DF_nonneg_t, R4 done." <<std::endl;
 
 
   bn_t rph_array[4], m1_array[4], r2_array[4], u_array[4];
 
   RS(u, u_array); // u = u_1^2 + u_2^2 + u_3^2 + u_4^2
+  // assert(u == u_array[0].pow(2) + u_array[1].pow(2) + u_array[2].pow(2) + u_array[3].pow(2));
 
   bn_t tmp = rho;
   for (int i = 0; i < 3; i++) {
     rph_array[i] = bn_t::rand(R1);
-    tmp = rho - rph_array[i];
+    tmp = tmp - rph_array[i];
   }
   rph_array[3] = tmp;
+// assert(rho == rph_array[0] + rph_array[1] + rph_array[2] + rph_array[3]);
 
 // bn_t test = 4, test_tmp, n = bn_t(17);
 // MODULO(n) test_tmp = bn_t(2).pow(test);
@@ -811,7 +813,7 @@ logger::log(logger::INFO) << "in zk_DF_nonneg_t, for done." <<std::endl;
     MODULO(_N)  c_3 = c_3 * c_1[i].pow(m1_array[i]);
   }
 
-logger::log(logger::INFO) << "in zk_DF_nonneg_t, before hash." <<std::endl;
+// logger::log(logger::INFO) << "in zk_DF_nonneg_t, before hash." <<std::endl;
 
 
   bn_t e = bn_t(sha256_t::hash(com, G, H, /*, ub::convert(c_1), ub::convert(c_2)*/ c_3, session_id, aux)) % F;
@@ -827,7 +829,7 @@ logger::log(logger::INFO) << "in zk_DF_nonneg_t, before hash." <<std::endl;
   }
   r_5 = r_3 + e * r_5;
 
-logger::log(logger::INFO) <<"in p " << r_5.to_string() <<std::endl;
+// logger::log(logger::INFO) <<"in p " << r_5.to_string() <<std::endl;
 
 
 //logger::log(logger::INFO) << m2_array[2].to_string() <<std::endl;
@@ -845,7 +847,7 @@ bool zk_DF_nonneg_t::v(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
 
 //logger::log(logger::INFO) <<"in v " << m2_array[2].to_string() <<std::endl;
 
-logger::log(logger::INFO) <<"in v " << r_5.to_string() <<std::endl;
+// logger::log(logger::INFO) <<"in v " << r_5.to_string() <<std::endl;
 
   bn_t tmp = 1;
  
@@ -880,42 +882,44 @@ logger::log(logger::INFO) <<"in v " << r_5.to_string() <<std::endl;
 void zk_DF_Paillier_equal_t::p(const bn_t com, const bn_t ciphertext, const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const int bits, mem_t session_id, uint8_t aux, 
          const bn_t u, const bn_t rho_1, const bn_t rho_2)
 {
-  // assert(u == (u_1 + u_2 + u_3 + u_4));
-
   bn_t F = bn_t(2).pow(80), T = bn_t(2).pow(bits), t = 160, B = bits;
-  bn_t R1, R2, R3, R4;
+  bn_t R1, R2;
   R1 = bn_t(2).pow(t) * F * T;
-  R2 = bn_t(2).pow(B + t * 2);
+  R2 = bn_t(2).pow(B + t * 2) * F;
   
+  bn_t N = paillier.get_N();
+
   bn_t m_1 = bn_t::rand(R1);
-  bn_t r_1 = bn_t::rand(paillier.get_N());
+  bn_t r_1 = bn_t::rand(N);
   bn_t r_2 = bn_t::rand(R2);
 
   c_3 = paillier.encrypt(m_1, r_1);
   MODULO(_N) c_4 = G.pow(m_1) * H.pow(r_2);
 
-  bn_t e = bn_t( sha256_t::hash(com, ciphertext, G, H, session_id, aux) );
+  bn_t e = bn_t(sha256_t::hash(com, ciphertext, G, H, session_id, aux)) % F;
 
   m_2 = m_1 + e * u;
-  r_3 = r_1 + e * rho_1;
+  MODULO(N) r_3 = r_1 * rho_1.pow(e);
   r_4 = r_2 + e * rho_2;
 
+logger::log(logger::INFO) <<"DATA " << ((m_1 + u * e ) % N).to_string()  <<std::endl;
+
 }
-bool zk_DF_Paillier_equal_t::v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const
+
+bool zk_DF_Paillier_equal_t::v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const
 {
-  bn_t e = bn_t( sha256_t::hash(com, ciphertext, G, H, session_id, aux) );
+  bn_t F = bn_t(2).pow(80);
+  bn_t e = bn_t( sha256_t::hash(com, ciphertext, G, H, session_id, aux) ) % F;
 
-  crypto::paillier_t paillier;
-  paillier.create_pub(N);
-
-  bn_t tmp = paillier.add_ciphers( paillier.encrypt(m_2, r_3), paillier.mul_scalar(ciphertext, e));
-  if (tmp != c_3) {
+  bn_t tmp = paillier.add_ciphers(c_3, paillier.mul_scalar(ciphertext, e));
+  if ((tmp - paillier.encrypt(m_2, r_3)) % N != 0 ) {
+    logger::log(logger::ERROR) << "FAIL 1 : "<<std::endl;
     return false;
   }
 
-  MODULO(_N) tmp = G.pow(m_2) * H.pow(r_4) * com.pow(e);
-
-  if(tmp != c_4){
+  MODULO(_N) tmp = c_4 * com.pow(e) - G.pow(m_2) * H.pow(r_4);
+  if(tmp != 0){
+    logger::log(logger::ERROR) << "FAIL 2" <<std::endl;
     return false;
   }
 
