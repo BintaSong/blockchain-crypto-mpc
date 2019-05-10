@@ -1635,19 +1635,21 @@ static int test_zk()
 {
   zk_DF_nonneg_t zk, zk_2;
   crypto::paillier_t p_1024, _p_1024;
-  p_1024.generate(1024, true);
-  _p_1024.generate(1024, true);
+  int bits = 1024;
+  p_1024.generate(bits, true);
+  _p_1024.generate(bits + 2, true);
 
 logger::log(logger::INFO) << "key generation done." <<std::endl;
 
-  bn_t G, H, _N;
+  bn_t G, H, alpha, _N;
   _N = _p_1024.get_N();
   G = bn_t::rand(_N);
   H = bn_t::rand(_N);
+  alpha = bn_t::rand(_N);
 
 
   MODULO(_N) G = G * G;
-  MODULO(_N) H = H * H;
+  MODULO(_N) H = G.pow(alpha);
 
 logger::log(logger::INFO) << "before com." <<std::endl;
 
@@ -1664,7 +1666,7 @@ logger::log(logger::INFO) << "before zk prove." <<std::endl;
 
 //----------------zk_DF_nonneg_t------------------
 
-  zk.p(com, G, H, _N, 1024, ub::mem_t::from_string("test"), 1, msg, r_1);
+  zk.p(com, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
   // ub::convert(zk_2, zk);
   buf_t msg1_buf = ub::convert(zk);
   ub::convert(zk_2, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
@@ -1681,13 +1683,74 @@ logger::log(logger::INFO) << "before zk prove." <<std::endl;
 
 //--------------zk_DF_Paillier_equal_t--------------
   zk_DF_Paillier_equal_t zk_3;
-  bn_t ciphertext, r_2;
-  r_2 = bn_t::rand(p_1024.get_N());
-  ciphertext = p_1024.encrypt(msg, r_2);
+  bn_t ciphertext, r_enc;
+  r_enc = bn_t::rand(p_1024.get_N());
+  ciphertext = p_1024.encrypt(msg, r_enc);
 
-  zk_3.p(com, ciphertext, G, H, _N, p_1024, 1024, ub::mem_t::from_string("test"), 1, msg, r_1, r_2);
+  zk_3.p(com, ciphertext, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc, r_1);
 
-  error = zk_3.v(com, ciphertext, G, H, _N, p_1024, p_1024.get_N(), 1024, ub::mem_t::from_string("test"), 1);
+  error = zk_3.v(com, ciphertext, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
+
+  if (!error) 
+    logger::log(logger::ERROR) << "fucked" <<std::endl;
+  else {
+    logger::log(logger::INFO) << "good" <<std::endl;
+  }
+
+
+//------------------zk_DF_com_range_t------------------
+  zk_DF_com_range_t zk_4;
+
+  bn_t a = 2, b = p_1024.get_N() - 1;
+
+  zk_4.p(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
+
+  error = zk_4.v(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1);
+
+  if (!error) 
+    logger::log(logger::ERROR) << "fucked" <<std::endl;
+  else {
+    logger::log(logger::INFO) << "good" <<std::endl;
+  }
+
+
+logger::log(logger::INFO) << "\n\n\n" <<std::endl;
+//------------------zk_DF_Paillier_range_t------------------
+
+  a = 0; 
+  b = p_1024.get_N() - 1;
+  zk_DF_Paillier_range_t zk_5;
+
+std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
+  zk_5.p(ciphertext, a, b, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc);
+
+std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+  error = zk_5.v(ciphertext, a, b, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
+
+std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+
+logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1 << " us" <<std::endl;
+logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 << " us" <<std::endl;
+
+buf_t msg2_buf = ub::convert(zk_5);
+int size = msg2_buf.size();
+logger::log(logger::INFO) << "proof size:"  << size << " bytes" <<std::endl;
+
+//ub::convert(zk_5, ub::mem_t(msg2_buf.data(), msg2_buf.size()) );
+/* 2048:
+[INFO] - time for zk_DF_Paillier_range_t prove:243466 us
+[INFO] - time for zk_DF_Paillier_range_t verify:132670 us
+[INFO] - proof size:12237 bytes
+
+3072:
+[INFO] - time for zk_DF_Paillier_range_t prove:770705 us
+[INFO] - time for zk_DF_Paillier_range_t verify:389848 us
+[INFO] - proof size:17870 bytes
+ */
   if (!error) 
     logger::log(logger::ERROR) << "fucked" <<std::endl;
   else {

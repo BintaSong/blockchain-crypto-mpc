@@ -191,9 +191,9 @@ struct zk_DF_nonneg_t
     converter.convert(r_5);
   }
 
-  void p(const bn_t c, const bn_t G, const bn_t H, const bn_t _N, const int bits, mem_t session_id, uint8_t aux, 
+  void p(const bn_t com, const bn_t G, const bn_t H, const bn_t _N, const int bits, mem_t session_id, uint8_t aux, 
          const bn_t u, const bn_t rho);
-  bool v(const bn_t c, const bn_t G, const bn_t H, const bn_t _N, mem_t session_id, uint8_t aux) const;
+  bool v(const bn_t com, const bn_t G, const bn_t H, const bn_t _N, mem_t session_id, uint8_t aux) const;
 };
 
 struct zk_DF_Paillier_equal_t
@@ -215,9 +215,50 @@ struct zk_DF_Paillier_equal_t
 
   void p(const bn_t com, const bn_t ciphertext, const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const int bits, mem_t session_id, uint8_t aux, 
          const bn_t u, const bn_t rho_1, const bn_t rho_2);
-  bool v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const;
+  bool v(const bn_t com, const bn_t ciphertext,  const bn_t G, const bn_t H, const bn_t _N, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const;
 };
 
+struct zk_DF_com_range_t
+{
+
+ // bn_t a, b;
+  bn_t com_a, r_a, com_b, r_b;
+  //crypto::paillier_t pa;
+  zk_DF_nonneg_t nonneg_a, nonneg_b;
+
+  void convert(ub::converter_t& converter)
+  {
+    converter.convert(com_a);
+    converter.convert(r_a);
+    converter.convert(com_b);
+    converter.convert(r_b);
+
+    converter.convert(nonneg_a);
+    converter.convert(nonneg_b);
+  }
+
+  void p(const bn_t com, const bn_t a, const bn_t b, const bn_t G, const bn_t H, const bn_t _N, const int bits, mem_t session_id, uint8_t aux, const bn_t u, const bn_t rho);
+  bool v(const bn_t com, const bn_t a, const bn_t b, const bn_t G, const bn_t H, const bn_t _N, const int bits, mem_t session_id, uint8_t aux) const;
+};
+
+struct zk_DF_Paillier_range_t
+{
+
+  bn_t com;
+  zk_DF_Paillier_equal_t equal_proof;
+  zk_DF_com_range_t range_proof;
+
+  void convert(ub::converter_t& converter)
+  {
+    converter.convert(com);
+    converter.convert(equal_proof);
+    converter.convert(range_proof);
+  }
+
+  void p(const bn_t ciphertext, const bn_t a, const bn_t b, const bn_t G, const bn_t H, const bn_t _N, const crypto::paillier_t paillier, const int bits, mem_t session_id, uint8_t aux, 
+         const bn_t u, const bn_t r_enc);
+  bool v(const bn_t ciphertext, const bn_t a, const bn_t b, const bn_t G, const bn_t H, const bn_t _N, const bn_t N,  const int bits, mem_t session_id, uint8_t aux) const;
+}; 
 
 
 struct zk_dl_t

@@ -175,7 +175,7 @@ logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " us" <<std::e
 begin = std::chrono::high_resolution_clock::now();
 
     out.zk_paillier_m.p(out.N, client_share.paillier.add_ciphers(out.c_1, out.c_2), bn_t(1), session_id, 1, client_share.r_1 * client_share.r_2);
-    out.zk_paillier_zero.p(out.N, out.c_3, session_id, 1, r_3);
+    out.zk_paillier_zero.p(out.N, out.c_3, session_id, 1, r_3); 
     out.zk_paillier_mult.p(out.N, out.c_1, out.c_2, out.c_3, session_id, 1, client_share.x_1, client_share.x_2, bn_t(0), client_share.r_1, client_share.r_2, r_3);
 
 end = std::chrono::high_resolution_clock::now();
