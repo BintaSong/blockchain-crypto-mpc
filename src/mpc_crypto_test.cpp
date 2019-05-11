@@ -1635,7 +1635,7 @@ static int test_zk()
 {
   zk_DF_nonneg_t zk, zk_2;
   crypto::paillier_t p_1024, _p_1024;
-  int bits = 1024;
+  int bits = 2048;
   p_1024.generate(bits, true);
   _p_1024.generate(bits + 2, true);
 
@@ -1657,105 +1657,155 @@ logger::log(logger::INFO) << "before com." <<std::endl;
   bn_t msg, r_1, com;
   msg = 123;
   r_1 = bn_t::rand(_N);
-logger::log(logger::INFO) << "before fuck." <<std::endl;
+logger::log(logger::INFO) << "before commit." <<std::endl;
 
   MODULO(_N) com = G.pow(msg) * H.pow(r_1);
 
 logger::log(logger::INFO) << "before zk prove." <<std::endl;
 
 
-//----------------zk_DF_nonneg_t------------------
+// ----------------zk_DF_nonneg_t------------------
 
-  zk.p(com, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
-  // ub::convert(zk_2, zk);
-  buf_t msg1_buf = ub::convert(zk);
-  ub::convert(zk_2, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
+//   zk.p(com, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
+//   // ub::convert(zk_2, zk);
+//   buf_t msg1_buf = ub::convert(zk);
+//   ub::convert(zk_2, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
 
-  // logger::log(logger::INFO) << "prove done." <<std::endl;
-  bool error = zk.v(com, G, H, _N, ub::mem_t::from_string("test"), 1);
-  if (!error) 
-    logger::log(logger::ERROR) << "fucked" <<std::endl;
-  else {
-    logger::log(logger::INFO) << "good" <<std::endl;
-  }
-
-
-
-//--------------zk_DF_Paillier_equal_t--------------
-  zk_DF_Paillier_equal_t zk_3;
-  bn_t ciphertext, r_enc;
-  r_enc = bn_t::rand(p_1024.get_N());
-  ciphertext = p_1024.encrypt(msg, r_enc);
-
-  zk_3.p(com, ciphertext, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc, r_1);
-
-  error = zk_3.v(com, ciphertext, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
-
-  if (!error) 
-    logger::log(logger::ERROR) << "fucked" <<std::endl;
-  else {
-    logger::log(logger::INFO) << "good" <<std::endl;
-  }
+//   // logger::log(logger::INFO) << "prove done." <<std::endl;
+//   bool error = zk.v(com, G, H, _N, ub::mem_t::from_string("test"), 1);
+//   if (!error) 
+//     logger::log(logger::ERROR) << "fucked" <<std::endl;
+//   else {
+//     logger::log(logger::INFO) << "good" <<std::endl;
+//   }
 
 
-//------------------zk_DF_com_range_t------------------
-  zk_DF_com_range_t zk_4;
 
-  bn_t a = 2, b = p_1024.get_N() - 1;
+// //--------------zk_DF_Paillier_equal_t--------------
+//   zk_DF_Paillier_equal_t zk_3;
+  //  bn_t ciphertext, r_enc;
+  //  r_enc = bn_t::rand(p_1024.get_N());
+  //  ciphertext = p_1024.encrypt(msg, r_enc);
 
-  zk_4.p(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
+//   zk_3.p(com, ciphertext, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc, r_1);
 
-  error = zk_4.v(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1);
+//   error = zk_3.v(com, ciphertext, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
 
-  if (!error) 
-    logger::log(logger::ERROR) << "fucked" <<std::endl;
-  else {
-    logger::log(logger::INFO) << "good" <<std::endl;
-  }
+//   if (!error) 
+//     logger::log(logger::ERROR) << "fucked" <<std::endl;
+//   else {
+//     logger::log(logger::INFO) << "good" <<std::endl;
+//   }
+
+
+// //------------------zk_DF_com_range_t------------------
+//   zk_DF_com_range_t zk_4;
+
+//   bn_t a = 2, b = p_1024.get_N() - 1;
+
+//   zk_4.p(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
+
+//   error = zk_4.v(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1);
+
+//   if (!error) 
+//     logger::log(logger::ERROR) << "fucked" <<std::endl;
+//   else {
+//     logger::log(logger::INFO) << "good" <<std::endl;
+//   }
 
 
 logger::log(logger::INFO) << "\n\n\n" <<std::endl;
 //------------------zk_DF_Paillier_range_t------------------
 
-  a = 0; 
-  b = p_1024.get_N() - 1;
-  zk_DF_Paillier_range_t zk_5;
+  bn_t ciphertext, r_enc;
+  r_enc = bn_t::rand(p_1024.get_N());
 
-std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+  bn_t m_1, m_2;
+  eGCD(p_1024.get_N(), p_1024.get_p(), p_1024.get_q(), m_1, m_2);
 
-  zk_5.p(ciphertext, a, b, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc);
+  ciphertext = p_1024.encrypt(m_1 * p_1024.get_p(), r_enc);
 
-std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+  bn_t  a = 2; 
+  bn_t  b = p_1024.get_N() - 1;
 
-  error = zk_5.v(ciphertext, a, b, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
 
-std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+  double d1 = 0.0, d2 = 0.0;
+  int size = 0;
 
-logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1 << " us" <<std::endl;
-logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 << " us" <<std::endl;
+  for(int i = 0; i < 10; i++) {
+    zk_DF_Paillier_range_t zk_5;
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-buf_t msg2_buf = ub::convert(zk_5);
-int size = msg2_buf.size();
-logger::log(logger::INFO) << "proof size:"  << size << " bytes" <<std::endl;
+      zk_5.p(ciphertext, a, b, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc);
 
-//ub::convert(zk_5, ub::mem_t(msg2_buf.data(), msg2_buf.size()) );
-/* 2048:
-[INFO] - time for zk_DF_Paillier_range_t prove:243466 us
-[INFO] - time for zk_DF_Paillier_range_t verify:132670 us
-[INFO] - proof size:12237 bytes
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-3072:
-[INFO] - time for zk_DF_Paillier_range_t prove:770705 us
-[INFO] - time for zk_DF_Paillier_range_t verify:389848 us
-[INFO] - proof size:17870 bytes
- */
-  if (!error) 
-    logger::log(logger::ERROR) << "fucked" <<std::endl;
-  else {
-    logger::log(logger::INFO) << "good" <<std::endl;
+      bool error = zk_5.v(ciphertext, a, b, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
+
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    
+    d1 += (double)std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+    d2 += (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+
+
+    buf_t msg2_buf = ub::convert(zk_5);
+    size += msg2_buf.size();
+    
+    if (!error){
+      logger::log(logger::ERROR) << "fucked" <<std::endl;
+    }
   }
+
+
+  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1/10.0 << " us" <<std::endl;
+  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 / 10.0 << " us" <<std::endl;
+
+  logger::log(logger::INFO) << "proof size:"  << size/10.0 << " bytes" <<std::endl;
+/* 
+  d1 = 0.0, d2 = 0.0, size = 0;
+  for(int i = 0; i < 10; i++) {
+    zk_DF_Paillier_range_t zk_5;
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
+      zk_5.p(ciphertext, a, b, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc);
+
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+      bool error = zk_5.v(ciphertext, a, b, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
+
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    
+    d1 += (double)std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+    d2 += (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+
+
+    buf_t msg2_buf = ub::convert(zk_5);
+    size += msg2_buf.size();
+    
+    if (!error){
+      logger::log(logger::ERROR) << "fucked" <<std::endl;
+    }
+  }
+
+
+  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1/10.0 << " us" <<std::endl;
+  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 / 10.0 << " us" <<std::endl;
+
+  logger::log(logger::INFO) <<  "proof size:"  << size/10.0 << " bytes" <<std::endl;
+*/
+
+  //ub::convert(zk_5, ub::mem_t(msg2_buf.data(), msg2_buf.size()) );
+  /* 2048:
+  [INFO] - time for zk_DF_Paillier_range_t prove:243466 us
+  [INFO] - time for zk_DF_Paillier_range_t verify:132670 us
+  [INFO] - proof size:12237 bytes
+
+  3072:
+  [INFO] - time for zk_DF_Paillier_range_t prove:770705 us
+  [INFO] - time for zk_DF_Paillier_range_t verify:389848 us
+  [INFO] - proof size:17870 bytes
+  */
+
 
 }
 

@@ -788,8 +788,15 @@ void zk_DF_nonneg_t::p(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
 
   bn_t rph_array[4], m1_array[4], r2_array[4], u_array[4];
 
+// std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+   
   RS(u, u_array); // u = u_1^2 + u_2^2 + u_3^2 + u_4^2
-  // assert(u == u_array[0].pow(2) + u_array[1].pow(2) + u_array[2].pow(2) + u_array[3].pow(2));
+
+// std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    
+// double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+// logger::log(logger::INFO) << "time for RS:"  << d1 << " us" <<std::endl;
+
 
   bn_t tmp = rho;
   for (int i = 0; i < 3; i++) {
@@ -802,7 +809,7 @@ void zk_DF_nonneg_t::p(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
 // bn_t test = 4, test_tmp, n = bn_t(17);
 // MODULO(n) test_tmp = bn_t(2).pow(test);
 
-logger::log(logger::INFO) << "in zk_DF_nonneg_t, for done." <<std::endl;
+// logger::log(logger::INFO) << "in zk_DF_nonneg_t, for done." <<std::endl;
 
   bn_t r_3 = bn_t::rand(R4);
   MODULO(_N)  c_3 = H.pow(r_3);
