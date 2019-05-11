@@ -1514,9 +1514,9 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
    addresses.push_back("localhost:7700");
    addresses.push_back("localhost:7701");
    addresses.push_back("localhost:7702");
-   //addresses.push_back("localhost:7703");
-   //addresses.push_back("localhost:7704");
-   //addresses.push_back("localhost:7705");
+   addresses.push_back("localhost:7703");
+   addresses.push_back("localhost:7704");
+   addresses.push_back("localhost:7705");
   //addresses.push_back("35.173.122.111:70000");
   //addresses.push_back("13.57.233.63:70001");
   //addresses.push_back("18.191.105.102:70002");

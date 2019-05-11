@@ -780,8 +780,8 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 
     auto decoding_job = [this, &data_, &total_decoding_time, &reconstruct_pool, &reconstruct_job](const leath::ReconstructReply reply) {
 
-            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
+        std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+ 
         uint64_t vid = reply.value_id();
 
         data_[vid].mtx.lock();       
@@ -797,7 +797,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
         
         if (data_[vid].received_share_counter == number_of_servers) {
             reconstruct_pool.enqueue(reconstruct_job, vid, data_[vid].in_share);
-        }
+        } 
     };
 
     auto p2p_reconstruct = [this, &begin, &end, &decoding_pool, &decoding_job](int server_id) {
