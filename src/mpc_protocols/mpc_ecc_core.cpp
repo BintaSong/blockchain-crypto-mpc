@@ -25,13 +25,17 @@
 #include "mpc_core.h"
 #include "mpc_ecc_core.h"
 
+
 using namespace ub;
 using namespace crypto;
 
 
 #include "python2.7/Python.h"
 
+//std::mutex RS_mutx_;
+
 void RS(bn_t n, bn_t *ret) {
+
     Py_Initialize();
 
     std::string path = "./src/mpc_protocols";
@@ -957,7 +961,7 @@ void zk_DF_com_range_t::p(const bn_t com, const bn_t a, const bn_t b, const bn_t
 
  //logger::log(logger::ERROR) << com_na.to_string() <<std::endl;
 
-  // FIXME: fix this fucking bug
+  // FIXME: fix this bug
   /*bn_t test, test2;
   MODULO(_N) test = G.pow(u) * H.pow(rho) /(G.pow(a) * H.pow(r_a));
   MODULO(_N) test2 = G.pow(u - a) * H.pow(rho - r_a);

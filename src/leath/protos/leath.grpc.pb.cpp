@@ -17,6 +17,7 @@ namespace mpc {
 namespace leath {
 
 static const char* LeathRPC_method_names[] = {
+  "/mpc.leath.LeathRPC/pre_setup",
   "/mpc.leath.LeathRPC/setup",
   "/mpc.leath.LeathRPC/share",
   "/mpc.leath.LeathRPC/batch_share",
@@ -31,13 +32,22 @@ std::unique_ptr< LeathRPC::Stub> LeathRPC::NewStub(const std::shared_ptr< ::grpc
 }
 
 LeathRPC::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_setup_(LeathRPC_method_names[0], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_share_(LeathRPC_method_names[1], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_batch_share_(LeathRPC_method_names[2], ::grpc::RpcMethod::CLIENT_STREAMING, channel)
-  , rpcmethod_reconstruct_(LeathRPC_method_names[3], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_batch_reconstruct_(LeathRPC_method_names[4], ::grpc::RpcMethod::BIDI_STREAMING, channel)
-  , rpcmethod_bulk_reconstruct_(LeathRPC_method_names[5], ::grpc::RpcMethod::SERVER_STREAMING, channel)
+  : channel_(channel), rpcmethod_pre_setup_(LeathRPC_method_names[0], ::grpc::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_setup_(LeathRPC_method_names[1], ::grpc::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_share_(LeathRPC_method_names[2], ::grpc::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_batch_share_(LeathRPC_method_names[3], ::grpc::RpcMethod::CLIENT_STREAMING, channel)
+  , rpcmethod_reconstruct_(LeathRPC_method_names[4], ::grpc::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_batch_reconstruct_(LeathRPC_method_names[5], ::grpc::RpcMethod::BIDI_STREAMING, channel)
+  , rpcmethod_bulk_reconstruct_(LeathRPC_method_names[6], ::grpc::RpcMethod::SERVER_STREAMING, channel)
   {}
+
+::grpc::Status LeathRPC::Stub::pre_setup(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::mpc::leath::preSetupMessage* response) {
+  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_pre_setup_, context, request, response);
+}
+
+::grpc::ClientAsyncResponseReader< ::mpc::leath::preSetupMessage>* LeathRPC::Stub::Asyncpre_setupRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+  return new ::grpc::ClientAsyncResponseReader< ::mpc::leath::preSetupMessage>(channel_.get(), cq, rpcmethod_pre_setup_, context, request);
+}
 
 ::grpc::Status LeathRPC::Stub::setup(::grpc::ClientContext* context, const ::mpc::leath::SetupMessage& request, ::mpc::leath::SetupMessage* response) {
   return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_setup_, context, request, response);
@@ -92,36 +102,48 @@ LeathRPC::Service::Service() {
   AddMethod(new ::grpc::RpcServiceMethod(
       LeathRPC_method_names[0],
       ::grpc::RpcMethod::NORMAL_RPC,
+      new ::grpc::RpcMethodHandler< LeathRPC::Service, ::google::protobuf::Empty, ::mpc::leath::preSetupMessage>(
+          std::mem_fn(&LeathRPC::Service::pre_setup), this)));
+  AddMethod(new ::grpc::RpcServiceMethod(
+      LeathRPC_method_names[1],
+      ::grpc::RpcMethod::NORMAL_RPC,
       new ::grpc::RpcMethodHandler< LeathRPC::Service, ::mpc::leath::SetupMessage, ::mpc::leath::SetupMessage>(
           std::mem_fn(&LeathRPC::Service::setup), this)));
   AddMethod(new ::grpc::RpcServiceMethod(
-      LeathRPC_method_names[1],
+      LeathRPC_method_names[2],
       ::grpc::RpcMethod::NORMAL_RPC,
       new ::grpc::RpcMethodHandler< LeathRPC::Service, ::mpc::leath::ShareRequestMessage, ::google::protobuf::Empty>(
           std::mem_fn(&LeathRPC::Service::share), this)));
   AddMethod(new ::grpc::RpcServiceMethod(
-      LeathRPC_method_names[2],
+      LeathRPC_method_names[3],
       ::grpc::RpcMethod::CLIENT_STREAMING,
       new ::grpc::ClientStreamingHandler< LeathRPC::Service, ::mpc::leath::ShareRequestMessage, ::mpc::leath::batchShareReply>(
           std::mem_fn(&LeathRPC::Service::batch_share), this)));
   AddMethod(new ::grpc::RpcServiceMethod(
-      LeathRPC_method_names[3],
+      LeathRPC_method_names[4],
       ::grpc::RpcMethod::NORMAL_RPC,
       new ::grpc::RpcMethodHandler< LeathRPC::Service, ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(
           std::mem_fn(&LeathRPC::Service::reconstruct), this)));
   AddMethod(new ::grpc::RpcServiceMethod(
-      LeathRPC_method_names[4],
+      LeathRPC_method_names[5],
       ::grpc::RpcMethod::BIDI_STREAMING,
       new ::grpc::BidiStreamingHandler< LeathRPC::Service, ::mpc::leath::ReconstructRequestMessage, ::mpc::leath::ReconstructReply>(
           std::mem_fn(&LeathRPC::Service::batch_reconstruct), this)));
   AddMethod(new ::grpc::RpcServiceMethod(
-      LeathRPC_method_names[5],
+      LeathRPC_method_names[6],
       ::grpc::RpcMethod::SERVER_STREAMING,
       new ::grpc::ServerStreamingHandler< LeathRPC::Service, ::mpc::leath::ReconstructRangeMessage, ::mpc::leath::ReconstructReply>(
           std::mem_fn(&LeathRPC::Service::bulk_reconstruct), this)));
 }
 
 LeathRPC::Service::~Service() {
+}
+
+::grpc::Status LeathRPC::Service::pre_setup(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::mpc::leath::preSetupMessage* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status LeathRPC::Service::setup(::grpc::ServerContext* context, const ::mpc::leath::SetupMessage* request, ::mpc::leath::SetupMessage* response) {

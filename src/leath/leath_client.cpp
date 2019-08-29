@@ -6,6 +6,7 @@ namespace mpc
 {
 leath_client_share_t LeathClient::client_share = {0};
 std::mutex LeathClient::client_share_mutx_;
+// std::mutex LeathClient::RS_mutx_;
 
 LeathClient::LeathClient(const std::string path, const int server_number, const int bits) : client_dir(path), paillier_keysize(bits), number_of_server(server_number)
 {
@@ -120,6 +121,16 @@ logger::log(logger::INFO)<< "Time for (c_1, c_2) generation:"  << d5  << " us" <
     return 0;
 }
 
+error_t LeathClient::leath_pre_setup_peer1_step1(mem_t session_id, int server_id, leath_pre_setup_message1_t &in)
+{
+    client_share_mutx_.lock();
+        client_share.G[server_id] = in.G;
+        client_share.H[server_id] = in.H;
+        client_share.range_N[server_id] = in.range_N;
+    client_share_mutx_.unlock();
+    return 0;
+}
+
 error_t LeathClient::leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out)
 {
     /* crypto::paillier_t paillier, _paillier;
@@ -226,8 +237,7 @@ error_t LeathClient::leath_setup_peer1_step3(mem_t session_id, int server_id, le
     out.mac_key_share = bn_t::rand(client_share.N);
 
     client_share_mutx_.lock();
-    MODULO(client_share.N)
-    client_share.mac_key += out.mac_key_share;
+    MODULO(client_share.N) client_share.mac_key += out.mac_key_share;
     client_share_mutx_.unlock();
 
     return 0;

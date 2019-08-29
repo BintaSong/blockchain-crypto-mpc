@@ -1513,10 +1513,10 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::vector<std::string> addresses;
    addresses.push_back("localhost:7700");
    addresses.push_back("localhost:7701");
-   addresses.push_back("localhost:7702");
-   addresses.push_back("localhost:7703");
-   addresses.push_back("localhost:7704");
-   addresses.push_back("localhost:7705");
+  // addresses.push_back("localhost:7702");
+  // addresses.push_back("localhost:7703");
+  // addresses.push_back("localhost:7704");
+  // addresses.push_back("localhost:7705");
   //addresses.push_back("35.173.122.111:70000");
   //addresses.push_back("13.57.233.63:70001");
   //addresses.push_back("18.191.105.102:70002");
@@ -1544,7 +1544,9 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
     case 'i':
       setup_way = atoi(optarg);
-
+      //logger::log(logger::INFO) << "hi." << std::endl;
+      client_runner->pre_setup();
+      //logger::log(logger::INFO) << "hh." << std::endl;
       if (setup_way == 1) client_runner->setup();
       if (setup_way == 2) client_runner->simple_setup();
       break;
@@ -1757,10 +1759,10 @@ logger::log(logger::INFO) << "\n\n\n" <<std::endl;
   }
 
 
-  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1/10.0 << " us" <<std::endl;
+  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1 / 10.0 << " us" <<std::endl;
   logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 / 10.0 << " us" <<std::endl;
 
-  logger::log(logger::INFO) << "proof size:"  << size/10.0 << " bytes" <<std::endl;
+  logger::log(logger::INFO) << "proof size:"  << size / 10.0 << " bytes" <<std::endl;
 /* 
   d1 = 0.0, d2 = 0.0, size = 0;
   for(int i = 0; i < 10; i++) {

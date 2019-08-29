@@ -7,6 +7,8 @@ package mpc.leath;
 
 service LeathRPC {
 
+rpc pre_setup (google.protobuf.Empty) returns (preSetupMessage) {}
+
 // Setup
 rpc setup (SetupMessage) returns (SetupMessage) {}
 
@@ -19,6 +21,13 @@ rpc reconstruct (ReconstructRequestMessage) returns (ReconstructReply) {}
 rpc batch_reconstruct (stream ReconstructRequestMessage) returns (stream ReconstructReply) {}
 rpc bulk_reconstruct (ReconstructRangeMessage) returns (stream ReconstructReply) {}
 
+}
+
+message preSetupMessage
+{
+    bytes G = 1;
+    bytes H = 2;
+    bytes N = 3; // modular for range proof
 }
 
 message SetupMessage

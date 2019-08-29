@@ -39,6 +39,8 @@ struct leath_client_share_t
   bn_t h_1, h_2, _N, N, N2, p, q;
   bn_t x_1, x_2, r_1, r_2, c_1, c_2, keys_share, mac_key;
   crypto::paillier_t paillier;
+  //TODO: add servers' G, H 
+  bn_t G[10], H[10], range_N[10];
 
   void convert(ub::converter_t &converter)
   {
@@ -58,6 +60,9 @@ struct leath_client_share_t
     converter.convert(keys_share);
     converter.convert(mac_key);
     converter.convert(paillier);
+    converter.convert(G);
+    converter.convert(H);
+    converter.convert(range_N);
   }
 };
 
@@ -68,6 +73,9 @@ struct leath_server_share_t
   bn_t c_1, c_2, N, N2;
   ecc_point_t pk;
   bn_t sk, keys_share, mac_key_share;
+
+  //TODO: add G, H, range_N for DF commitment
+  bn_t G, H, range_N;
 
   void convert(ub::converter_t &converter)
   {
@@ -83,6 +91,8 @@ struct leath_server_share_t
     converter.convert(sk);
     converter.convert(keys_share);
     converter.convert(mac_key_share);
+    converter.convert(G);
+    converter.convert(H);
   }
 };
 
@@ -132,6 +142,21 @@ struct leath_create_paillier_t
   error_t peer1_step2(leath_client_share_t &client_share, mem_t session_id, int server_id, const message2_t &in);
 };
 
+struct leath_pre_setup_message1_t {
+  bn_t G, H, range_N;
+  void convert(ub::converter_t &converter)
+  { 
+    converter.convert(G);
+    converter.convert(H);
+    converter.convert(range_N);
+  }
+};
+
+struct leath_pre_setup_message2_t {
+  //TODO:
+
+};
+
 struct leath_setup_message1_t
 {
   bn_t N, c_1, c_2, c_3;
@@ -140,6 +165,7 @@ struct leath_setup_message1_t
   zk_paillier_m_t zk_paillier_m;
   zk_paillier_zero_t zk_paillier_zero;
   zk_paillier_mult_t zk_paillier_mult;
+  zk_DF_Paillier_range_t zk_DF_Paillier_range;
 
   void convert(ub::converter_t &converter)
   {
@@ -154,6 +180,14 @@ struct leath_setup_message1_t
     converter.convert(zk_paillier_m);
     converter.convert(zk_paillier_zero);
     converter.convert(zk_paillier_mult);
+    converter.convert(zk_DF_Paillier_range);
+  }
+
+  void update_range_proof(bn_t G, bn_t H, int bits, bn_t range_proof_N, bn_t msg, bn_t r_enc, ub::mem_t session_id) //bits is the size of all modulars
+  {
+    crypto::paillier_t pail;
+    pail.create_pub(N);
+    zk_DF_Paillier_range.p(c_1, 2, N-1, G, H, range_proof_N, pail, bits, session_id, 1, msg, r_enc);
   }
 };
 

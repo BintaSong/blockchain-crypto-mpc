@@ -173,6 +173,7 @@ struct zk_pdl_mult_t
   bool v(ecurve_t curve, const ecc_point_t X, const bn_t N, const bn_t c_1, const bn_t c_2, const bn_t h_1, const bn_t h_2, const bn_t _N, mem_t session_id, uint8_t aux) const;
 };
 
+
 struct zk_DF_nonneg_t
 {
 
@@ -221,7 +222,7 @@ struct zk_DF_Paillier_equal_t
 struct zk_DF_com_range_t
 {
 
- // bn_t a, b;
+  // bn_t a, b;
   bn_t com_a, r_a, com_b, r_b;
   //crypto::paillier_t pa;
   zk_DF_nonneg_t nonneg_a, nonneg_b;
@@ -245,9 +246,10 @@ struct zk_DF_Paillier_range_t
 {
 
   bn_t com;
+  bn_t G, H; // FIXME: Note that G, H must be generated and already proven of correctness from, i.e., G = H^w.
   zk_DF_Paillier_equal_t equal_proof;
   zk_DF_com_range_t range_proof;
-
+  
   void convert(ub::converter_t& converter)
   {
     converter.convert(com);

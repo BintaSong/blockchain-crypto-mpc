@@ -25,7 +25,11 @@ namespace mpc {
     class LeathServerImpl final : public leath::LeathRPC::Service {
     public:
         explicit LeathServerImpl(const std::string& path, uint8_t id);
-        
+
+        grpc::Status pre_setup(grpc::ServerContext* context,
+                           const google::protobuf::Empty* request,
+                           preSetupMessage* response) override;
+
         grpc::Status setup(grpc::ServerContext* context,
                            const SetupMessage* request,
                            SetupMessage* response) override;

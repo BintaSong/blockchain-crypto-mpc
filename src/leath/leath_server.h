@@ -24,6 +24,7 @@ public:
     error_t set_server_share(const leath_server_share_t s_share);
 
     // ------------------for setup------------------
+    error_t leath_pre_setup_peer2_step1(mem_t session_id, int server_id, leath_pre_setup_message1_t &out);
     error_t leath_setup_peer2_step1(mem_t session_id, int server_id, const leath_setup_message1_t &in, leath_setup_message2_t &out);
     error_t leath_setup_peer2_step2(mem_t session_id, int server_id, const leath_setup_message3_t &in);
 

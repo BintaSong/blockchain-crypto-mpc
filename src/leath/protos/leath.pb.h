@@ -44,8 +44,116 @@ class ReconstructRequestMessage;
 class SetupMessage;
 class ShareRequestMessage;
 class batchShareReply;
+class preSetupMessage;
 
 // ===================================================================
+
+class preSetupMessage : public ::google::protobuf::Message {
+ public:
+  preSetupMessage();
+  virtual ~preSetupMessage();
+
+  preSetupMessage(const preSetupMessage& from);
+
+  inline preSetupMessage& operator=(const preSetupMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const preSetupMessage& default_instance();
+
+  void Swap(preSetupMessage* other);
+
+  // implements Message ----------------------------------------------
+
+  inline preSetupMessage* New() const { return New(NULL); }
+
+  preSetupMessage* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const preSetupMessage& from);
+  void MergeFrom(const preSetupMessage& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(preSetupMessage* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional bytes G = 1;
+  void clear_g();
+  static const int kGFieldNumber = 1;
+  const ::std::string& g() const;
+  void set_g(const ::std::string& value);
+  void set_g(const char* value);
+  void set_g(const void* value, size_t size);
+  ::std::string* mutable_g();
+  ::std::string* release_g();
+  void set_allocated_g(::std::string* g);
+
+  // optional bytes H = 2;
+  void clear_h();
+  static const int kHFieldNumber = 2;
+  const ::std::string& h() const;
+  void set_h(const ::std::string& value);
+  void set_h(const char* value);
+  void set_h(const void* value, size_t size);
+  ::std::string* mutable_h();
+  ::std::string* release_h();
+  void set_allocated_h(::std::string* h);
+
+  // optional bytes N = 3;
+  void clear_n();
+  static const int kNFieldNumber = 3;
+  const ::std::string& n() const;
+  void set_n(const ::std::string& value);
+  void set_n(const char* value);
+  void set_n(const void* value, size_t size);
+  ::std::string* mutable_n();
+  ::std::string* release_n();
+  void set_allocated_n(::std::string* n);
+
+  // @@protoc_insertion_point(class_scope:mpc.leath.preSetupMessage)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr g_;
+  ::google::protobuf::internal::ArenaStringPtr h_;
+  ::google::protobuf::internal::ArenaStringPtr n_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_leath_2eproto();
+  friend void protobuf_AssignDesc_leath_2eproto();
+  friend void protobuf_ShutdownFile_leath_2eproto();
+
+  void InitAsDefaultInstance();
+  static preSetupMessage* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class SetupMessage : public ::google::protobuf::Message {
  public:
@@ -586,6 +694,142 @@ class ReconstructReply : public ::google::protobuf::Message {
 // ===================================================================
 
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
+// preSetupMessage
+
+// optional bytes G = 1;
+inline void preSetupMessage::clear_g() {
+  g_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& preSetupMessage::g() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.preSetupMessage.G)
+  return g_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void preSetupMessage::set_g(const ::std::string& value) {
+  
+  g_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:mpc.leath.preSetupMessage.G)
+}
+inline void preSetupMessage::set_g(const char* value) {
+  
+  g_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:mpc.leath.preSetupMessage.G)
+}
+inline void preSetupMessage::set_g(const void* value, size_t size) {
+  
+  g_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:mpc.leath.preSetupMessage.G)
+}
+inline ::std::string* preSetupMessage::mutable_g() {
+  
+  // @@protoc_insertion_point(field_mutable:mpc.leath.preSetupMessage.G)
+  return g_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* preSetupMessage::release_g() {
+  // @@protoc_insertion_point(field_release:mpc.leath.preSetupMessage.G)
+  
+  return g_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void preSetupMessage::set_allocated_g(::std::string* g) {
+  if (g != NULL) {
+    
+  } else {
+    
+  }
+  g_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), g);
+  // @@protoc_insertion_point(field_set_allocated:mpc.leath.preSetupMessage.G)
+}
+
+// optional bytes H = 2;
+inline void preSetupMessage::clear_h() {
+  h_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& preSetupMessage::h() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.preSetupMessage.H)
+  return h_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void preSetupMessage::set_h(const ::std::string& value) {
+  
+  h_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:mpc.leath.preSetupMessage.H)
+}
+inline void preSetupMessage::set_h(const char* value) {
+  
+  h_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:mpc.leath.preSetupMessage.H)
+}
+inline void preSetupMessage::set_h(const void* value, size_t size) {
+  
+  h_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:mpc.leath.preSetupMessage.H)
+}
+inline ::std::string* preSetupMessage::mutable_h() {
+  
+  // @@protoc_insertion_point(field_mutable:mpc.leath.preSetupMessage.H)
+  return h_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* preSetupMessage::release_h() {
+  // @@protoc_insertion_point(field_release:mpc.leath.preSetupMessage.H)
+  
+  return h_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void preSetupMessage::set_allocated_h(::std::string* h) {
+  if (h != NULL) {
+    
+  } else {
+    
+  }
+  h_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), h);
+  // @@protoc_insertion_point(field_set_allocated:mpc.leath.preSetupMessage.H)
+}
+
+// optional bytes N = 3;
+inline void preSetupMessage::clear_n() {
+  n_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& preSetupMessage::n() const {
+  // @@protoc_insertion_point(field_get:mpc.leath.preSetupMessage.N)
+  return n_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void preSetupMessage::set_n(const ::std::string& value) {
+  
+  n_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:mpc.leath.preSetupMessage.N)
+}
+inline void preSetupMessage::set_n(const char* value) {
+  
+  n_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:mpc.leath.preSetupMessage.N)
+}
+inline void preSetupMessage::set_n(const void* value, size_t size) {
+  
+  n_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:mpc.leath.preSetupMessage.N)
+}
+inline ::std::string* preSetupMessage::mutable_n() {
+  
+  // @@protoc_insertion_point(field_mutable:mpc.leath.preSetupMessage.N)
+  return n_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* preSetupMessage::release_n() {
+  // @@protoc_insertion_point(field_release:mpc.leath.preSetupMessage.N)
+  
+  return n_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void preSetupMessage::set_allocated_n(::std::string* n) {
+  if (n != NULL) {
+    
+  } else {
+    
+  }
+  n_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), n);
+  // @@protoc_insertion_point(field_set_allocated:mpc.leath.preSetupMessage.N)
+}
+
+// -------------------------------------------------------------------
+
 // SetupMessage
 
 // optional uint64 msg_id = 1;
@@ -927,6 +1171,8 @@ inline void ReconstructReply::set_allocated_mac_share(::std::string* mac_share) 
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

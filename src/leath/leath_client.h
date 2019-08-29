@@ -21,6 +21,9 @@ public:
     static std::unique_ptr<LeathClient> init_in_directory(const std::string dir_path, const int number_of_servers, const int bits);
 
     //----------client setup step functions---------------
+    // before setup, client and servers should initlize the commitment scheme for R_R proof
+    error_t leath_pre_setup_peer1_step1(mem_t session_id, int server_id, leath_pre_setup_message1_t &in);  // TODO:  
+
     error_t leath_setup_paillier_generation();
     error_t leath_setup_peer1_step1(mem_t session_id, leath_setup_message1_t &out);
     error_t leath_setup_peer1_step2(mem_t session_id, int server_id, const leath_setup_message2_t &in);
@@ -65,6 +68,7 @@ public:
 
     static leath_client_share_t client_share;
     static std::mutex client_share_mutx_;
+    // static std::mutex RS_mutx_;
 };
 
 } //namespace mpc

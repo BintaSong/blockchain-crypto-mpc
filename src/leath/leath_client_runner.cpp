@@ -7,6 +7,8 @@
 
 namespace mpc
 {
+std::mutex LeathClientRunner::RS_mtx;
+
 LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, const std::string client_path, const int bits) : client_dir(client_path), current_step(1), already_setup(false), abort(false)
 {
     // addr_vector = addresses;
@@ -43,6 +45,45 @@ LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, 
     }
 }
 
+void LeathClientRunner::pre_setup()
+{
+    //TODO: 
+    logger::log(logger::INFO) << "Pre setup begins ... " << std::endl;
+
+    auto p2p_presetup = [this](int server_id){
+        grpc::ClientContext context1;
+        google::protobuf::Empty request;
+        leath::preSetupMessage response;
+        grpc::Status status;
+
+        status = stub_vector[server_id]->pre_setup(&context1, request, &response);
+        if (!status.ok())
+        {
+            logger::log(logger::ERROR) << "Setup for server " << (int)server_id << " failed." << std::endl;
+            return;
+        }
+
+        leath_pre_setup_message1_t in;
+
+        in.G = bn_t::from_string( response.g().c_str() );
+        in.H = bn_t::from_string( response.h().c_str() );
+        in.range_N = bn_t::from_string( response.n().c_str() );
+
+        client_->leath_pre_setup_peer1_step1(mem_t::from_string("pre_setup_session"), server_id, in);
+    };
+
+
+    std::vector<std::thread> threads;
+    for (int t = 0; t < number_of_servers; t++)
+    {
+        threads.push_back(std::thread(p2p_presetup, t));
+    }
+    for (auto &t : threads)
+    {
+        t.join();
+    }
+}
+
 void LeathClientRunner::setup()
 {
     logger::log(logger::INFO) << "Setup begins ... " << std::endl;
@@ -76,15 +117,21 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
 
 
     int8_t id = 0;
-    auto p2p_setup = [this, &out1](int id) {
+    auto p2p_setup = [this](int id, leath_setup_message1_t out) {
         // logger::log(logger::INFO) << "Thread " << (int)id << " begins" << std::endl;
+        leath_setup_message1_t update_out = out;
+        // update range proof for each server, FIXME: the bit size of DF commitment is fiexed to 2048
+        RS_mtx.lock();
+            update_out.update_range_proof(client_->client_share.G[id], client_->client_share.H[id], 2048, client_->client_share.range_N[id], client_->client_share.x_1, client_->client_share.r_1, mem_t::from_string("setup_session"));
+            logger::log(logger::INFO) << "for server " << (int)id << ": " << client_->client_share.G[id].to_string() << std::endl;
+        RS_mtx.unlock();
 
         grpc::ClientContext context1;
         leath::SetupMessage request, response;
         grpc::Status status;
 
         request.set_msg_id(1);
-        request.set_msg(ub::convert(out1).to_string());
+        request.set_msg(ub::convert(update_out).to_string());
         // request.set_msg();
     logger::log(logger::INFO) << "leath_setup_peer1_step1 message length:" << request.msg().size() << std::endl;
 
@@ -153,7 +200,7 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
 
     for (int t = 0; t < number_of_servers; t++)
     {
-        threads.push_back(std::thread(p2p_setup, t));
+        threads.push_back(std::thread(p2p_setup, t, out1));
     }
     for (auto &t : threads)
     {
@@ -172,7 +219,7 @@ logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " us
 } //setup
 
 
-void LeathClientRunner::parallel_setup()
+/* void LeathClientRunner::parallel_setup()
 {
     logger::log(logger::INFO) << "parallel_setup begins ... " << std::endl;
 
@@ -265,7 +312,7 @@ double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(
 logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " us" <<std::endl;
 
 } //setup
-
+ */
 void LeathClientRunner::simple_setup()
 {
     if (already_setup)
@@ -298,7 +345,7 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
     // std::string addresses[2] = {"0.0.0.0:7000", "0.0.0.0:7001"};
 
 
-    for(int id =0; id < number_of_servers; id++) 
+    for(int id =0; id < number_of_servers; id++)
     { 
 // std::shared_ptr<grpc::Channel> channel0(grpc::CreateChannel(addresses[0], grpc::InsecureChannelCredentials()));
 // std::unique_ptr<leath::LeathRPC::Stub> stub_0= leath::LeathRPC::NewStub(channel0);
@@ -311,6 +358,8 @@ std::chrono::high_resolution_clock::time_point t3_ = std::chrono::high_resolutio
         grpc::Status status;
 
 std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+        
+        out1.update_range_proof(client_->client_share.G[id], client_->client_share.H[id], 2048, client_->client_share.range_N[id], client_->client_share.x_1, client_->client_share.r_1, mem_t::from_string("setup_session"));
 
         request.set_msg_id(1);
         // request.set_msg(ub::convert(out1).to_string());

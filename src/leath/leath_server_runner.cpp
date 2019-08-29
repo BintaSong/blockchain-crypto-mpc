@@ -22,6 +22,19 @@ namespace mpc {
         }
     }
 
+    grpc::Status LeathServerImpl::pre_setup(grpc::ServerContext* context, const google::protobuf::Empty* request, preSetupMessage* response) {
+        error_t rv = 0;
+        leath_pre_setup_message1_t out;
+        // logger::log(logger::INFO) << "server 1." << std::endl;
+        rv = server_->leath_pre_setup_peer2_step1(mem_t::from_string("pre_setup_session"), server_id, out);
+        
+        response->set_g(out.G.to_string());
+        response->set_h(out.H.to_string());
+        response->set_n(out.range_N.to_string()); 
+
+        return grpc::Status::OK;       
+    }
+
     grpc::Status LeathServerImpl::setup(grpc::ServerContext* context, const SetupMessage* request, SetupMessage* response) {
         error_t rv = 0;
 
