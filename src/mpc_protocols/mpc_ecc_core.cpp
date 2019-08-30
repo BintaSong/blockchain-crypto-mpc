@@ -792,14 +792,14 @@ void zk_DF_nonneg_t::p(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
 
   bn_t rph_array[4], m1_array[4], r2_array[4], u_array[4];
 
-// std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
    
   RS(u, u_array); // u = u_1^2 + u_2^2 + u_3^2 + u_4^2
 
-// std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+ std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     
-// double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-// logger::log(logger::INFO) << "time for RS:"  << d1 << " us" <<std::endl;
+ double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+ logger::log(logger::INFO) << "time for RS in non-neg:"  << d1 << " us" <<std::endl;
 
 
   bn_t tmp = rho;
@@ -962,7 +962,8 @@ void zk_DF_com_range_t::p(const bn_t com, const bn_t a, const bn_t b, const bn_t
  //logger::log(logger::ERROR) << com_na.to_string() <<std::endl;
 
   // FIXME: fix this bug
-  /*bn_t test, test2;
+  bn_t test, test2;
+  /* 
   MODULO(_N) test = G.pow(u) * H.pow(rho) /(G.pow(a) * H.pow(r_a));
   MODULO(_N) test2 = G.pow(u - a) * H.pow(rho - r_a);
   assert( test == test2 );
