@@ -661,7 +661,7 @@ logger::log(logger::INFO)<< "threads number: "<< n_threads <<", shared size: "<<
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-logger::log(logger::INFO)<<"SINGLE THREAD SHARE_BENCHMARK: Shared size: "<< (end - begin) <<", time for share_benchmark() with Network:"  << duration /(end - begin)  << " ms per share" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<<"SINGLE THREAD SHARE_BENCHMARK: Shared size: "<< (end - begin) <<", time for share_benchmark() with Network:"  << duration << " us in total" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
     delete [] writer_array;
@@ -901,7 +901,7 @@ double duration = (double) std::chrono::duration_cast<std::chrono::microseconds>
 
 logger::log(logger::INFO)<<" total reconstruction time:"  << (double) duration << " us" <<std::endl;
 
-logger::log(logger::INFO)<< "reconstruct_pool size: "<< pool_size << ", Reconstructed " << reconstruct_size <<" data, time for per reconstruct with network:"  << duration / reconstruct_size << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+logger::log(logger::INFO)<< "reconstruct_pool size: "<< pool_size << ", Reconstructed " << reconstruct_size <<" data, time for reconstruct with network:"  << duration << " us in total" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
     
     delete [] data_;
     // delete [] raw_data_array;
