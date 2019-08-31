@@ -127,6 +127,7 @@ error_t LeathClient::leath_pre_setup_peer1_step1(mem_t session_id, int server_id
         client_share.G[server_id] = in.G;
         client_share.H[server_id] = in.H;
         client_share.range_N[server_id] = in.range_N;
+        // logger::log(logger::INFO) << "server " << server_id << ", G : " << client_share.G[server_id].to_string() << std::endl;
     client_share_mutx_.unlock();
     return 0;
 }
@@ -175,7 +176,8 @@ logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " us" <<std::e
     client_share.x_1 = m1;
     client_share.x_2 = m2;
 
-    out.c_3 = paillier.encrypt(0, r_3); */
+    out.c_3 = paillier.encrypt(0, r_3); 
+*/
 
     out.c_1 = client_share.c_1;
     out.c_2 = client_share.c_2;
@@ -221,11 +223,12 @@ error_t LeathClient::leath_setup_peer1_step2(mem_t session_id, int server_id, co
     ecurve_t curve = in.pk_i.get_curve();
     if (!curve)
         return rv = ub::error(E_BADARG);
-    int bits = curve.bits();
+    // int bits = curve.bits();
 
     // FIXME: maybe return the share is better ?
     client_share_mutx_.lock();
-    client_share.keys_share += x_i * bn_t(2).pow_mod(bn_t(bits * server_id), client_share.paillier.get_N());
+        client_share.keys_share += x_i ;
+        // client_share.keys_share += x_i * bn_t(2).pow_mod(bn_t(bits * server_id), client_share.paillier.get_N());
     client_share_mutx_.unlock();
 
     return 0;
@@ -237,7 +240,7 @@ error_t LeathClient::leath_setup_peer1_step3(mem_t session_id, int server_id, le
     out.mac_key_share = bn_t::rand(client_share.N);
 
     client_share_mutx_.lock();
-    MODULO(client_share.N) client_share.mac_key += out.mac_key_share;
+        MODULO(client_share.N) client_share.mac_key += out.mac_key_share;
     client_share_mutx_.unlock();
 
     return 0;

@@ -30,7 +30,7 @@ namespace mpc {
         
         response->set_g(out.G.to_string());
         response->set_h(out.H.to_string());
-        response->set_n(out.range_N.to_string()); 
+        response->set_n(out.range_N.to_string());
 
         return grpc::Status::OK;       
     }

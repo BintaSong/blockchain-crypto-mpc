@@ -246,7 +246,7 @@ struct zk_DF_Paillier_range_t
 {
 
   bn_t com;
-  bn_t G, H; // FIXME: Note that G, H must be generated and already proven of correctness from, i.e., G = H^w.
+  // bn_t G, H; // FIXME: Note that G, H must be generated and already proven of correctness from, i.e., G = H^w.
   zk_DF_Paillier_equal_t equal_proof;
   zk_DF_com_range_t range_proof;
   

@@ -871,7 +871,7 @@ bool zk_DF_nonneg_t::v(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
     MODULO(_N) tmp2 = c_1[i].pow(e) * c_2[i];
 
     if ( tmp1 != tmp2 ) {
-      // logger::log(logger::ERROR) << "FAIL 1" <<std::endl;
+      logger::log(logger::ERROR) << "FAIL 1" <<std::endl;
       return false;
     }
 
@@ -883,7 +883,7 @@ bool zk_DF_nonneg_t::v(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
   MODULO(_N) tmp3 = com.pow(e) * c_3;
   
   if (tmp != tmp3) {
-    // logger::log(logger::ERROR) << "FAIL 2" <<std::endl;
+    logger::log(logger::ERROR) << "FAIL 2" <<std::endl;
     return false;
   }
 
@@ -982,11 +982,13 @@ bool zk_DF_com_range_t::v(const bn_t com, const bn_t a, const bn_t b, const bn_t
   bn_t test_zero_1, test_zero_2;
 
   MODULO(_N) test_zero_1 = com_a - G.pow(a) * H.pow(r_a);
+  assert(test_zero_1 == 0);
   if (test_zero_1 != 0) {
     return false;
   } 
 
   MODULO(_N) test_zero_2 = com_b - G.pow(b) * H.pow(r_b);
+  assert(test_zero_2 == 0);
   if (test_zero_2 != 0) {
     return false;
   }
@@ -997,10 +999,12 @@ bool zk_DF_com_range_t::v(const bn_t com, const bn_t a, const bn_t b, const bn_t
 
 
   if(!nonneg_a.v(com_na, G, H, _N, session_id, aux)) {
+    logger::log(logger::ERROR) << "Fucked: 1" <<std::endl;
     return false;
   }
 
   if(!nonneg_b.v(com_nb, G, H, _N, session_id, aux)) {
+    logger::log(logger::ERROR) << "Fucked: 2" <<std::endl;
     return false;
   }
 

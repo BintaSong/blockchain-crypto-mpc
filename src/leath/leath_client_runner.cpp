@@ -123,7 +123,12 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
         // update range proof for each server, FIXME: the bit size of DF commitment is fiexed to 2048
         RS_mtx.lock();
             update_out.update_range_proof(client_->client_share.G[id], client_->client_share.H[id], 2048, client_->client_share.range_N[id], client_->client_share.x_1, client_->client_share.r_1, mem_t::from_string("setup_session"));
-            logger::log(logger::INFO) << "for server " << (int)id << ": " << client_->client_share.G[id].to_string() << std::endl;
+            if(! update_out.zk_DF_Paillier_range.v(update_out.c_1, 2, out.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], out.N,  2048, mem_t::from_string("setup_session"), 1) )
+            {
+
+                logger::log(logger::INFO) << "**** verify failed ****" << std::endl;
+            }
+            
         RS_mtx.unlock();
 
         grpc::ClientContext context1;

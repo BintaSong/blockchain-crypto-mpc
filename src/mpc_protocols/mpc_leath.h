@@ -91,8 +91,10 @@ struct leath_server_share_t
     converter.convert(sk);
     converter.convert(keys_share);
     converter.convert(mac_key_share);
+    
     converter.convert(G);
     converter.convert(H);
+    converter.convert(range_N);
   }
 };
 

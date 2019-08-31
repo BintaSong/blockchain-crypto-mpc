@@ -74,7 +74,7 @@ error_t LeathServer::leath_pre_setup_peer2_step1(mem_t session_id, int server_id
     error_t rv = 0;
 
     crypto::paillier_t _p;
-    int bits = 2048; // FIXME: 
+    int bits = 2048 + 2; // FIXME:
     _p.generate(bits, true);
 
     logger::log(logger::INFO) << "key generation done." << std::endl;
@@ -91,7 +91,7 @@ error_t LeathServer::leath_pre_setup_peer2_step1(mem_t session_id, int server_id
     out.G = server_share.G = G;
     out.H = server_share.H = H;
     out.range_N = server_share.range_N = _N;
-    logger::log(logger::INFO) << "server " << server_id << ": " << server_share.G.to_string() << std::endl;
+    // logger::log(logger::INFO) << "server " << server_id << ", G : " << server_share.G.to_string() << std::endl;
     // logger::log(logger::INFO) << "leath_pre_setup_peer2_step1  done." << std::endl;
     return 0;
 }
@@ -128,9 +128,10 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     if (!in.zk_paillier_mult.v(in.N, in.c_1, in.c_2, in.c_3, session_id, 1))
         return rv = error(E_CRYPTO);
 
-    if (!in.zk_DF_Paillier_range.v(in.c_1, 2, in.N - 1, server_share.G, server_share.H, server_share.range_N, in.N, 2048, session_id, 1))
+    if (!in.zk_DF_Paillier_range.v(in.c_1, 2, in.N - 1, server_share.G, server_share.H, server_share.range_N, in.N, 2048, session_id, 1)){
+        logger::log(logger::INFO) << "ERROR for server " << (int)server_id << ", G : " << server_share.G.to_string() << std::endl;
         return rv = error(E_CRYPTO);
-
+    }
     end = std::chrono::high_resolution_clock::now();
     duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
     logger::log(logger::INFO) << "Time for RG verification:" << duration << " us" << std::endl; // printf("p_6144 decryption: %f ms \n", duration / (count));
@@ -172,9 +173,9 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     {
         return rv = error(E_BADARG);
     }
-    MODULO(in.N)
-    server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
-
+    // MODULO(in.N)    server_share.keys_share = in.N - r * bn_t(2).pow(bits * server_id);
+    MODULO(in.N)    server_share.keys_share = in.N - r;
+    
     end = std::chrono::high_resolution_clock::now();
     duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
     logger::log(logger::INFO) << "Server-side time for [crt(0, sk)] generation:" << duration << " us" << std::endl;
