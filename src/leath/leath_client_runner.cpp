@@ -124,10 +124,11 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
         RS_mtx.lock();
             crypto::paillier_t pail; pail.create_pub(update_out.N);
             update_out.zk_DF_Paillier_range.p(update_out.c_1, 2, update_out.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], pail, 2048, mem_t::from_string("setup_session"), 1, client_->client_share.x_1, client_->client_share.r_1);
-            if(! update_out.zk_DF_Paillier_range.v(update_out.c_1, 2, out.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], out.N,  2048, mem_t::from_string("setup_session"), 1) )
+            /*if(! update_out.zk_DF_Paillier_range.v(update_out.c_1, 2, out.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], out.N,  2048, mem_t::from_string("setup_session"), 1) )
             {
                 logger::log(logger::INFO) << "**** verify failed ****" << std::endl;
             }
+            */
         RS_mtx.unlock();
 
         grpc::ClientContext context1;
@@ -260,10 +261,12 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
                 out_1.update_range_proof(client_->client_share.G[id], client_->client_share.H[id], 2048, client_->client_share.range_N[id], client_->client_share.x_1, client_->client_share.r_1, mem_t::from_string("setup_session"));
                 // crypto::paillier_t pail; pail.create_pub(out1.N);
                 // out1.zk_DF_Paillier_range.p(out1.c_1, 2, out1.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], pail, 2048, mem_t::from_string("setup_session"), 1, client_->client_share.x_1, client_->client_share.r_1);
-                if(! out_1.zk_DF_Paillier_range.v(out_1.c_1, 2, out_1.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], out_1.N,  2048, mem_t::from_string("setup_session"), 1) )
-                {
-                    logger::log(logger::INFO) << "**** YOU ARE FUCKED ****" << std::endl;
-                }
+                /* 
+                    if(! out_1.zk_DF_Paillier_range.v(out_1.c_1, 2, out_1.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], out_1.N,  2048, mem_t::from_string("setup_session"), 1) )
+                    {
+                        logger::log(logger::INFO) << "**** YOU ARE FUCKED ****" << std::endl;
+                    }
+                */
                 request.set_msg_id(1);
                 request.set_msg(ub::convert(out_1).to_string());
 
