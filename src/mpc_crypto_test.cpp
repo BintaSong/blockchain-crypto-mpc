@@ -1512,7 +1512,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
   std::vector<std::string> addresses;
   addresses.push_back("localhost:7700");
-  // addresses.push_back("localhost:7701");
+  addresses.push_back("localhost:7701");
   // addresses.push_back("localhost:7702");
   // addresses.push_back("13.56.114.115:7700");
   // addresses.push_back("3.17.80.213:7701");
@@ -1667,58 +1667,6 @@ logger::log(logger::INFO) << "before commit." <<std::endl;
   MODULO(_N) com = G.pow(msg) * H.pow(r_1);
 
 logger::log(logger::INFO) << "before zk prove." <<std::endl;
-
-
-// ----------------zk_DF_nonneg_t------------------
-
-//   zk.p(com, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
-//   // ub::convert(zk_2, zk);
-//   buf_t msg1_buf = ub::convert(zk);
-//   ub::convert(zk_2, ub::mem_t(msg1_buf.data(), msg1_buf.size()) );
-
-//   // logger::log(logger::INFO) << "prove done." <<std::endl;
-//   bool error = zk.v(com, G, H, _N, ub::mem_t::from_string("test"), 1);
-//   if (!error) 
-//     logger::log(logger::ERROR) << "fucked" <<std::endl;
-//   else {
-//     logger::log(logger::INFO) << "good" <<std::endl;
-//   }
-
-
-
-// //--------------zk_DF_Paillier_equal_t--------------
-//   zk_DF_Paillier_equal_t zk_3;
-  //  bn_t ciphertext, r_enc;
-  //  r_enc = bn_t::rand(p_1024.get_N());
-  //  ciphertext = p_1024.encrypt(msg, r_enc);
-
-//   zk_3.p(com, ciphertext, G, H, _N, p_1024, bits, ub::mem_t::from_string("test"), 1, msg, r_enc, r_1);
-
-//   error = zk_3.v(com, ciphertext, G, H, _N, p_1024.get_N(), bits, ub::mem_t::from_string("test"), 1);
-
-//   if (!error) 
-//     logger::log(logger::ERROR) << "fucked" <<std::endl;
-//   else {
-//     logger::log(logger::INFO) << "good" <<std::endl;
-//   }
-
-
-// //------------------zk_DF_com_range_t------------------
-//   zk_DF_com_range_t zk_4;
-
-//   bn_t a = 2, b = p_1024.get_N() - 1;
-
-//   zk_4.p(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1, msg, r_1);
-
-//   error = zk_4.v(com, a, b, G, H, _N, bits, ub::mem_t::from_string("test"), 1);
-
-//   if (!error) 
-//     logger::log(logger::ERROR) << "fucked" <<std::endl;
-//   else {
-//     logger::log(logger::INFO) << "good" <<std::endl;
-//   }
-
-
 logger::log(logger::INFO) << "\n\n\n" <<std::endl;
 //------------------zk_DF_Paillier_range_t------------------
 

@@ -195,6 +195,6 @@ leath_rpc_client: test/leath_rpc_client.o libmpc_crypto.so # leath.pb.cc  leath.
 clean:
 	rm -f $(LIB_OBJ) $(TEST_OBJ) $(LEATH_OBJ)  mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
 	
-.DEFAULT_GOAL := mpc_crypto_test # leath_server #mpc_crypto_test
-#.DEFAULT_GOAL := leath_rpc_client
+#.DEFAULT_GOAL := mpc_crypto_test # leath_server #mpc_crypto_test
+.DEFAULT_GOAL := leath_rpc_client
 #.DEFAULT_GOAL := leath_rpc_server

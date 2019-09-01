@@ -81,8 +81,7 @@ error_t LeathServer::leath_pre_setup_peer2_step1(mem_t session_id, int server_id
 
     bn_t G, H, alpha, _N;
     _N = _p.get_N();
-    G = bn_t::rand(_N);
-    H = bn_t::rand(_N);
+    
     alpha = bn_t::rand(_N);
 
     MODULO(_N) G = G * G;
