@@ -1512,7 +1512,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
 
   std::vector<std::string> addresses;
   addresses.push_back("localhost:7700");
-   addresses.push_back("localhost:7701");
+  // addresses.push_back("localhost:7701");
   // addresses.push_back("localhost:7702");
   // addresses.push_back("13.56.114.115:7700");
   // addresses.push_back("3.17.80.213:7701");
@@ -1660,7 +1660,7 @@ logger::log(logger::INFO) << "before com." <<std::endl;
 
 
   bn_t msg, r_1, com;
-  msg = 123;
+  msg = p_1024.get_N() - 2;
   r_1 = bn_t::rand(_N);
 logger::log(logger::INFO) << "before commit." <<std::endl;
 

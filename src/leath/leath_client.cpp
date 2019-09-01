@@ -227,7 +227,7 @@ error_t LeathClient::leath_setup_peer1_step2(mem_t session_id, int server_id, co
 
     // FIXME: maybe return the share is better ?
     client_share_mutx_.lock();
-        client_share.keys_share += x_i ;
+        MODULO(client_share.N) client_share.keys_share += x_i ;
         // client_share.keys_share += x_i * bn_t(2).pow_mod(bn_t(bits * server_id), client_share.paillier.get_N());
     client_share_mutx_.unlock();
 

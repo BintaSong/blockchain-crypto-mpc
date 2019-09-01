@@ -115,20 +115,20 @@ std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution
 double d0 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t0 - begin).count();
 logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " us" <<std::endl;
 
-
     int8_t id = 0;
     auto p2p_setup = [this](int id, leath_setup_message1_t out) {
         // logger::log(logger::INFO) << "Thread " << (int)id << " begins" << std::endl;
         leath_setup_message1_t update_out = out;
         // update range proof for each server, FIXME: the bit size of DF commitment is fiexed to 2048
+        
         RS_mtx.lock();
-            update_out.update_range_proof(client_->client_share.G[id], client_->client_share.H[id], 2048, client_->client_share.range_N[id], client_->client_share.x_1, client_->client_share.r_1, mem_t::from_string("setup_session"));
+            // update_out.update_range_proof(client_->client_share.G[id], client_->client_share.H[id], 2048, client_->client_share.range_N[id], client_->client_share.x_1, client_->client_share.r_1, mem_t::from_string("setup_session"));
+            crypto::paillier_t pail; pail.create_pub(update_out.N);
+            update_out.zk_DF_Paillier_range.p(update_out.c_1, 2, update_out.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], pail, 2048, mem_t::from_string("setup_session"), 1, client_->client_share.x_1, client_->client_share.r_1);
             if(! update_out.zk_DF_Paillier_range.v(update_out.c_1, 2, out.N - 1, client_->client_share.G[id], client_->client_share.H[id], client_->client_share.range_N[id], out.N,  2048, mem_t::from_string("setup_session"), 1) )
             {
-
                 logger::log(logger::INFO) << "**** verify failed ****" << std::endl;
             }
-            
         RS_mtx.unlock();
 
         grpc::ClientContext context1;
@@ -139,8 +139,6 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
         request.set_msg(ub::convert(update_out).to_string());
         // request.set_msg();
     logger::log(logger::INFO) << "leath_setup_peer1_step1 message length:" << request.msg().size() << std::endl;
-
-
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 

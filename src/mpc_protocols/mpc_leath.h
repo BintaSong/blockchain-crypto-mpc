@@ -189,7 +189,7 @@ struct leath_setup_message1_t
   {
     crypto::paillier_t pail;
     pail.create_pub(N);
-    zk_DF_Paillier_range.p(c_1, 2, N-1, G, H, range_proof_N, pail, bits, session_id, 1, msg, r_enc);
+    zk_DF_Paillier_range.p(c_1, 2, N - 1, G, H, range_proof_N, pail, bits, session_id, 1, msg, r_enc);
   }
 };
 
