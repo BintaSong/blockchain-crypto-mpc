@@ -799,7 +799,7 @@ void zk_DF_nonneg_t::p(const bn_t com, const bn_t G, const bn_t H, const bn_t _N
  std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     
  double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
- logger::log(logger::INFO) << "time for RS in non-neg:"  << d1 << " us" <<std::endl;
+// logger::log(logger::INFO) << "time for RS in non-neg:"  << d1 << " us" <<std::endl;
 
 
   bn_t tmp = rho;

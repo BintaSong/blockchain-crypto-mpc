@@ -64,15 +64,15 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "Time for paillier key N generation:"  << d2  << " us" <<std::endl;
-logger::log(logger::INFO)<< "N:"  << paillier.get_N().to_string() <<std::endl;
+// logger::log(logger::INFO)<< "Time for paillier key N generation:"  << d2  << " us" <<std::endl;
+// logger::log(logger::INFO)<< "N:"  << paillier.get_N().to_string() <<std::endl;
 
 
     _paillier.generate(paillier_keysize, true);
 
 std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 double d32 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count();
-logger::log(logger::INFO)<< "Time for paillier key _N generation:"  << d32  << " us" <<std::endl;
+// logger::log(logger::INFO)<< "Time for paillier key _N generation:"  << d32  << " us" <<std::endl;
 
 
 
@@ -111,7 +111,7 @@ std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution
 
 std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
 double d5 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t4).count();
-logger::log(logger::INFO)<< "Time for (c_1, c_2) generation:"  << d5  << " us" <<std::endl;
+// logger::log(logger::INFO)<< "Time for (c_1, c_2) generation:"  << d5  << " us" <<std::endl;
 
     client_share.x_1 = m1;
     client_share.x_2 = m2;
@@ -154,7 +154,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
 
 std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+// logger::log(logger::INFO)<< "Time for RN proof:"  << duration  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 /*     bn_t lambda, mu;
     bn_t r = eGCD(out.N, paillier.get_p(), paillier.get_q(), mu, lambda);
@@ -193,11 +193,11 @@ begin = std::chrono::high_resolution_clock::now();
 
 end = std::chrono::high_resolution_clock::now();
 duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-logger::log(logger::INFO)<< "Time for RG proof:" << duration << " us" <<std::endl;
+// logger::log(logger::INFO)<< "Time for RG proof:" << duration << " us" <<std::endl;
 
     client_share.mac_key = 0; // TODO: set mac key to zero!
     
-    logger::log(logger::INFO) << "Init from dir, |N| =  " << client_share.N.get_bin_size() << std::endl; 
+    // logger::log(logger::INFO) << "Init from dir, |N| =  " << client_share.N.get_bin_size() << std::endl; 
 
     return 0;
 }
@@ -213,7 +213,7 @@ error_t LeathClient::leath_setup_peer1_step2(mem_t session_id, int server_id, co
 
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    logger::log(logger::INFO)<< "time for RS verification:"  << d2 << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "time for RS verification:"  << d2 << " us" <<std::endl;
 
     bn_t x_i = client_share.paillier.decrypt(in._c_i);
 

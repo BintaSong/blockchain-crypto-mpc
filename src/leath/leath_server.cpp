@@ -111,7 +111,7 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
 
     std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
     double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    logger::log(logger::INFO) << "Time for RN verification:" << duration << " us" << std::endl; // printf("p_6144 decryption: %f ms \n", duration / (count));
+//    logger::log(logger::INFO) << "Time for RN verification:" << duration << " us" << std::endl; // printf("p_6144 decryption: %f ms \n", duration / (count));
 
     crypto::paillier_t paillier;
     paillier.create_pub(in.N);
@@ -133,7 +133,7 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     }
     end = std::chrono::high_resolution_clock::now();
     duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    logger::log(logger::INFO) << "Time for RG verification:" << duration << " us" << std::endl; // printf("p_6144 decryption: %f ms \n", duration / (count));
+//    logger::log(logger::INFO) << "Time for RG verification:" << duration << " us" << std::endl; // printf("p_6144 decryption: %f ms \n", duration / (count));
 
     // if all good, prepare return message
     // TODO:
@@ -177,7 +177,7 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
     
     end = std::chrono::high_resolution_clock::now();
     duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    logger::log(logger::INFO) << "Server-side time for [crt(0, sk)] generation:" << duration << " us" << std::endl;
+//    logger::log(logger::INFO) << "Server-side time for [crt(0, sk)] generation:" << duration << " us" << std::endl;
 
     //-----------------------zk_pdl_mult------------------------
     begin = std::chrono::high_resolution_clock::now();
@@ -187,7 +187,7 @@ error_t LeathServer::leath_setup_peer2_step1(mem_t session_id, int server_id, co
 
     end = std::chrono::high_resolution_clock::now();
     duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    logger::log(logger::INFO) << "Time for RS proof:" << duration << " us" << std::endl;
+//    logger::log(logger::INFO) << "Time for RS proof:" << duration << " us" << std::endl;
 
     return 0;
 }

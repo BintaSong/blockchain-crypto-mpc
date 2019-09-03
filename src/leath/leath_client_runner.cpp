@@ -27,7 +27,7 @@ LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, 
     {
         client_ = LeathClient::construct_from_directory(client_path, number_of_servers, bits);
         already_setup = true;
-        logger::log(logger::INFO) << "Setup from dir, |N| =  " << client_->client_share.N.get_bin_size() << std::endl;
+        // logger::log(logger::INFO) << "Setup from dir, |N| =  " << client_->client_share.N.get_bin_size() << std::endl;
     }
     else if (exists(client_path))
     {
@@ -48,7 +48,7 @@ LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, 
 void LeathClientRunner::pre_setup()
 {
     //TODO: 
-    logger::log(logger::INFO) << "Pre setup begins ... " << std::endl;
+    // logger::log(logger::INFO) << "Pre setup begins ... " << std::endl;
 
     auto p2p_presetup = [this](int server_id){
         grpc::ClientContext context1;
@@ -59,7 +59,7 @@ void LeathClientRunner::pre_setup()
         status = stub_vector[server_id]->pre_setup(&context1, request, &response);
         if (!status.ok())
         {
-            logger::log(logger::ERROR) << "Setup for server " << (int)server_id << " failed." << std::endl;
+            logger::log(logger::ERROR) << "PreSetup for server " << (int)server_id << " failed." << std::endl;
             return;
         }
 
@@ -86,14 +86,14 @@ void LeathClientRunner::pre_setup()
 
 void LeathClientRunner::setup()
 {
-    logger::log(logger::INFO) << "Setup begins ... " << std::endl;
+    // logger::log(logger::INFO) << "Setup begins ... " << std::endl;
 
 
-    if (already_setup)
-    {
-        logger::log(logger::ERROR) << "Setup is already finished!" << std::endl;
-        return;
-    }
+    //if (already_setup)
+    //{
+     //   logger::log(logger::ERROR) << "Setup is already finished!" << std::endl;
+    //    return;
+    //}
 
 
 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
@@ -102,7 +102,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters generation:"  << d2  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+// logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters generation:"  << d2  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
 
@@ -113,7 +113,7 @@ std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolut
 
 std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 double d0 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t0 - begin).count();
-logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " us" <<std::endl;
+// logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " us" <<std::endl;
 
     int8_t id = 0;
     auto p2p_setup = [this](int id, leath_setup_message1_t out) {
@@ -138,7 +138,7 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
         request.set_msg_id(1);
         request.set_msg(ub::convert(update_out).to_string());
         // request.set_msg();
-    logger::log(logger::INFO) << "leath_setup_peer1_step1 message length:" << request.msg().size() << std::endl;
+    // logger::log(logger::INFO) << "leath_setup_peer1_step1 message length:" << request.msg().size() << std::endl;
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -151,7 +151,7 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
 
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     double d21 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step() RPC time:"  << d21 << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step() RPC time:"  << d21 << " us" <<std::endl;
 
 
         if (response.msg_id() != 2)
@@ -169,7 +169,7 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
         client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
     std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
     double d43 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d43 << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step2():"  << d43 << " us" <<std::endl;
 
 
         leath_setup_message3_t out3;
@@ -177,7 +177,7 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
 
     std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
     double d54 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t4).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3():"  << d54 << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3():"  << d54 << " us" <<std::endl;
 
 
         grpc::ClientContext context2;
@@ -187,7 +187,7 @@ logger::log(logger::INFO) << "time for leath_setup_peer1_step1():"  << d0 << " u
 
     std::chrono::high_resolution_clock::time_point t6 = std::chrono::high_resolution_clock::now();
     double d65 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t6 - t5).count();
-    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3() RPC time:"  << d65 << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "Thread " << id << ", time for leath_setup_peer1_step3() RPC time:"  << d65 << " us" <<std::endl;
 
 
         if (!status.ok())
@@ -217,26 +217,26 @@ double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(
     already_setup = true;
     client_->write_share();
 
-logger::log(logger::INFO)<< "Time for Setup with network:"  << duration  << " us" <<std::endl;
+    std::cout << duration <<std::endl;
 
 } //setup
 
 
 void LeathClientRunner::simple_setup()
 {
-    if (already_setup)
+    /*if (already_setup)
     {
         logger::log(logger::ERROR) << "Setup is already finished!" << std::endl;
         return;
     }
-
+    */
 std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     client_->leath_setup_paillier_generation();
 
 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 double d0 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-logger::log(logger::INFO)<< "Time for paillier key and parameters generation:"  << d0  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+// logger::log(logger::INFO)<< "Time for paillier key and parameters generation:"  << d0  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
     leath_setup_message1_t out1;
@@ -244,7 +244,7 @@ logger::log(logger::INFO)<< "Time for paillier key and parameters generation:"  
 
 std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " us" <<std::endl;
+// logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " us" <<std::endl;
 
     for(int id = 0; id < number_of_servers; id++)
     { 
@@ -272,17 +272,17 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
 
         std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
         double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count();
-        logger::log(logger::INFO)<< "Server " << id <<", time for setup message `leath_setup_message1_t` encoding: "  << d2  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<", time for setup message `leath_setup_message1_t` encoding: "  << d2  << " us" <<std::endl;
 
-        time_t now = time(0); 
-        logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
+//        time_t now = time(0); 
+//        logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
 
                 status = stub_vector[id]->setup(&context1, request, &response);
                 //status = setup_rpc(id, request, &response);
 
         std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
         double d3 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t4).count();
-        logger::log(logger::INFO)<< "Server " << id <<",Time for setup message `leath_setup_message1_t` RPC: "  << d3  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<",Time for setup message `leath_setup_message1_t` RPC: "  << d3  << " us" <<std::endl;
 
                 if (!status.ok())
                 {
@@ -305,12 +305,12 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
 
         std::chrono::high_resolution_clock::time_point t6 = std::chrono::high_resolution_clock::now();
         double d4 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t6 - t5).count();
-        logger::log(logger::INFO)<< "Server " << id <<", time for setup message `leath_setup_message2_t` encoding: "  << d4  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<", time for setup message `leath_setup_message2_t` encoding: "  << d4  << " us" <<std::endl;
 
                 client_->leath_setup_peer1_step2(mem_t::from_string("setup_session"), id, in);
         std::chrono::high_resolution_clock::time_point t7 = std::chrono::high_resolution_clock::now();
         double d5 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t7 - t6).count();
-        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_peer1_step2`: "  << d5  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_peer1_step2`: "  << d5  << " us" <<std::endl;
 
                 // logger::log(logger::INFO) <<  "simple setup for server " << (int)id << " leath_setup_peer1_step2(): "
                 //                          << " done." << std::endl;
@@ -323,7 +323,7 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
 
         std::chrono::high_resolution_clock::time_point t8 = std::chrono::high_resolution_clock::now();
         double d6 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t8 - t7).count();
-        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_peer1_step3`: "  << d6  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_peer1_step3`: "  << d6  << " us" <<std::endl;
 
                 grpc::ClientContext context2;
                 request.set_msg_id(3);
@@ -331,7 +331,7 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
 
         std::chrono::high_resolution_clock::time_point t9 = std::chrono::high_resolution_clock::now();
         double d7 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t9 - t8).count();
-        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_message3_t` encoding: "  << d7  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_message3_t` encoding: "  << d7  << " us" <<std::endl;
 
 
                 status = stub_vector[id]->setup(&context2, request, &response);
@@ -339,7 +339,7 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
 
         std::chrono::high_resolution_clock::time_point t10 = std::chrono::high_resolution_clock::now();
         double d8 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t10 - t9).count();
-        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_message3_t` RPC: "  << d8  << " us" <<std::endl;
+//        logger::log(logger::INFO)<< "Server " << id <<", time for `leath_setup_message3_t` RPC: "  << d8  << " us" <<std::endl;
 
                 if (!status.ok())
                 {
@@ -347,21 +347,24 @@ logger::log(logger::INFO)<< "Time for leath_setup_peer1_step1():"  << d1  << " u
                     return;
                 }
 
-                logger::log(logger::INFO) << "Simple setup for server " << (int)id << ", Done. \n" << std::endl;
+//                logger::log(logger::INFO) << "Simple setup for server " << (int)id << ", Done. \n" << std::endl;
     } //end of for
 
     std::chrono::high_resolution_clock::time_point t11 = std::chrono::high_resolution_clock::now();
 
     // in the end, store client share !
-    already_setup = true;
+    // already_setup = true; // TODO: only for benchmark test
     client_->write_share();
 
     std::chrono::high_resolution_clock::time_point t12 = std::chrono::high_resolution_clock::now();
     double d9 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t12 - t11).count();
-    logger::log(logger::INFO)<< "Time for write_share():"  << d9  << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "Time for write_share():"  << d9  << " us" <<std::endl;
 
     double d10 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t12 - t1).count();
-    logger::log(logger::INFO)<< "TOTAL TIME FOR SIMPLE SETUP:"  << d10  << " us" <<std::endl;
+//    logger::log(logger::INFO)<< "TOTAL TIME FOR SIMPLE SETUP:"  << d10  << " us" <<std::endl;
+
+    std::cout << d10 <<std::endl;
+
 } //setup
 
 error_t LeathClientRunner::share(const uint64_t val_id, const bn_t& val)

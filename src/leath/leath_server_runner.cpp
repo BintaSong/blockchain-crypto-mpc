@@ -39,10 +39,10 @@ namespace mpc {
         error_t rv = 0;
 
         logger::log(logger::INFO)<< "SETUP RECEIVED." <<std::endl;
-        if (already_setup) return grpc::Status::CANCELLED;
+        // if (already_setup) return grpc::Status::CANCELLED;
 
-time_t now = time(0); 
-logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
+// time_t now = time(0); 
+// logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
 
         {// atomic operation
             //std::lock_guard<std::mutex> lock(mtx_);
@@ -87,8 +87,12 @@ logger::log(logger::INFO)<< "Current time:"  << now  << " s" <<std::endl;
                 current_step++;
                 already_setup = true; 
                 server_->write_share();
+                
+                //FIXME: JUST FOR BENCHMARK
+                current_step = 1;
             }
         }
+
         return grpc::Status::OK;
     }
 
@@ -236,7 +240,7 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
 double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(t5 - t1).count();
 
-logger::log(logger::INFO)<< "Time for PARALLEL bulk_reconstruct() with Network:"  << duration / (request->end_id() - request->begin_id())  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
+// logger::log(logger::INFO)<< "Time for PARALLEL bulk_reconstruct() with Network:"  << duration / (request->end_id() - request->begin_id())  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
         return  grpc::Status::OK;
     }

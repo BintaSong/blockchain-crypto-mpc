@@ -1579,7 +1579,7 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   if (is_reconstruction) {
     rv = client_runner->bulk_reconstruct(0,  reconstruction_counter);
   }
-  logger::log(logger::INFO) << "Done." << std::endl;
+ // logger::log(logger::INFO) << "Done." << std::endl;
 
 
   return 0;
@@ -1710,8 +1710,8 @@ logger::log(logger::INFO) << "\n\n\n" <<std::endl;
   }
 
 
-  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1 / 10.0 << " us" <<std::endl;
-  logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 / 10.0 << " us" <<std::endl;
+  // logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t prove:"  << d1 / 10.0 << " us" <<std::endl;
+  // logger::log(logger::INFO) << "time for zk_DF_Paillier_range_t verify:"  << d2 / 10.0 << " us" <<std::endl;
 
   logger::log(logger::INFO) << "proof size:"  << size / 10.0 << " bytes" <<std::endl;
 /* 
