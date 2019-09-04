@@ -9,17 +9,22 @@ namespace mpc
 {
 std::mutex LeathClientRunner::RS_mtx;
 
-LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, const std::string client_path, const int bits) : client_dir(client_path), current_step(1), already_setup(false), abort(false)
+LeathClientRunner::LeathClientRunner(const std::vector<std::string> &addresses, const uint64_t server_number, const std::string client_path, const int bits) : client_dir(client_path), current_step(1), already_setup(false), abort(false)
 {
     // addr_vector = addresses;
 
-    for (int i = 0; i < addresses.size(); i++)
+    if (addresses.size() < server_number) 
+        throw std::runtime_error("server addresses lost ");
+
+    number_of_servers = server_number;
+
+    for (int i = 0; i < number_of_servers; i++)
     {
         std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(addresses[i], grpc::InsecureChannelCredentials()));
         stub_vector.push_back(std::move(leath::LeathRPC::NewStub(channel)));
     }
 
-    number_of_servers = (uint64_t) addresses.size();
+    
 
     // client_.reset( new LeathClient(client_path, number_of_servers, 1024) );
 
@@ -49,6 +54,8 @@ void LeathClientRunner::pre_setup()
 {
     //TODO: 
     // logger::log(logger::INFO) << "Pre setup begins ... " << std::endl;
+
+    client_->leath_setup_paillier_generation();
 
     auto p2p_presetup = [this](int server_id){
         grpc::ClientContext context1;
@@ -96,12 +103,12 @@ void LeathClientRunner::setup()
     //}
 
 
-std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+// std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-    client_->leath_setup_paillier_generation();
+//     client_->leath_setup_paillier_generation();
 
-std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+// std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+// double d2 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 // logger::log(logger::INFO)<< "*TOTAL* Time for paillier key and parameters generation:"  << d2  << " us" <<std::endl;// printf("p_6144 decryption: %f ms \n", duration / (count));
 
 
@@ -217,7 +224,7 @@ double duration = (double)std::chrono::duration_cast<std::chrono::microseconds>(
     already_setup = true;
     client_->write_share();
 
-    std::cout << duration <<std::endl;
+    std::cout << number_of_servers << " " << client_->paillier_keysize <<" 1 "<< duration <<std::endl;
 
 } //setup
 
@@ -363,9 +370,9 @@ double d1 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t2 - t
     double d10 = (double)std::chrono::duration_cast<std::chrono::microseconds>(t12 - t1).count();
 //    logger::log(logger::INFO)<< "TOTAL TIME FOR SIMPLE SETUP:"  << d10  << " us" <<std::endl;
 
-    std::cout << d10 <<std::endl;
+    std::cout << number_of_servers << " " << client_->paillier_keysize <<" 2 "<< d10 <<std::endl;
 
-} //setup
+} //simple_setup
 
 error_t LeathClientRunner::share(const uint64_t val_id, const bn_t& val)
 {

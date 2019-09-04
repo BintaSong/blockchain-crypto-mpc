@@ -17,7 +17,7 @@
 namespace mpc {
     class LeathClientRunner {
     public:    
-        LeathClientRunner(const std::vector<std::string>& addresses, const std::string client_path, const int bits);
+        LeathClientRunner(const std::vector<std::string>& addresses, const uint64_t server_number, const std::string client_path, const int bits);
         // ~LeathClientRunner();
         
         //void generate_parameter();

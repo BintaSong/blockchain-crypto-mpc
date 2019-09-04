@@ -1491,7 +1491,7 @@ static int test_leath_client_rpc()
   addresses.push_back("localhost:7788");
   addresses.push_back("localhost:7788");
 
-  client_runner.reset(new mpc::LeathClientRunner(addresses, "", 1024));
+  client_runner.reset(new mpc::LeathClientRunner(addresses, 2, "", 1024));
   // std::cout << "INFO:" << "before setup." << std::endl;
   client_runner->setup();
 
@@ -1511,21 +1511,12 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::unique_ptr<mpc::LeathClientRunner> client_runner;
 
   std::vector<std::string> addresses;
-  addresses.push_back("localhost:7700");
-  addresses.push_back("localhost:7701");
-  // addresses.push_back("localhost:7702");
-  // addresses.push_back("13.56.114.115:7700");
-  // addresses.push_back("3.17.80.213:7701");
-  // addresses.push_back("34.238.234.165:7702");
-  // addresses.push_back("localhost:7703");
-  // addresses.push_back("localhost:7704");
-  // addresses.push_back("localhost:7705");
-  //addresses.push_back("35.173.122.111:70000");
-  //addresses.push_back("13.57.233.63:70001");
-  //addresses.push_back("18.191.105.102:70002");
-  //addresses.push_back("54.237.157.39:70003");
-  //addresses.push_back("13.58.41.77:70004");
-  //addresses.push_back("13.56.249.230:70005");
+  addresses.push_back("13.57.9.122:7700");
+  addresses.push_back("13.57.9.122:7701");
+  addresses.push_back("3.15.233.108:7702");
+  addresses.push_back("54.67.47.74:7703");
+  addresses.push_back("35.174.136.200:7704");
+  addresses.push_back("18.224.3.203:7705");
 
   int bits = 2048;
   int share_counter = 0, reconstruction_counter = 0;
@@ -1536,19 +1527,24 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   opterr = 0;
   int c;
   int setup_way = 1;
+  uint64_t server_number = 2;
   
-  while ((c = getopt(argc, argv, "i:s:r:b:")) != -1)
+  while ((c = getopt(argc, argv, "i:s:r:b:n:")) != -1)
     switch (c)
     {
     case 'b':
       bits = atoi(optarg);
-      client_runner.reset(new mpc::LeathClientRunner(addresses, "test-client", bits));
+      break;
+    
+    case 'n':
+      server_number = atoi(optarg);
+      client_runner.reset(new mpc::LeathClientRunner(addresses, server_number, "test-client", bits));
       break;
 
     case 'i':
       setup_way = atoi(optarg);
-      //logger::log(logger::INFO) << "hi." << std::endl;
       client_runner->pre_setup();
+
       //logger::log(logger::INFO) << "hh." << std::endl;
       if (setup_way == 1) client_runner->setup();
       if (setup_way == 2) client_runner->simple_setup();
