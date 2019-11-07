@@ -1,0 +1,18 @@
+
+syntax = "proto3";
+
+// import "google/protobuf/empty.proto";
+
+package mpc.yak;
+
+service YakRPC {
+//exchange
+rpc AKE (YakMessage) returns (YakMessage) {}
+}
+
+message YakMessage
+{
+    bytes e = 1;    // ephemeral message
+    bytes zkp = 2;  // schnoor proof
+    bytes pk = 3;   // public key
+}

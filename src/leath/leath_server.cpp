@@ -289,7 +289,7 @@ error_t LeathServer::leath_reconstruct_peer2_step1_parallel(mem_t session_id, co
     {
         t.join();
     }
-    logger::log(logger::ERROR) << "reconstruction thread number:" << n_threads << std::endl;
+    logger::log(logger::INFO) << "reconstruction thread number:" << n_threads << std::endl;
     return 0;
 }
 

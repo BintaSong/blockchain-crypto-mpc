@@ -708,6 +708,7 @@ Examples:
 
 def get_rs(n):
 	r = decompose(n);
+	print("test")
 	result = [str(i) for i in r[0]]
 	return result
 

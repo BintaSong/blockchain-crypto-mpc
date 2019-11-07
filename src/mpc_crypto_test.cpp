@@ -33,6 +33,8 @@
 #include "leath_client_runner.h"
 #include "leath_server_runner.h"
 
+#include "yak_common.h"
+
 #include "logger.h"
 
 #include <stdio.h>
@@ -959,6 +961,18 @@ static int test_ecurve()
   bn_t order = curve.order();
   int bits = curve.bits();
   printf("bits: %d bits \n", bits);
+
+  std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < 1000; i++)
+  {
+    bn_t r = bn_t::rand(order);
+    ecc_point_t tmp = G * r;
+  }
+  std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+  double duration = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+  
+  logger::log(logger::INFO)<< "Time:"  << duration /1000  << " ms" <<std::endl;
 }
 
 static int test_leath_share_reconstruct()
@@ -1511,12 +1525,12 @@ MPCCRYPTO_API int leath_client(int argc, char *argv[])
   std::unique_ptr<mpc::LeathClientRunner> client_runner;
 
   std::vector<std::string> addresses;
-  addresses.push_back("13.57.9.122:7700");
-  addresses.push_back("13.57.9.122:7701");
-  addresses.push_back("3.15.233.108:7702");
-  addresses.push_back("54.67.47.74:7703");
-  addresses.push_back("35.174.136.200:7704");
-  addresses.push_back("18.224.3.203:7705");
+  addresses.push_back("localhost:7700");
+  addresses.push_back("localhost:7701");
+  addresses.push_back("localhost:7702");
+  addresses.push_back("localhost:7703");
+  addresses.push_back("localhost:7704");
+  addresses.push_back("localhost:7705");
 
   int bits = 2048;
   int share_counter = 0, reconstruction_counter = 0;
@@ -1758,6 +1772,17 @@ logger::log(logger::INFO) << "\n\n\n" <<std::endl;
 
 }
 
+static int test_yak() {
+// test key generation
+  std::string pk1 = sk_to_pk("53877FAD07DA5ADDD88C8EA509B10EA35730D89FE06D801CFE6A478C614A7CB4");
+  std::string pk2 = pk_to_addr("335ddfe9f2aaeb109f087494fa349c20b006b45c0638435ee220496bb03dccc347400e6d7ed5cd07a28b2c60d1a3184d1b31b88dcd025bdb74f4aca36ea5013c");
+  logger::log(logger::INFO) << "test_yak, pk2 = " << pk1.compare("335ddfe9f2aaeb109f087494fa349c20b006b45c0638435ee220496bb03dccc347400e6d7ed5cd07a28b2c60d1a3184d1b31b88dcd025bdb74f4aca36ea5013c") <<std::endl;
+
+// test yak ake
+  // YakClient client1 = new ();
+}
+
+
 MPCCRYPTO_API int MPCCrypto_test()
 {
   int rv = 0;
@@ -1783,8 +1808,9 @@ MPCCRYPTO_API int MPCCrypto_test()
   t = ub::read_timer_ms() - t; */
 
   // test_paillier();
-  test_zk();
-
+  // test_zk();
+  // test_ecurve();
+  test_yak();
   // rv = test_paillier();
   // assert(rv == 0);
   // logger::log(logger::INFO) << "ALL GOOD !" << std::endl;

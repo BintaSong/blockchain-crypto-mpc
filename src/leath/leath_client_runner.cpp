@@ -756,9 +756,10 @@ std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution
 
         data_[vid].received_share_counter++;
         
-        if (data_[vid].received_share_counter == number_of_servers) {
-            reconstruct_pool.enqueue(reconstruct_job, vid, data_[vid].in_share);
-        } 
+        //if (data_[vid].received_share_counter == number_of_servers) {
+            // reconstruct_pool.enqueue(reconstruct_job, vid, data_[vid].in_share);
+
+        //} 
     };
 
     auto p2p_reconstruct = [this, &begin, &end, &decoding_pool, &decoding_job](int server_id) {

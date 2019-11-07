@@ -46,26 +46,13 @@ void RS(bn_t n, bn_t *ret) {
 
     PyObject* moduleName = PyString_FromString("RS"); 
     PyObject* pModule = PyImport_Import(moduleName);
-/*     if (!pModule) 
-    {
-        logger::log(logger::INFO)<< "Time for paillier key _N generation:"  << d32  << " us" <<std::endl;
-        return ;
-    }*/
 
     PyObject* pv = PyObject_GetAttrString(pModule, "get_rs");
-   /* if (!pv || !PyCallable_Check(pv))  
-    {
-        std::cout << "[ERROR] Can't find funftion (test_add)" << std::endl;
-        return ;
-    }
- */
     //
     PyObject* args = PyTuple_New(1);  
     PyObject* arg1 = PyInt_FromString((char*) n.to_string().c_str(), 0, 10); 
     PyTuple_SetItem(args, 0, arg1);
-    // PyTuple_SetItem(args, 1, arg2);
 
-    //
     PyObject* pRet = PyObject_CallObject(pv, args);
 
     if (pRet)  
@@ -80,7 +67,6 @@ void RS(bn_t n, bn_t *ret) {
        
         std::string result = PyString_AS_STRING(item);
         ret[i] = bn_t::from_string(result.c_str());
-        // mpc::logger::log(mpc::logger::INFO) << "[RS]:" << ret[i].to_string() << std::endl;
       }
     }
     Py_Finalize();   

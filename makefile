@@ -46,7 +46,9 @@ LIB_CPPSRC = $(wildcard src/*.cpp) \
 	$(wildcard src/crypto_utils/*.cpp) \
 	$(wildcard src/mpc_protocols/*.cpp) \
 	$(wildcard src/leath/*.cpp) \
-	$(wildcard src/leath/protos/*.cpp)
+	$(wildcard src/leath/protos/*.cpp)\
+	$(wildcard src/yak/*.cpp) \
+	$(wildcard src/yak/protos/*.cpp)
 		 
 LIB_ASMSRC = \
 	$(wildcard src/mpc_protocols/*.s)
@@ -60,7 +62,9 @@ LIB_HEADERS = $(wildcard src/*.h) \
 	$(wildcard src/crypto_utils/*.h) \
 	$(wildcard src/mpc_protocols/*.h) \
 	$(wildcard src/leath/*.h) \
-	$(wildcard src/leath/protos/*.h)
+	$(wildcard src/leath/protos/*.h)\
+	$(wildcard src/yak/*.h) \
+	$(wildcard src/yak/protos/*.h)
 	
 LIB_INCLUDES = \
 	$(COMMON_INCLUDES) \
@@ -70,7 +74,9 @@ LIB_INCLUDES = \
 	-I src/crypto_utils \
 	-I src/mpc_protocols \
 	-I src/leath \
-	-I src/leath/protos
+	-I src/leath/protos\
+	-I src/yak \
+	-I src/yak/protos
 	
 
 LIB_CPPFLAGS = \
@@ -195,6 +201,6 @@ leath_rpc_client: test/leath_rpc_client.o libmpc_crypto.so # leath.pb.cc  leath.
 clean:
 	rm -f $(LIB_OBJ) $(TEST_OBJ) $(LEATH_OBJ)  mpc_crypto_test mpc_crypto_bench libmpc_crypto.so src/utils/precompiled.h.gch
 	
-#.DEFAULT_GOAL := mpc_crypto_test # leath_server #mpc_crypto_test
-.DEFAULT_GOAL := leath_rpc_client
+.DEFAULT_GOAL := mpc_crypto_test # leath_server #mpc_crypto_test
+#.DEFAULT_GOAL := leath_rpc_client
 #.DEFAULT_GOAL := leath_rpc_server
