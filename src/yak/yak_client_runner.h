@@ -15,8 +15,8 @@
 namespace mpc {
     class YakClientRunner {
       public:    
-        YakClientRunner(const std::string peer_net_address, const std::string channel_addr);
-        error_t AKE(const ecc_point_t my_pk, const bn_t my_sk);
+        YakClientRunner(const std::string peer_net_address, const std::string channel_addr, const std::string my_pk_hex, const std::string my_sk_hex);
+        error_t AKE();
 
       private:
         std::unique_ptr<yak::YakRPC::Stub> stub_;

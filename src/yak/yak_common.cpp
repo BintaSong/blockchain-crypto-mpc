@@ -21,8 +21,47 @@ std::string sk_to_pk(std::string sk_hex) {
 
   ecc_point_t pk = G * sk;
   std::string pk_str = strext::to_hex(pk.get_x().to_bin()) + strext::to_hex(pk.get_y().to_bin()) ;
-
   return pk_str;
+}
+
+ecc_point_t sk_to_pk_point(std::string sk_hex) {
+
+  bn_t sk = bn_t::from_hex(sk_hex.c_str());
+
+  ecurve_t curve = ecurve_t::find(NID_secp256k1);
+  bn_t order = curve.order();
+  ecc_generator_point_t G = curve.generator();
+
+  ecc_point_t pk = G * sk;
+
+  return pk;
+}
+
+ecc_point_t sk_to_pk_point(bn_t sk) {
+
+  ecurve_t curve = ecurve_t::find(NID_secp256k1);
+  bn_t order = curve.order();
+  ecc_generator_point_t G = curve.generator();
+
+  ecc_point_t pk = G * sk;
+
+  return pk;
+}
+
+
+ecc_point_t hex_to_point(std::string point_hex) {
+  std::string x_hex(point_hex, 0, 64), y_hex(point_hex, 64, 64); 
+  bn_t x = bn_t::from_hex(x_hex.c_str());
+  bn_t y = bn_t::from_hex(y_hex.c_str());
+
+  ecc_point_t point(ecurve_t::find(NID_secp256k1), x, y);
+  return point;
+}
+
+std::string point_to_hex(ecc_point_t point) {
+  std::string x = strext::to_hex(point.get_x().to_bin());
+  std::string y = strext::to_hex(point.get_y().to_bin());
+  return x + y;
 }
 
 std::string pk_to_addr(std::string public_key) {

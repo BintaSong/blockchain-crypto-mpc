@@ -6,8 +6,8 @@ namespace mpc
 {
     class YakServer{
         public:
-            YakServer(const ecc_point_t _my_pk, const bn_t _my_sk, const std::string _my_addr, const std::string _peer_address);
-            error_t yak_peer2_step1(const mem_t session_id, const yak_msg_t in, yak_msg_t &out);
+            YakServer(const std::string _my_pk_hex, const std::string _my_sk_hex, const std::string _my_addr, const std::string _peer_address);
+            error_t yak_peer2_step1(const mem_t session_id, const yak_msg_t in, yak_msg_t &out, ecc_point_t &result);
 
         private:
             ecc_point_t my_pk;

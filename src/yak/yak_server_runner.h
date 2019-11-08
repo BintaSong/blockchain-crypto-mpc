@@ -23,27 +23,27 @@ namespace mpc {
 
     class YakServerImpl final : public yak::YakRPC::Service {
         public:
-            explicit YakServerImpl(const std::string& path, const std::string channel_addr, const ecc_point_t my_pk, const bn_t my_sk){
+            explicit YakServerImpl(const std::string& path, const std::string channel_addr, const std::string my_pk_hex, const std::string my_sk_hex){
                 yak_channel_info_t info;
                 get_channel_info(channel_addr, info);
     
-                server_ = std::unique_ptr<YakServer>(new YakServer(my_pk, my_sk, info.my_addr, info.peer_addr));
+                server_ = std::unique_ptr<YakServer>(new YakServer(my_pk_hex, my_sk_hex, info.my_addr, info.peer_addr));
             }
 
             grpc::Status AKE(grpc::ServerContext* context, const yak::YakMessage* request, yak::YakMessage* response){
                 error_t rv = 0;
                 yak_msg_t in, out;
-
-                rv = server_->yak_peer2_step1(mem_t::from_string("test_session"), in, out);
+                ecc_point_t dh;
+                rv = server_->yak_peer2_step1(mem_t::from_string("test_session"), in, out, dh);
                 if (rv != 0) 
                 {
                     logger::log(logger::ERROR) << "RPC failed." << std::endl;   
                     return grpc::Status::CANCELLED; 
                 }
 
-                response->pk = ub::convert(out.pk).to_string();
-                response->e = ub::convert(out.eph).to_string();
-                response->zkp = ub::convert(out.eph_zkp).to_string();
+                response->set_pk( ub::convert(out.pk).to_string() );
+                response->set_e( ub::convert(out.eph).to_string() );
+                response->set_zkp( ub::convert(out.eph_zkp).to_string() );
 
                 return grpc::Status::OK;
             }

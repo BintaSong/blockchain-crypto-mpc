@@ -42,6 +42,14 @@ error_t get_channel_info(const std::string channel_addr, yak_channel_info_t &inf
 
 std::string sk_to_pk(std::string sk_hex);
 
+ecc_point_t sk_to_pk_point(bn_t sk);
+
+ecc_point_t sk_to_pk_point(std::string sk_hex);
+
+ecc_point_t hex_to_point(std::string point_hex);
+
+std::string point_to_hex(ecc_point_t point);
+
 std::string pk_to_addr(std::string public_key);
 
 error_t check_pk_match(const ecc_point_t pk, const std::string peer_addr);

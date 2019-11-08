@@ -7,17 +7,17 @@
 
 namespace mpc {
 
-YakClientRunner::YakClientRunner(const std::string peer_net_address, const std::string channel_addr) {
+YakClientRunner::YakClientRunner(const std::string peer_net_address, const std::string channel_addr, const std::string my_pk_hex, const std::string my_sk_hex) {
     std::shared_ptr<grpc::Channel> channel(grpc::CreateChannel(peer_net_address, grpc::InsecureChannelCredentials()));
     stub_ = yak::YakRPC::NewStub(channel);
     
     yak_channel_info_t info;
     get_channel_info(channel_addr, info);
     
-    client_ = std::unique_ptr<YakClient>(new YakClient(info.my_addr, info.peer_addr));
+    client_ = std::unique_ptr<YakClient>(new YakClient(info.my_addr, info.peer_addr, my_pk_hex, my_sk_hex));
 }
 
-error_t YakClientRunner::AKE(const ecc_point_t my_pk, const bn_t my_sk) {
+error_t YakClientRunner::AKE() {
     error_t rv = 0;
     
     yak_msg_t out, rec;    
@@ -42,7 +42,8 @@ error_t YakClientRunner::AKE(const ecc_point_t my_pk, const bn_t my_sk) {
     ub::convert(rec.eph_zkp, mem_t::from_string(response.zkp()));
     ub::convert(rec.pk, mem_t::from_string(response.pk()));
 
-    rv = client_->yak_peer1_step2(ub::mem_t::from_string("test_session"), my_pk, my_sk, rec);
+    ecc_point_t dh;
+    rv = client_->yak_peer1_step2(ub::mem_t::from_string("test_session"), rec, dh);
     if (rv != 0)
     {   
         logger::log(logger::ERROR) << "Check message failed." << std::endl;

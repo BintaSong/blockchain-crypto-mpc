@@ -34,6 +34,10 @@
 #include "leath_server_runner.h"
 
 #include "yak_common.h"
+#include "yak_client.h"
+#include "yak_server.h"
+#include "yak_client_runner.h"
+#include "yak_server_runner.h"
 
 #include "logger.h"
 
@@ -1773,15 +1777,45 @@ logger::log(logger::INFO) << "\n\n\n" <<std::endl;
 }
 
 static int test_yak() {
-// test key generation
-  std::string pk1 = sk_to_pk("53877FAD07DA5ADDD88C8EA509B10EA35730D89FE06D801CFE6A478C614A7CB4");
-  std::string pk2 = pk_to_addr("335ddfe9f2aaeb109f087494fa349c20b006b45c0638435ee220496bb03dccc347400e6d7ed5cd07a28b2c60d1a3184d1b31b88dcd025bdb74f4aca36ea5013c");
-  logger::log(logger::INFO) << "test_yak, pk2 = " << pk1.compare("335ddfe9f2aaeb109f087494fa349c20b006b45c0638435ee220496bb03dccc347400e6d7ed5cd07a28b2c60d1a3184d1b31b88dcd025bdb74f4aca36ea5013c") <<std::endl;
 
 // test yak ake
-  // YakClient client1 = new ();
-}
+  std::string client_addr = "0x08A01a36fe70ede5Ac5e6144e7793713BfB8aeb6",
+              server_addr = "0xffF2036dbFbbC739B988fD7F1f362B1f4278fe61";
+  
+  std::string client_sk = "7BC30E99D9A8B3B7AB5D6ECE87D6FCB2165EA5C3BF3C90263B6625EB8C487C04",
+              server_sk = "53877FAD07DA5ADDD88C8EA509B10EA35730D89FE06D801CFE6A478C614A7CB4";
+  std::string client_pk = sk_to_pk(client_sk),
+              server_pk = sk_to_pk(server_sk);
 
+  logger::log(logger::INFO) << "client pk = " << client_pk << std::endl;
+  logger::log(logger::INFO) << "server pk = " << server_pk << std::endl;
+
+  logger::log(logger::INFO) <<  pk_to_addr(client_pk) << std::endl;
+  assert( pk_to_addr(client_pk).compare(client_addr) == 0 );
+  assert( point_to_hex(hex_to_point(client_pk)).compare(client_pk) == 0 );
+  
+  mpc::YakClient client(client_pk, server_pk, client_addr, server_addr);
+
+  mpc::YakServer server(server_pk, client_pk, server_addr, client_addr);
+
+  mpc::yak_msg_t m1, m2;
+
+  ecc_point_t dh1, dh2, correct_dh;
+
+  error_t ret = 0;
+  ret = client.yak_peer1_step1(ub::mem_t::from_string("test_session"), m1);
+  assert(ret == 0);
+
+  ret = server.yak_peer2_step1(ub::mem_t::from_string("test_session"), m1, m2, dh1);
+  assert(ret == 0);
+
+  ret = client.yak_peer1_step2(ub::mem_t::from_string("test_session"), m2, dh2);
+  assert(ret == 0);
+
+  // correct_dh = bn_t::from_string(client_sk.c_str())
+
+  //logger::log(logger::INFO) << "in YakClient(), client pk = " << _my_pk_hex << std::endl;
+}
 
 MPCCRYPTO_API int MPCCrypto_test()
 {
